@@ -1,0 +1,37 @@
+# Sanitizers.cmake
+# Sets up address, undefined behavior, and thread sanitizers
+
+function(set_target_sanitizer target sanitizer_type)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES ".*Clang|GNU")
+        message(STATUS "Sanitizers only supported on Clang and GCC")
+        return()
+    endif()
+
+    string(TOLOWER ${sanitizer_type} sanitizer_lower)
+
+    if(sanitizer_lower STREQUAL "address" OR sanitizer_lower STREQUAL "asan")
+        target_compile_options(${target} PRIVATE -fsanitize=address,undefined -fno-omit-frame-pointer -fno-optimize-sibling-calls -g)
+        target_link_options(${target} PRIVATE -fsanitize=address,undefined)
+    elseif(sanitizer_lower STREQUAL "thread" OR sanitizer_lower STREQUAL "tsan")
+        target_compile_options(${target} PRIVATE -fsanitize=thread -fno-omit-frame-pointer -g)
+        target_link_options(${target} PRIVATE -fsanitize=thread)
+    elseif(sanitizer_lower STREQUAL "memory" OR sanitizer_lower STREQUAL "msan")
+        if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+            target_compile_options(${target} PRIVATE -fsanitize=memory -fno-omit-frame-pointer -g)
+            target_link_options(${target} PRIVATE -fsanitize=memory)
+        else()
+            message(WARNING "MemorySanitizer only available on Clang")
+        endif()
+    else()
+        message(WARNING "Unknown sanitizer type: ${sanitizer_type}")
+    endif()
+endfunction()
+
+function(set_target_fuzzer target)
+    if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+        target_compile_options(${target} PRIVATE -fsanitize=fuzzer,address,undefined -fno-omit-frame-pointer -g)
+        target_link_options(${target} PRIVATE -fsanitize=fuzzer,address,undefined)
+    else()
+        message(WARNING "LibFuzzer only available on Clang")
+    endif()
+endfunction()
