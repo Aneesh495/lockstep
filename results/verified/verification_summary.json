@@ -1,0 +1,49 @@
+{
+  "verification_date": "2026-09-16",
+  "status": "passed",
+  "tests": {
+    "unit_tests": {
+      "status": "passed",
+      "count": 47,
+      "categories": ["endian", "crc32c", "checked_math", "object_pool", "robin_hood_map", "spsc_ring", "order_book", "matching_engine", "risk_engine", "codec", "wal", "snapshot", "differential", "network", "recovery", "udp", "golden"]
+    },
+    "fuzz_smoke_tests": {
+      "status": "passed",
+      "targets": ["fuzz_frame_decoder", "fuzz_wal_decoder", "fuzz_snapshot_decoder"],
+      "total_tests": 21208
+    },
+    "benchmarks": {
+      "status": "passed",
+      "repetitions": 10,
+      "median_throughput_ops_per_sec": 28988313
+    },
+    "stress_tests": {
+      "status": "passed",
+      "fault_stress_events": 10000000,
+      "recovery_scenarios": 10000,
+      "faults_injected": {
+        "dropped": 99728,
+        "duplicated": 49622,
+        "reordered": 49580,
+        "corrupted": 9928
+      }
+    }
+  },
+  "build": {
+    "compiler": "AppleClang 21.0.0",
+    "platform": "macOS arm64",
+    "build_type": "Release"
+  },
+  "bugs_fixed": [
+    {
+      "issue": "Infinite loop in self-trade prevention",
+      "files": ["src/engine/order_book.cpp", "src/engine/reference_book.cpp"],
+      "description": "When self-trade was detected, inner while loop broke but outer loop continued indefinitely"
+    },
+    {
+      "issue": "Large default InstrumentConfig causing slow initialization",
+      "files": ["include/lockstep/common/types.hpp"],
+      "description": "maxOrdersPerLevel=10000 and maxPriceLevels=10000 caused 100M order pool allocation"
+    }
+  ]
+}

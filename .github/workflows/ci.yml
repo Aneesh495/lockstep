@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-linux-gcc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y g++ cmake make
+      
+      - name: Configure
+        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+      
+      - name: Build
+        run: cmake --build build --parallel
+      
+      - name: Test
+        run: cd build && ctest --output-on-failure
+
+  build-linux-clang:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake make
+      
+      - name: Configure
+        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++
+      
+      - name: Build
+        run: cmake --build build --parallel
+      
+      - name: Test
+        run: cd build && ctest --output-on-failure
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure
+        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+      
+      - name: Build
+        run: cmake --build build --parallel
+      
+      - name: Test
+        run: cd build && ctest --output-on-failure
+
+  sanitize-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake make
+      
+      - name: Configure
+        run: cmake -S . -B build-asan -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DLOCKSTEP_ENABLE_SANITIZERS=ON -DLOCKSTEP_BUILD_BENCHMARKS=OFF
+      
+      - name: Build
+        run: cmake --build build-asan --parallel
+      
+      - name: Test
+        run: cd build-asan && ctest --output-on-failure
+
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install clang-format
+        run: sudo apt-get install -y clang-format
+      
+      - name: Check formatting
+        run: |
+          find include src apps tests bench -name "*.cpp" -o -name "*.hpp" | \
+          xargs clang-format --dry-run --Werror
