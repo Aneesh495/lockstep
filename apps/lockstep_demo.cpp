@@ -34,15 +34,15 @@ int main(int argc, char** argv) {
     
     InstrumentConfig instr1;
     instr1.id = 1;
-    instr1.minPrice = 10000;
-    instr1.maxPrice = 20000;
+    instr1.minPrice = 9900;
+    instr1.maxPrice = 10100;  // 200 tick range = 200 price levels per side
     instr1.tickSize = 1;
     engineConfig.instruments.push_back(instr1);
     
     InstrumentConfig instr2;
     instr2.id = 2;
-    instr2.minPrice = 50000;
-    instr2.maxPrice = 100000;
+    instr2.minPrice = 49900;
+    instr2.maxPrice = 50100;  // 200 tick range
     instr2.tickSize = 1;
     engineConfig.instruments.push_back(instr2);
     
@@ -72,12 +72,12 @@ int main(int argc, char** argv) {
     buy1.orderId = 1;
     buy1.instrumentId = 1;
     buy1.side = Side::Buy;
-    buy1.price = 15000;
+    buy1.price = 9950;
     buy1.quantity = 100;
     buy1.tif = TimeInForce::GTC;
     
     auto r1 = engine.newOrder(buy1);
-    std::cout << "  Client 1: Buy 100 @ 15000 -> " << (r1.success ? "Accepted" : "Rejected") << "\n";
+    std::cout << "  Client 1: Buy 100 @ 9950 -> " << (r1.success ? "Accepted" : "Rejected") << "\n";
     
     // Client 1: Another resting buy
     Order buy2;
@@ -85,12 +85,12 @@ int main(int argc, char** argv) {
     buy2.orderId = 2;
     buy2.instrumentId = 1;
     buy2.side = Side::Buy;
-    buy2.price = 14900;
+    buy2.price = 9925;
     buy2.quantity = 200;
     buy2.tif = TimeInForce::GTC;
     
     auto r2 = engine.newOrder(buy2);
-    std::cout << "  Client 1: Buy 200 @ 14900 -> " << (r2.success ? "Accepted" : "Rejected") << "\n";
+    std::cout << "  Client 1: Buy 200 @ 9925 -> " << (r2.success ? "Accepted" : "Rejected") << "\n";
     
     // Client 2: Resting sell
     Order sell1;
@@ -98,12 +98,12 @@ int main(int argc, char** argv) {
     sell1.orderId = 1;
     sell1.instrumentId = 1;
     sell1.side = Side::Sell;
-    sell1.price = 15100;
+    sell1.price = 10050;
     sell1.quantity = 150;
     sell1.tif = TimeInForce::GTC;
     
     auto r3 = engine.newOrder(sell1);
-    std::cout << "  Client 2: Sell 150 @ 15100 -> " << (r3.success ? "Accepted" : "Rejected") << "\n";
+    std::cout << "  Client 2: Sell 150 @ 10050 -> " << (r3.success ? "Accepted" : "Rejected") << "\n";
     
     std::cout << "\nStep 2: Marketable order with matching...\n";
     
@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
     sell2.orderId = 2;
     sell2.instrumentId = 1;
     sell2.side = Side::Sell;
-    sell2.price = 15000;
+    sell2.price = 9950;
     sell2.quantity = 50;
     sell2.tif = TimeInForce::GTC;
     
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     Quantity r4Filled = 0;
     Price r4Price = 0;
     for (const auto& m : r4.matches) { r4Filled += m.quantity; r4Price = m.price; }
-    std::cout << "  Client 2: Sell 50 @ 15000 -> Filled " << r4Filled << " @ " << r4Price << "\n";
+    std::cout << "  Client 2: Sell 50 @ 9950 -> Filled " << r4Filled << " @ " << r4Price << "\n";
     
     std::cout << "\nStep 3: IOC and FOK orders...\n";
     
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
     ioc.orderId = 3;
     ioc.instrumentId = 1;
     ioc.side = Side::Buy;
-    ioc.price = 15100;
+    ioc.price = 10050;
     ioc.quantity = 200;
     ioc.tif = TimeInForce::IOC;
     
@@ -146,12 +146,12 @@ int main(int argc, char** argv) {
     fok.orderId = 3;
     fok.instrumentId = 1;
     fok.side = Side::Sell;
-    fok.price = 15000;
+    fok.price = 9950;
     fok.quantity = 1000;
     fok.tif = TimeInForce::FOK;
     
     auto r6 = engine.newOrder(fok);
-    std::cout << "  Client 2: FOK Sell 1000 @ 15000 -> " 
+    std::cout << "  Client 2: FOK Sell 1000 @ 9950 -> " 
               << (r6.success ? "Filled" : "Rejected (insufficient liquidity)") << "\n";
     
     std::cout << "\nStep 4: Cancel and replace...\n";
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
     auto r7 = engine.cancelOrder(1, 2, 1);
     std::cout << "  Client 1: Cancel order 2 -> " << (r7.success ? "Success" : "Failed") << "\n";
     
-    auto r8 = engine.replaceOrder(1, 1, 4, 1, 15500, 150);
+    auto r8 = engine.replaceOrder(1, 1, 4, 1, 9975, 150);
     std::cout << "  Client 1: Replace order 1 -> " << (r8.success ? "Success" : "Failed") << "\n";
     
     std::cout << "\nStep 5: Risk rejection...\n";
@@ -170,12 +170,12 @@ int main(int argc, char** argv) {
     bigOrder.orderId = 4;
     bigOrder.instrumentId = 1;
     bigOrder.side = Side::Buy;
-    bigOrder.price = 15000;
+    bigOrder.price = 9950;
     bigOrder.quantity = 10000; // Exceeds maxOrderQuantity
     bigOrder.tif = TimeInForce::GTC;
     
-    auto check = risk.checkNewOrder(2, 1, Side::Buy, 15000, 10000, instr1);
-    std::cout << "  Client 2: Buy 10000 @ 15000 -> Rejected (" 
+    auto check = risk.checkNewOrder(2, 1, Side::Buy, 9950, 10000, instr1);
+    std::cout << "  Client 2: Buy 10000 @ 9950 -> Rejected (" 
               << (check.second == RejectionReason::MaxOrderQuantityExceeded ? "MaxOrderQuantityExceeded" : "Other") << ")\n";
     
     std::cout << "\nStep 6: Book state...\n";
