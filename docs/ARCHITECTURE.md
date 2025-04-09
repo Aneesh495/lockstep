@@ -4,7 +4,7 @@
 
 Lockstep is a low-latency deterministic electronic exchange engine built in C++20. It implements a price-time priority matching engine with risk controls, network interfaces, and durable persistence.
 
-The design prioritizes correctness and determinism over raw throughput. Given the same sequence of inputs, the engine produces identical outputs—this is a hard requirement for regulatory compliance, audit trails, and debugging production incidents in real trading systems.
+The design prioritizes correctness and determinism over raw throughput. Given the same sequence of inputs, the engine produces identical outputs. This is a hard requirement for regulatory compliance, audit trails, and debugging production incidents in real trading systems.
 
 ## Components
 
@@ -38,7 +38,7 @@ The risk engine (`risk/risk_engine.hpp`) enforces:
 - Reservation-based exposure tracking
 - Kill switch capability
 
-Risk checks run before orders reach the matching engine. This keeps latency minimal—the risk engine is stateless for orders, tracking only aggregate positions and order counts.
+Risk checks run before orders reach the matching engine. This keeps latency minimal: the risk engine is stateless for orders, tracking only aggregate positions and order counts.
 
 ### Persistence
 
