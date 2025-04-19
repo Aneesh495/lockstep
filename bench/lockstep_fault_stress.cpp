@@ -11,7 +11,10 @@ int main(int argc, char** argv) {
     std::cout << "Lockstep Fault Stress Test\n";
     std::cout << "==========================\n\n";
     
-    constexpr uint64_t TOTAL_EVENTS = 10000000;  // 10M events for reasonable runtime
+    // Aggregate gate: 100M logical events under fault injection with zero
+    // digest mismatches (docs/VERIFICATION.md). Shard/resume may split work;
+    // this binary's default run target matches the documented gate.
+    constexpr uint64_t TOTAL_EVENTS = 100000000;
     constexpr uint64_t SEED = 12345;
     
     // Configure instrument for any engine tests

@@ -13,9 +13,11 @@
 
 namespace lockstep {
 
-// Optimized price-time order book
-// Fixed-capacity, zero heap allocations after initialization
-// Preallocated price levels indexed by legal price offset
+// Optimized price-time order book.
+// Fixed-capacity, zero heap allocations after initialization.
+// Preallocated price levels indexed by legal price offset.
+// Isolated matching-core benches gate >=5M commands/s and p99 <1us
+// (see docs/BENCHMARKS.md); network and WAL are excluded from those numbers.
 
 class OrderBook {
 public:

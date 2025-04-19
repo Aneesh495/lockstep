@@ -2,151 +2,147 @@
 
 ## Overview
 
-Lockstep is a low-latency deterministic electronic exchange engine built in C++20. It implements a price-time priority matching engine with risk controls, network interfaces, and durable persistence.
+Lockstep is a C++20 **deterministic exchange matching and recovery engine**:
+price-time priority matching, pre-trade risk, TCP order entry, **dual UDP**
+market-data feeds, and **WAL + snapshot** durability.
 
-The design prioritizes correctness and determinism over raw throughput. Given the same sequence of inputs, the engine produces identical outputs. This is a hard requirement for regulatory compliance, audit trails, and debugging production incidents in real trading systems.
+Correctness and determinism come first. Given the same command sequence, the
+core produces identical books and digests. Performance claims below are for the
+**isolated matching core** (no sockets, no disk) unless stated otherwise.
 
 ## Components
 
-### Matching Engine
+### Matching engine
 
-The core matching engine (`engine/matching_engine.hpp`) processes orders in a single-threaded deterministic manner:
+`engine/matching_engine.hpp` - single-threaded deterministic apply path:
 
-- Single writer model - all book mutations happen on one thread
-- Price-time priority - FIFO within price level, best price first
-- Fixed-capacity data structures - no heap allocations after init
+- Single writer: all book mutations on one engine thread
+- Price-time priority: best price first, FIFO within level
+- Fixed-capacity structures: **no heap allocations after init**
 - Reference book for differential testing
 
-The matching algorithm is standard: when a new order arrives, check if it crosses the opposite side of the book. If so, match at the best price, working through levels until either the order is filled or no more matches are possible.
+### Order book
 
-### Order Book
+`engine/order_book.hpp`:
 
-The optimized order book (`engine/order_book.hpp`) uses:
+- Preallocated price-level arrays indexed by tick offset
+- Bitset-assisted best bid/ask tracking
+- Object pool for orders (intrusive free list)
+- Robin Hood hash for order id lookup
 
-- Preallocated price level array indexed by price offset
-- Bitset-based best bid/ask tracking
-- Object pool for order storage with intrusive free list
-- Robin Hood hash table for order lookup
+### Risk engine
 
-The book is organized as two arrays of price levels, one for bids and one for asks. Each price level contains a linked list of orders in arrival order. The best bid/ask are tracked using a bitset for O(1) best price updates.
-
-### Risk Engine
-
-The risk engine (`risk/risk_engine.hpp`) enforces:
-
-- Per-client position and order limits
-- Reservation-based exposure tracking
-- Kill switch capability
-
-Risk checks run before orders reach the matching engine. This keeps latency minimal: the risk engine is stateless for orders, tracking only aggregate positions and order counts.
+`risk/risk_engine.hpp` - per-client position / size / count limits, reservation
+accounting, kill switch. Runs before the book so rejected orders never mutate
+liquidity.
 
 ### Persistence
 
-The persistence layer provides:
-
-- Write-ahead log with CRC32C verification
-- Snapshot-based recovery
-- Atomic file operations
-
-Every incoming command is serialized and appended to a file before execution. The WAL uses the "WALK" magic number and CRC32C checksums for integrity.
+- Write-ahead log with CRC32C (`WALK` magic)
+- Atomic snapshots (`SNAP` magic)
+- Recovery: newest valid snapshot + WAL replay
 
 ### Networking
 
-The network layer implements:
-
 - TCP gateway for order entry
-- Dual UDP publishers for market data
-- Feed arbiter for redundant stream handling
+- **Dual UDP publishers** (Feed A / Feed B) with independent sequences
+- Feed arbiter for gap detect and alternate-channel heal
+- Seeded **fault proxy** for loss, duplicate, reorder, corruption, outages
 
-The TCP gateway accepts client connections, decodes framed messages, forwards to matching engine. UDP publishers broadcast market data on two independent feeds (A and B). Subscribers can detect gaps via sequence numbers and request retransmission from the alternate feed.
-
-## Threading Model
+## Threading model
 
 ```
-                    ┌─────────────────┐
-                    │ TCP Gateway     │
-                    │ (Parser Thread) │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ SPSC Ring       │
-                    │ (Commands)      │
-                    └────────┬────────┘
-                             │
-                             ▼
-┌──────────────┐    ┌─────────────────┐    ┌──────────────┐
-│ UDP Pub A    │◄───│ Matching Engine │───►│ UDP Pub B    │
-└──────────────┘    │ (Engine Thread) │    └──────────────┘
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ SPSC Ring       │
-                    │ (Responses)     │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ TCP Gateway     │
-                    │ (Sender Thread) │
-                    └─────────────────┘
+                    +-----------------+
+                    | TCP Gateway     |
+                    | (parse thread)  |
+                    +--------+--------+
+                             |
+                             v
+                    +-----------------+
+                    | SPSC ring       |
+                    | (commands)      |
+                    +--------+--------+
+                             |
+                             v
++----------+        +-----------------+        +----------+
+| UDP A    |<-------| Matching Engine |------->| UDP B    |
++----------+        | (engine thread) |        +----------+
+                    +--------+--------+
+                             |
+                             v
+                    +-----------------+
+                    | SPSC ring       |
+                    | (responses)     |
+                    +--------+--------+
+                             |
+                             v
+                    +-----------------+
+                    | TCP Gateway     |
+                    | (send thread)   |
+                    +-----------------+
 ```
 
-The single-threaded matching engine eliminates synchronization overhead and ensures deterministic execution. Real exchanges shard by instrument to scale across cores, but each shard remains single-threaded.
+WAL append sits on the durable path before ack when strict durability is on.
+Isolated benches bypass TCP/UDP/WAL to measure the match core alone.
 
-## Memory Management
+## Memory management
 
-All hot-path structures are preallocated:
-
-- Price levels: vector with size = (max_price - min_price) / tick_size
-- Order pool: object pool with fixed capacity
-- Order index: Robin Hood hash with fixed capacity
-- SPSC rings: power-of-two capacity, preallocated
-
-No heap allocations occur after initialization. The `AllocationCounter` class can verify this at runtime in debug builds.
+Hot-path structures are preallocated: price levels, order pool, order index,
+SPSC rings. **Zero heap allocations after initialization** on the matching hot
+path. `AllocationCounter` verifies this in instrumented runs.
 
 ## Determinism
 
-The engine is deterministic when replaying from WAL:
-
-- Same command sequence produces same state
-- Virtual clock for timestamps
+- Same WAL command sequence → same state digest
+- Virtual clock for engine timestamps during replay
 - Stable hashing for digests
-- No reading of wall-clock time
+- No wall-clock reads on the match path
 
-Non-determinism only appears in:
+Verified by `test_differential` (optimized book vs `ReferenceBook`).
 
-- Network packet arrival order (gateway assigns sequence)
-- Session IDs (generated on startup)
+## Failure model
 
-This is verified by the `test_differential` property test, which runs random operations against both the optimized `OrderBook` and the reference `ReferenceBook`, then checks that both produce identical results.
+| Fault | Handling |
+| --- | --- |
+| Process kill | Snapshot + WAL replay |
+| Single UDP channel loss / gap | Dual-feed arbiter + alternate channel |
+| WAL truncated tail | Ignore incomplete last record |
+| Mid-WAL corruption | Fail closed |
 
-## Failure Model
+Not claimed: sudden power loss past controller cache, silent disk firmware bugs,
+kernel panic survival.
 
-The system handles:
+## Performance characteristics (isolated core)
 
-- Process termination: Recover from snapshot + WAL
-- Network faults: Dual UDP feed with gap detection
-- Disk write failures: CRC validation, fsync
+Resume **gates** (must hold on Release Apple Silicon / documented CI hosts):
 
-Not handled:
+| Metric | Gate |
+| --- | --- |
+| Throughput | **≥5M commands/s** (bulk loop, pre-generated commands) |
+| Latency p99 | **&lt;1 µs** (separate one-at-a-time harness, ≥1M samples/rep) |
+| Allocations | **0** after init |
 
-- Sudden power loss (depends on hardware write caching)
-- Disk corruption
-- Kernel panics
-
-## Performance Characteristics
-
-On Apple Silicon M3:
+Illustrative observed medians on Apple Silicon M-series (same isolation; not
+the gate):
 
 | Operation | Latency (p50) | Latency (p99) |
 |-----------|---------------|---------------|
-| New order (no match) | ~50ns | ~200ns |
-| New order (with match) | ~100ns | ~500ns |
-| Cancel order | ~30ns | ~100ns |
-| Replace order | ~80ns | ~300ns |
+| New order (no match) | ~50 ns | ~200 ns |
+| New order (with match) | ~100 ns | ~500 ns |
+| Cancel | ~30 ns | ~100 ns |
+| Replace | ~80 ns | ~300 ns |
 
-Throughput: ~29M operations/second (single-threaded, release build)
+Bulk throughput medians often land ~20-30M ops/s; always report the **5M+**
+gate when summarizing for resume. Full method: `docs/BENCHMARKS.md`.
 
-Memory: ~128 bytes per active order, plus fixed overhead for price levels
+## Resilience characteristics
+
+| Metric | Gate |
+| --- | --- |
+| Fault-injected logical events | **100M** across required fault profiles |
+| Recovery trials | **10K** distinct snapshot/WAL scenarios |
+| State digest mismatches | **0** (public L2 and recovered L3) |
+
+Dual-feed UDP + WAL are exercised together in stress/recovery harnesses
+(`bench/lockstep_fault_stress`, `bench/lockstep_crash_matrix`). Details:
+`docs/VERIFICATION.md`, `docs/DURABILITY.md`.

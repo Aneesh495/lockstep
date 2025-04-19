@@ -1,28 +1,70 @@
 # Lockstep
 
-A low-latency deterministic exchange matching engine.
+A low-latency **deterministic exchange matching and recovery engine** in C++20:
+price-time priority matching, pre-trade risk, dual UDP market-data feeds, and
+WAL + snapshot crash recovery - built so an engineer can verify the hot path
+and the fault story from the docs and harnesses alone.
 
-Lockstep is a complete implementation of an electronic trading exchange in C++20. It demonstrates the core components that power real trading venues: price-time priority matching, pre-trade risk controls, network protocols, and crash recovery.
+## Design in one page
 
-## What This Is
+- **Single-threaded matching core** - one writer, deterministic book mutations
+- **Zero-allocation hot path** after init (fixed pools, fixed price levels)
+- **Isolated core benches** - throughput and latency measured separately (no
+  network, no WAL) against explicit resume gates
+- **Dual-feed UDP + WAL recovery** - redundant market-data channels and durable
+  command log; stress and recovery matrices demand **zero state mismatches**
 
-This is a functioning exchange engine: the kind of software that sits at the heart of electronic markets. Given the same sequence of orders, it produces identical results every time. That determinism matters for regulatory compliance, debugging production incidents, and ensuring audit trails match reality.
+```
+                 +------------------+
+            +--->| UDP Feed A :5001 |
+            |    +------------------+
+ Clients    |    +--------+
+ (TCP:8080)-+--->| Match  |---- WAL / snapshots
+            |    | Engine |
+            |    +--------+
+            +--->| UDP Feed B :5002 |
+                 +------------------+
+                      |
+                      v
+              fault proxy / arbiter (tests)
+                      |
+                      v
+              state digest == 0 mismatches
+```
 
-The design trades raw throughput for correctness. Single-threaded matching eliminates synchronization overhead and the subtle non-determinism that creeps into concurrent systems. Fixed memory allocation means no garbage collection pauses or allocator fragmentation. Fixed-point arithmetic avoids the chaos of IEEE 754 rounding.
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the threading model and
+component map.
+
+## Documented performance and resilience gates
+
+These are the numbers the README and benches are written to support. Methodology
+and isolation rules: [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md),
+[`docs/VERIFICATION.md`](docs/VERIFICATION.md),
+[`docs/DURABILITY.md`](docs/DURABILITY.md).
+
+| Gate | Claim | Isolation |
+| --- | --- | --- |
+| Matching throughput | **≥5M commands/s** | In-memory core only (no TCP/UDP, no WAL I/O) |
+| Matching latency | **p99 &lt;1 µs** | Separate one-command-at-a-time latency harness |
+| Allocations | **Zero** heap allocs on the hot path after init | `AllocationCounter` |
+| Fault stress | **100M** logical events under fault injection | Dual-feed path + arbiter/digest logic |
+| Recovery matrix | **10K** recovery trials | Snapshot + WAL prefix / kill / truncate cases |
+| Correctness | **Zero** public L2 / L3 state digest mismatches | Across stress + recovery aggregates |
+
+Observed Apple Silicon Release medians on the same isolated core often land
+well above the throughput gate (tens of millions of ops/s). The **resume gate
+remains 5M+ / &lt;1 µs p99** so claims stay conservative and comparable.
 
 ## Features
 
-- Price-time priority order book with GTC, IOC, and FOK order types
-- Self-trade prevention (regulatory requirement in most markets)
-- Pre-trade risk limits per client (position, order size, order count)
-- Write-ahead log with CRC32C checksums for crash recovery
-- Snapshot-based state dumps for fast recovery
-- TCP gateway for order entry
-- Dual redundant UDP feeds for market data with gap detection
-- Differential testing against a reference implementation
-- Zero-allocation hot path after initialization
+- Price-time priority book: GTC, IOC, FOK; self-trade prevention
+- Per-client pre-trade risk (position, size, count) + kill switch
+- Write-ahead log with CRC32C; atomic snapshots for fast restart
+- TCP order-entry gateway; dual redundant UDP market-data feeds with gap detect
+- Differential testing vs a reference book; seeded fault proxy
+- Fixed-point prices; no IEEE rounding on the match path
 
-## Quick Start
+## Quick start
 
 ```bash
 git clone https://github.com/Aneesh495/lockstep.git
@@ -32,184 +74,86 @@ make test
 make demo
 ```
 
-The demo runs through a realistic trading scenario: resting orders, matching trades, IOC and FOK handling, risk rejections, and state verification.
-
-## Running the Exchange
-
-Start the matching engine:
-
 ```bash
-./build/lockstep_exchange
-```
-
-Listens on TCP port 8080 for orders. Broadcasts market data on UDP ports 5001 and 5002.
-
-Connect a client:
-
-```bash
+./build/lockstep_exchange   # TCP 8080; UDP 5001 / 5002
 ./build/lockstep_client
 ```
 
-## Architecture
+## Order book (price-time)
+
+Better prices first; FIFO within a price. Self-trade prevention rejects an
+aggressor that would match the same client's resting liquidity.
 
 ```
-                        ┌─────────────────┐
-                    ┌──►│  UDP Feed A     │
-                    │   │  (Port 5001)    │
-┌─────────────┐    ┌┴───┐└─────────────────┘
-│   Clients   │───►│Match│
-│  (TCP/IP)   │    │ Eng │┌─────────────────┐
-└─────────────┘    └┬───┘│  UDP Feed B     │
-                    │   │  (Port 5002)    │
-                    └──►└─────────────────┘
-                    │
-               ┌────▼───┐
-               │  WAL   │
-               │ Writer │
-               └────────┘
-```
-
-Single-threaded matching core. Orders arrive via TCP, get logged to the write-ahead log, execute against the book, and generate market data broadcasts on redundant UDP feeds.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details.
-
-## The Order Book
-
-Standard price-time priority:
-
-- Better prices execute first
-- At the same price, earlier orders execute first
-- Self-trade prevention rejects orders that would match against your own resting orders
-
-Example:
-
-```
-Book state:
+Book:
   Bids: 100.05 x 500, 100.00 x 1000
   Asks: 100.10 x 300, 100.15 x 800
 
-Incoming: Sell 700 @ 100.05 (marketable)
+Incoming: Sell 700 @ 100.05
 
-Execution:
-  - Matches 500 @ 100.05 against best bid
-  - Rests 200 @ 100.05 as new best ask
-
-Result:
-  Bids: 100.00 x 1000
-  Asks: 100.05 x 200, 100.10 x 300, 100.15 x 800
+  Matches 500 @ 100.05; rests 200 @ 100.05 as new best ask
 ```
 
-## Persistence
+## Persistence and dual-feed recovery
 
-Every command is logged to a write-ahead log before execution. Combined with periodic snapshots, the engine recovers from crashes by loading the latest snapshot and replaying the WAL.
+Every command is appended to the WAL before apply (strict durable mode also
+fsyncs). Snapshots capture live orders, risk, and sequences. On restart: load
+newest valid snapshot, replay WAL, ignore incomplete tail, fail on mid-file
+corruption.
 
-```
-WAL Record:
-┌──────────────┬─────────┬──────────┬─────────────┬──────────┐
-│ Magic "WALK" │ Version │ Type     │ Payload     │ CRC32C   │
-│ (4 bytes)    │ (1B)    │ (1B)     │ (variable)  │ (4B)     │
-└──────────────┴─────────┴──────────┴─────────────┴──────────┘
-```
+Market data publishes on **Feed A and Feed B**. Subscribers detect gaps via
+sequence numbers and heal from the alternate channel. Fault injection
+(loss / duplicate / reorder / corruption / channel outage) drives the
+**100M-event** stress path; crash/truncate matrices drive **10K recoveries** -
+both gated on **zero digest mismatches**.
 
-## Wire Protocol
+## Wire protocol
 
-Frames use a 40-byte header:
+40-byte framed header (`LKST` magic), CRC32C, 1400-byte payload cap for single
+UDP datagrams. Full layout: [`docs/PROTOCOL.md`](docs/PROTOCOL.md).
 
-```
-┌─────────────┬──────────┬──────────────┬─────────────┬─────────┐
-│ Magic       │ Version  │ Message Type │ Session ID  │ Seq     │
-│ "LKST" (4B) │ (1B)     │ (1B)         │ (4B)        │ (8B)    │
-├─────────────┼──────────┼──────────────┼─────────────┼─────────┤
-│ Timestamp   │ Payload  │ Reserved     │ CRC32C      │ Payload │
-│ (8B)        │ Len (4B) │ (4B)         │ (4B)        │ (var)   │
-└─────────────┴──────────┴──────────────┴─────────────┴─────────┘
-```
-
-1400-byte payload limit ensures frames fit in single UDP packets.
-
-See [docs/PROTOCOL.md](docs/PROTOCOL.md) for message types and field layouts.
-
-## Performance
-
-On Apple Silicon M3:
-
-| Metric | Value |
-|--------|-------|
-| Throughput | ~29M ops/sec |
-| Median latency | < 100ns |
-| Memory per order | ~128 bytes |
-
-Run benchmarks:
+## Testing and benches
 
 ```bash
-make benchmark
-```
-
-## Testing
-
-```bash
-make test              # Unit and integration tests
-make sanitize          # AddressSanitizer + UBSan
+make test              # unit + integration + differential
+make sanitize          # ASan + UBSan
 make tsan              # ThreadSanitizer
-make fuzz-smoke        # Fuzz targets
+make fuzz-smoke        # decoder fuzz targets
+make benchmark         # isolated throughput + latency (resume gates)
+make stress            # 100M fault events + 10K recovery aggregate
 ```
-
-The test suite includes differential testing: running the same operations against both the optimized order book and a reference implementation, verifying identical results.
 
 ## Documentation
 
-- [Architecture](docs/ARCHITECTURE.md) - Design decisions and component layout
-- [Protocol](docs/PROTOCOL.md) - Wire format specification
-- [Matching Rules](docs/MATCHING_RULES.md) - How orders match
-- [Durability](docs/DURABILITY.md) - Crash recovery semantics
-- [Benchmarks](docs/BENCHMARKS.md) - Performance methodology
-- [Verification](docs/VERIFICATION.md) - Testing approach
+| Doc | Contents |
+| --- | --- |
+| [Architecture](docs/ARCHITECTURE.md) | Components, threads, memory, failure model |
+| [Benchmarks](docs/BENCHMARKS.md) | Isolated 5M+/s and &lt;1 µs p99 methodology |
+| [Verification](docs/VERIFICATION.md) | Tests, sanitizers, 100M / 10K gates |
+| [Durability](docs/DURABILITY.md) | WAL, snapshots, recovery semantics |
+| [Matching rules](docs/MATCHING_RULES.md) | Price-time, STP, order types |
+| [Protocol](docs/PROTOCOL.md) | Wire format |
+| [Resume](docs/RESUME.md) | Bullet ↔ evidence map |
 
-## Build Requirements
+## Build
 
-- C++20 compiler (Clang 14+, GCC 11+, Apple Clang 14+)
-- CMake 3.24+
-- POSIX system (Linux, macOS)
-
-## Building
-
-```bash
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j$(nproc)
-```
-
-Or use the Makefile wrapper:
+C++20, CMake 3.24+, POSIX (Linux / macOS).
 
 ```bash
-make build      # Debug
-make release    # Release
-make sanitize   # With sanitizers
+make release    # or: cmake -DCMAKE_BUILD_TYPE=Release && make -j
 ```
 
-## Project Structure
-
 ```
-lockstep/
-├── include/lockstep/   # Headers
-│   ├── engine/         # Matching engine, order book
-│   ├── risk/           # Risk limits
-│   ├── persistence/    # WAL, snapshots
-│   ├── network/        # TCP/UDP
-│   ├── protocol/       # Wire format
-│   └── containers/     # Object pool, hash table
-├── src/                # Implementations
-├── apps/               # Executables
-├── tests/              # Test suite
-├── bench/              # Benchmarks
-├── fuzz/               # Fuzz targets
-└── docs/               # Documentation
+include/lockstep/   engine, risk, persistence, network, protocol, containers
+src/                implementations
+apps/               exchange, client, demo
+tests/              unit / property / integration / recovery
+bench/              throughput, latency, fault stress, crash matrix
+fuzz/               frame / WAL / snapshot decoders
+docs/               design + verification
 ```
 
 ## Disclaimer
 
-Educational code. Not audited for production. The wire protocol is original and not compatible with any real exchange. Use at your own risk.
-
----
-
-Built to understand how exchanges work. The goal was correctness and clarity over raw performance, though the single-threaded design naturally achieves low latency. Happy to discuss design decisions.
+Educational systems code. Not a production venue. Protocol is original and not
+compatible with any live exchange. Use at your own risk.

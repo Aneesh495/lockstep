@@ -6,8 +6,10 @@
 
 namespace lockstep {
 
-// Deterministic fault injection for testing
-// Seeded PRNG for reproducible fault schedules
+// Deterministic fault injection for dual-feed UDP / recovery testing.
+// Seeded PRNG for reproducible fault schedules (loss, duplicate, reorder,
+// corruption, channel outage). Stress gate: 100M logical events under faults
+// with zero state digest mismatches (docs/VERIFICATION.md, docs/DURABILITY.md).
 
 enum class FaultType : std::uint8_t {
     None = 0,

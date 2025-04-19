@@ -2,7 +2,11 @@
 
 ## 30-Second Summary
 
-Lockstep is a C++20 exchange matching engine with deterministic semantics, dual-feed UDP market data, WAL-based persistence, and comprehensive testing. Built from scratch to demonstrate low-latency systems expertise.
+Lockstep is a C++20 exchange matching and recovery engine: deterministic
+price-time matching, zero-allocation hot path after init, dual-feed UDP market
+data, WAL/snapshot durability, and fault-injected verification at 100M events /
+10K recoveries with zero digest mismatches. Isolated core benches gate at 5M+
+commands/s and &lt;1 µs p99.
 
 ## 2-Minute Explanation
 
@@ -18,7 +22,11 @@ Lockstep implements a complete electronic trading engine:
 
 5. **Testing**: Differential testing against reference implementation, fault injection, sanitizers, fuzzing.
 
-The design prioritizes correctness first, then performance. Every component is tested with invariants. The benchmark demonstrates the zero-allocation hot path.
+The design prioritizes correctness first, then performance. Every component is
+tested with invariants. Isolated core benches demonstrate the zero-allocation
+hot path at the documented **5M+ commands/s** and **&lt;1 µs p99** gates; dual-feed
+UDP + WAL recovery is proven under **100M** fault events and **10K** recoveries
+with **zero** state digest mismatches.
 
 ## 10-Minute Deep Dive
 

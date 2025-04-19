@@ -1,37 +1,44 @@
 # Benchmarks
 
-## Methodology
+## Isolation rules (read first)
 
-### Throughput Measurement
+Resume performance claims are for the **matching core only**:
 
-Throughput is measured in a tight loop:
+- **Included:** order book + matching engine (+ risk when the workload enables it)
+- **Excluded:** TCP/UDP syscalls, kernel networking, WAL append/fsync, snapshots
+
+Throughput and latency are **separate tests**. Never quote a latency percentile
+from a bulk throughput loop, or a commands/s number from the latency harness.
+
+## Resume gates
+
+| Gate | Threshold | Harness notes |
+| --- | --- | --- |
+| Throughput | **≥5,000,000 commands/s** | Pre-generated commands; warm-up; median over repetitions |
+| Latency | **p99 &lt;1,000 ns (1 µs)** | One command at a time; raw (unadjusted) p99; nearest-rank |
+| Allocations | **0** heap allocs after init | `AllocationCounter` over the measured window |
+
+Passing above the gate (e.g. ~29M ops/s median on Apple Silicon) is expected and
+may be reported as an observed median, but documentation and resume language use
+the **5M+ / &lt;1 µs** thresholds.
+
+## Throughput method
 
 1. Pre-generate all commands
-2. Warm up with 2M operations
-3. Measure 10M operations per repetition
-4. Run 10 repetitions
+2. Warm up (≥2M operations)
+3. Measure a large batch per repetition (≥10M ops when runtime allows)
+4. Run ≥10 repetitions; report median commands/s
 
-### Latency Measurement
-
-Latency is measured per operation:
+## Latency method
 
 1. Pre-generate commands
-2. Record timestamp before each operation
-3. Record timestamp after each operation
-4. Compute percentiles over raw samples
+2. Timestamp before / after each operation (steady / cycle clock)
+3. Store raw samples (preallocated); ≥1M samples per repetition when gated
+4. Percentiles via nearest-rank over the full sample set: p50, p95, p99, p99.9
+5. Run multiple repetitions; resume uses **raw p99** (timer overhead disclosed,
+   not subtracted for the gate)
 
-### Percentile Calculation
-
-Uses nearest-rank method over complete sample set:
-
-- p50: median
-- p95: 95th percentile
-- p99: 99th percentile
-- p99.9: 99.9th percentile
-
-## Workload
-
-Command distribution:
+## Workload mix
 
 | Command | Percentage |
 |---------|------------|
@@ -42,37 +49,20 @@ Command distribution:
 | IOC | 5% |
 | FOK | 5% |
 
-Price range: 100-200 ticks
-Quantity range: 10-109 lots
+Price range: 100-200 ticks. Quantity range: 10-109 lots.
 
-## Results
+## Evidence
 
-Results are generated from actual benchmark runs and stored in `artifacts/benchmarks/raw/`.
-
-See `results/verified/BENCHMARKS.json` for final verified results.
-
-## System Requirements
-
-For reproducible results:
-
-- Dedicated machine (no other load)
-- Pinned CPU core (Linux only)
-- Disabled power management
-- Consistent memory configuration
-
-## Commands
+Raw runs land under `artifacts/benchmarks/`. Verified summaries under
+`results/verified/` (see `docs/RESUME.md`).
 
 ```bash
-# Run benchmarks
 make benchmark
-
-# Run with perf (Linux)
-make profile
 ```
 
 ## Notes
 
-- Core measurements exclude network I/O
-- Core measurements exclude WAL I/O
-- Zero-allocation verification included
-- Reference book comparison included
+- Zero-allocation verification is part of the bench / acceptance path
+- Reference-book differential checks are correctness, not throughput
+- Networked or durable end-to-end paths are profiled separately and are **not**
+  the 5M+/s or &lt;1 µs claims
