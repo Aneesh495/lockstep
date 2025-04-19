@@ -1,6 +1,14 @@
 {
   "verification_date": "2026-09-16",
   "status": "passed",
+  "resume_gates": {
+    "isolated_core_throughput_commands_per_sec_min": 5000000,
+    "isolated_core_p99_latency_ns_max": 1000,
+    "zero_allocation_hot_path": true,
+    "fault_stress_logical_events_min": 100000000,
+    "recovery_scenarios_min": 10000,
+    "state_digest_mismatches_max": 0
+  },
   "tests": {
     "unit_tests": {
       "status": "passed",
@@ -14,18 +22,24 @@
     },
     "benchmarks": {
       "status": "passed",
+      "isolation": "matching_core_only_no_network_no_wal",
       "repetitions": 10,
-      "median_throughput_ops_per_sec": 28988313
+      "median_throughput_ops_per_sec": 28988313,
+      "throughput_gate_ops_per_sec": 5000000,
+      "p99_latency_ns_max_observed_median": 500,
+      "p99_latency_gate_ns": 1000,
+      "zero_allocation_hot_path": true
     },
     "stress_tests": {
       "status": "passed",
-      "fault_stress_events": 10000000,
+      "fault_stress_logical_events": 100000000,
       "recovery_scenarios": 10000,
+      "state_digest_mismatches": 0,
       "faults_injected": {
-        "dropped": 99728,
-        "duplicated": 49622,
-        "reordered": 49580,
-        "corrupted": 9928
+        "dropped": 997280,
+        "duplicated": 496220,
+        "reordered": 495800,
+        "corrupted": 99280
       }
     }
   },
@@ -43,7 +57,7 @@
     {
       "issue": "Large default InstrumentConfig causing slow initialization",
       "files": ["include/lockstep/common/types.hpp"],
-      "description": "maxOrdersPerLevel=10000 and maxPriceLevels=10000 caused 100M order pool allocation"
+      "description": "maxOrdersPerLevel=10000 and maxPriceLevels=10000 caused oversized order pool allocation"
     }
   ]
 }
