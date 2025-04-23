@@ -4,11 +4,25 @@
 
 namespace lockstep {
 
+namespace {
+    // Round up to next power of 2
+    std::uint32_t nextPowerOf2(std::uint32_t n) {
+        if (n == 0) return 1;
+        n--;
+        n |= n >> 1;
+        n |= n >> 2;
+        n |= n >> 4;
+        n |= n >> 8;
+        n |= n >> 16;
+        return n + 1;
+    }
+}
+
 OrderBook::OrderBook(const Config& config)
     : config_(config)
     , numPriceLevels_(static_cast<std::uint32_t>((config.maxPrice - config.minPrice) / config.tickSize + 1))
     , orderPool_(config.maxOrders)
-    , orderIndex_(config.maxOrders * 2) // Lower load factor
+    , orderIndex_(nextPowerOf2(config.maxOrders * 2)) // Lower load factor, power of 2
     , bidLevels_(numPriceLevels_)
     , askLevels_(numPriceLevels_)
 {
