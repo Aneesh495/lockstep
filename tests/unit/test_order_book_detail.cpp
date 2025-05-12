@@ -1,8 +1,8 @@
-#include "lockstep/engine/order_book.hpp"
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <random>
 #include <vector>
+#include "lockstep/engine/order_book.hpp"
 
 namespace {
 
@@ -19,7 +19,7 @@ lockstep::OrderBook::Config makeTestConfig() {
 void testNewResting() {
     auto config = makeTestConfig();
     lockstep::OrderBook book(config);
-    
+
     lockstep::Order order;
     order.clientId = 1;
     order.orderId = 1;
@@ -27,18 +27,18 @@ void testNewResting() {
     order.side = lockstep::Side::Buy;
     order.price = 150;
     order.quantity = 100;
-    
+
     auto result = book.newOrder(order);
     assert(result.success);
     assert(book.bestBid() == 150);
-    
+
     std::cout << "  [PASS] New resting order\n";
 }
 
 void testIOC() {
     auto config = makeTestConfig();
     lockstep::OrderBook book(config);
-    
+
     lockstep::Order resting;
     resting.clientId = 1;
     resting.orderId = 1;
@@ -47,7 +47,7 @@ void testIOC() {
     resting.price = 150;
     resting.quantity = 100;
     book.newOrder(resting);
-    
+
     lockstep::Order ioc;
     ioc.clientId = 2;
     ioc.orderId = 2;
@@ -56,19 +56,19 @@ void testIOC() {
     ioc.price = 150;
     ioc.quantity = 200;
     ioc.tif = lockstep::TimeInForce::IOC;
-    
+
     auto result = book.newOrder(ioc);
     assert(result.success);
     assert(result.filledQuantity == 100);
     assert(book.orderCount() == 0);
-    
+
     std::cout << "  [PASS] IOC order\n";
 }
 
 void testFOK() {
     auto config = makeTestConfig();
     lockstep::OrderBook book(config);
-    
+
     lockstep::Order resting;
     resting.clientId = 1;
     resting.orderId = 1;
@@ -77,7 +77,7 @@ void testFOK() {
     resting.price = 150;
     resting.quantity = 100;
     book.newOrder(resting);
-    
+
     lockstep::Order fok1;
     fok1.clientId = 2;
     fok1.orderId = 2;
@@ -86,14 +86,14 @@ void testFOK() {
     fok1.price = 150;
     fok1.quantity = 100;
     fok1.tif = lockstep::TimeInForce::FOK;
-    
+
     auto result1 = book.newOrder(fok1);
     assert(result1.success);
     assert(result1.filledQuantity == 100);
-    
+
     resting.orderId = 3;
     book.newOrder(resting);
-    
+
     lockstep::Order fok2;
     fok2.clientId = 2;
     fok2.orderId = 4;
@@ -102,18 +102,18 @@ void testFOK() {
     fok2.price = 150;
     fok2.quantity = 200;
     fok2.tif = lockstep::TimeInForce::FOK;
-    
+
     auto result2 = book.newOrder(fok2);
     assert(!result2.success);
     assert(result2.reason == lockstep::RejectionReason::FOKCannotFill);
-    
+
     std::cout << "  [PASS] FOK order\n";
 }
 
 void testPriority() {
     auto config = makeTestConfig();
     lockstep::OrderBook book(config);
-    
+
     for (int i = 0; i < 5; ++i) {
         lockstep::Order order;
         order.clientId = 1;
@@ -124,7 +124,7 @@ void testPriority() {
         order.quantity = 100;
         book.newOrder(order);
     }
-    
+
     lockstep::Order sell;
     sell.clientId = 2;
     sell.orderId = 10;
@@ -132,15 +132,15 @@ void testPriority() {
     sell.side = lockstep::Side::Sell;
     sell.price = 150;
     sell.quantity = 100;
-    
+
     auto result = book.newOrder(sell);
     assert(result.success);
     assert(result.matches[0].passiveOrderId == 1);
-    
+
     std::cout << "  [PASS] Priority ordering\n";
 }
 
-} // namespace
+}  // namespace
 
 int runOrderBookDetailTests() {
     testNewResting();
@@ -149,4 +149,3 @@ int runOrderBookDetailTests() {
     testPriority();
     return 0;
 }
-

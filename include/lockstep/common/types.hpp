@@ -1,23 +1,27 @@
 #pragma once
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 
 namespace lockstep {
 
 // Core numeric types as specified
-using Price = std::int64_t;          // Signed 64-bit integer ticks
-using Quantity = std::uint32_t;      // Unsigned 32-bit integer lots
-using Position = std::int64_t;       // Signed 64-bit positions
-using Notional = __int128;           // Checked 128-bit intermediate for notional arithmetic
+using Price = std::int64_t;      // Signed 64-bit integer ticks
+using Quantity = std::uint32_t;  // Unsigned 32-bit integer lots
+using Position = std::int64_t;   // Signed 64-bit positions
+#if defined(__SIZEOF_INT128__)
+__extension__ using Notional = __int128;  // Checked 128-bit intermediate for notional arithmetic
+#else
+#error "Lockstep requires 128-bit integer support (__SIZEOF_INT128__)"
+#endif
 
 using ClientId = std::uint32_t;
 using OrderId = std::uint64_t;
 using InstrumentId = std::uint32_t;
 using Sequence = std::uint64_t;
-using Timestamp = std::uint64_t;     // Monotonic integer nanoseconds
+using Timestamp = std::uint64_t;  // Monotonic integer nanoseconds
 
 using SlotIndex = std::uint32_t;
 using PriceOffset = std::uint32_t;
@@ -32,7 +36,7 @@ constexpr SlotIndex INVALID_SLOT = std::numeric_limits<SlotIndex>::max();
 constexpr PriceOffset INVALID_PRICE_OFFSET = std::numeric_limits<PriceOffset>::max();
 
 // Network byte order magic
-constexpr std::uint32_t FRAME_MAGIC = 0x4C4B5354; // "LKST"
+constexpr std::uint32_t FRAME_MAGIC = 0x4C4B5354;  // "LKST"
 constexpr std::uint8_t PROTOCOL_VERSION = 1;
 
 // Time in Force
@@ -97,7 +101,7 @@ enum class MessageType : std::uint8_t {
     MassCancel = 4,
     SnapshotRequest = 5,
     Heartbeat = 6,
-    
+
     // Exchange -> Client
     OrderAccepted = 101,
     OrderRejected = 102,
@@ -109,7 +113,7 @@ enum class MessageType : std::uint8_t {
     SnapshotRow = 108,
     SnapshotEnd = 109,
     HeartbeatAck = 110,
-    
+
     // Market data events
     BookAdd = 201,
     BookChange = 202,
@@ -134,7 +138,7 @@ enum class Liquidity : std::uint8_t {
 };
 
 constexpr std::size_t FRAME_HEADER_SIZE = 40;
-constexpr std::size_t MAX_PAYLOAD_SIZE = 1400; // MTU-safe
+constexpr std::size_t MAX_PAYLOAD_SIZE = 1400;  // MTU-safe
 
 // Instrument configuration
 struct InstrumentConfig {
@@ -170,4 +174,4 @@ struct Match {
     Timestamp timestamp = 0;
 };
 
-} // namespace lockstep
+}  // namespace lockstep

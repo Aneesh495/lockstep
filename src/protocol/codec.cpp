@@ -7,4 +7,4 @@ namespace lockstep {
 
 // Placeholder for any future non-inline implementations
 
-} // namespace lockstep
+}  // namespace lockstep

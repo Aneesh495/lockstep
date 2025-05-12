@@ -17,7 +17,7 @@ namespace lockstep {
 // - Footer: CRC32C
 
 struct SnapshotHeader {
-    std::uint32_t magic = 0x534E4150; // "SNAP"
+    std::uint32_t magic = 0x534E4150;  // "SNAP"
     std::uint8_t version = 1;
     std::uint8_t reserved[3] = {0};
     std::uint64_t timestamp = 0;
@@ -30,34 +30,34 @@ struct SnapshotHeader {
 };
 
 class SnapshotWriter {
-public:
+   public:
     explicit SnapshotWriter(const std::string& path);
-    
+
     bool write(const MatchingEngine& engine, const RiskEngine& risk);
-    
+
     std::string error() const { return error_; }
 
-private:
+   private:
     std::string path_;
     std::string error_;
 };
 
 class SnapshotReader {
-public:
+   public:
     explicit SnapshotReader(const std::string& path);
-    
+
     bool read(MatchingEngine& engine, RiskEngine& risk);
-    
+
     std::uint64_t commandSeq() const { return header_.commandSeq; }
     std::uint64_t eventSeq() const { return header_.eventSeq; }
     std::uint64_t coveredWalSeq() const { return header_.coveredWalSeq; }
-    
+
     std::string error() const { return error_; }
 
-private:
+   private:
     std::string path_;
     SnapshotHeader header_;
     std::string error_;
 };
 
-} // namespace lockstep
+}  // namespace lockstep

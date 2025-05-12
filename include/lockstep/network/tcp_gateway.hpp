@@ -1,10 +1,10 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <thread>
-#include <atomic>
+#include <vector>
 #include "lockstep/common/types.hpp"
 #include "lockstep/concurrency/spsc_ring.hpp"
 #include "lockstep/protocol/frame.hpp"
@@ -40,39 +40,39 @@ struct ResponseMessage {
 };
 
 class TcpGateway {
-public:
+   public:
     explicit TcpGateway(std::uint16_t port, std::uint32_t maxClients = 100);
     ~TcpGateway();
-    
+
     // Start/stop gateway
     bool start();
     void stop();
-    
+
     // Command queue (producer)
     SpscRing<CommandMessage>& commandQueue() { return commandQueue_; }
-    
+
     // Response queue (consumer)
     SpscRing<ResponseMessage>& responseQueue() { return responseQueue_; }
-    
+
     bool isRunning() const { return running_; }
 
-private:
+   private:
     void run();
     void acceptClient();
     void handleClient(ClientConnection& client);
     bool parseFrame(ClientConnection& client);
     void sendResponse(ClientConnection& client, const ResponseMessage& response);
-    
+
     std::uint16_t port_;
     std::uint32_t maxClients_;
     int listenFd_ = -1;
     std::atomic<bool> running_{false};
     std::thread thread_;
-    
+
     std::vector<ClientConnection> clients_;
-    
+
     SpscRing<CommandMessage> commandQueue_;
     SpscRing<ResponseMessage> responseQueue_;
 };
 
-} // namespace lockstep
+}  // namespace lockstep

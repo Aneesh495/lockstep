@@ -74,8 +74,22 @@ int main(int argc, char* argv[]) {
     std::cout << "===========================\n\n";
     
     uint32_t seed = 12345;
-    if (argc > 1) {
-        seed = static_cast<uint32_t>(std::stoul(argv[1]));
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg.rfind("-max_total_time=", 0) == 0 || arg.rfind("--max_total_time=", 0) == 0) {
+            continue;
+        }
+        if (arg.rfind("-runs=", 0) == 0 || arg.rfind("--runs=", 0) == 0) {
+            continue;
+        }
+        if (arg.rfind("-seed=", 0) == 0 || arg.rfind("--seed=", 0) == 0) {
+            auto pos = arg.find('=');
+            try { seed = static_cast<uint32_t>(std::stoul(arg.substr(pos + 1))); } catch (...) {}
+            continue;
+        }
+        try {
+            seed = static_cast<uint32_t>(std::stoul(arg));
+        } catch (...) {}
     }
     std::cout << "Seed: " << seed << "\n";
     

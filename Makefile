@@ -3,6 +3,9 @@
 
 .PHONY: all configure build clean test sanitize tsan fuzz-smoke demo benchmark profile stress acceptance verify help
 
+SHELL := /bin/bash
+.SHELLFLAGS := -euo pipefail -c
+
 # Default target
 all: build
 
@@ -32,7 +35,7 @@ build: configure
 # Run tests
 test: build
 	@echo "=== Running Tests ==="
-	cd $(BUILD_DIR) && $(CTEST) --output-on-failure
+	cd $(BUILD_DIR) && $(CTEST) --output-on-failure --no-tests=error
 
 # Run sanitizers (ASan + UBSan)
 sanitize:
@@ -42,7 +45,7 @@ sanitize:
 		-DLOCKSTEP_ENABLE_SANITIZERS=ON \
 		-DLOCKSTEP_BUILD_BENCHMARKS=OFF
 	$(CMAKE) --build $(BUILD_DIR)-asan --parallel
-	cd $(BUILD_DIR)-asan && $(CTEST) --output-on-failure
+	cd $(BUILD_DIR)-asan && $(CTEST) --output-on-failure --no-tests=error
 
 # Run ThreadSanitizer
 tsan:
@@ -52,7 +55,7 @@ tsan:
 		-DLOCKSTEP_ENABLE_TSAN=ON \
 		-DLOCKSTEP_BUILD_BENCHMARKS=OFF
 	$(CMAKE) --build $(BUILD_DIR)-tsan --parallel
-	cd $(BUILD_DIR)-tsan && $(CTEST) --output-on-failure -R "spsc|network"
+	cd $(BUILD_DIR)-tsan && $(CTEST) --output-on-failure --no-tests=error -R "spsc|network"
 
 # Run fuzzer smoke tests
 fuzz-smoke:
@@ -64,12 +67,12 @@ fuzz-smoke:
 			-DLOCKSTEP_BUILD_BENCHMARKS=OFF; \
 	fi
 	$(CMAKE) --build $(BUILD_DIR)-fuzz --parallel
-	@echo "Running fuzz_frame_decoder for 10 seconds..."
-	@timeout 10s $(BUILD_DIR)-fuzz/fuzz_frame_decoder -max_total_time=10 -runs=1000 || true
-	@echo "Running fuzz_wal_decoder for 10 seconds..."
-	@timeout 10s $(BUILD_DIR)-fuzz/fuzz_wal_decoder -max_total_time=10 -runs=1000 || true
-	@echo "Running fuzz_snapshot_decoder for 10 seconds..."
-	@timeout 10s $(BUILD_DIR)-fuzz/fuzz_snapshot_decoder -max_total_time=10 -runs=1000 || true
+	@echo "Running fuzz_frame_decoder..."
+	$(BUILD_DIR)-fuzz/fuzz_frame_decoder
+	@echo "Running fuzz_wal_decoder..."
+	$(BUILD_DIR)-fuzz/fuzz_wal_decoder
+	@echo "Running fuzz_snapshot_decoder..."
+	$(BUILD_DIR)-fuzz/fuzz_snapshot_decoder
 	@echo "Fuzzer smoke tests complete"
 
 # Run demo
@@ -115,7 +118,7 @@ acceptance:
 		-DLOCKSTEP_ENABLE_NATIVE=ON
 	$(CMAKE) --build $(BUILD_DIR)-release --parallel
 	@echo "Step 2: Run tests"
-	cd $(BUILD_DIR)-release && $(CTEST) --output-on-failure
+	cd $(BUILD_DIR)-release && $(CTEST) --output-on-failure --no-tests=error
 	@echo "Step 3: Run sanitizers"
 	$(MAKE) sanitize
 	@echo "Step 4: Run fuzzer smoke tests"
@@ -145,7 +148,7 @@ verify:
 	@echo "Checking build..."
 	$(MAKE) build
 	@echo "Running quick tests..."
-	cd $(BUILD_DIR) && $(CTEST) --output-on-failure -E "stress|benchmark"
+	cd $(BUILD_DIR) && $(CTEST) --output-on-failure --no-tests=error -E "stress|benchmark"
 	@echo "Checking evidence hashes..."
 	@if [ -f results/verified/RESUME_METRICS.json ]; then \
 		python3 tools/make_report.py --verify; \
