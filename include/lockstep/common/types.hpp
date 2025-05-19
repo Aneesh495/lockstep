@@ -147,8 +147,8 @@ struct InstrumentConfig {
     Price maxPrice = 0;
     Price tickSize = 1;
     Quantity maxQuantity = std::numeric_limits<Quantity>::max();
-    std::uint32_t maxOrdersPerLevel = 10000;
-    std::uint32_t maxPriceLevels = 10000;
+    std::uint32_t maxOrdersPerLevel = 1000;
+    std::uint32_t maxPriceLevels = 1000;
 };
 
 // Risk limits per client
@@ -167,6 +167,8 @@ struct RiskLimits {
 struct Match {
     OrderId passiveOrderId = INVALID_ORDER_ID;
     OrderId aggressiveOrderId = INVALID_ORDER_ID;
+    ClientId passiveClientId = INVALID_CLIENT_ID;
+    ClientId aggressiveClientId = INVALID_CLIENT_ID;
     std::uint64_t matchId = 0;
     Price price = 0;
     Quantity quantity = 0;

@@ -63,11 +63,56 @@ class OrderBook {
     // State
     std::uint32_t orderCount() const { return orderPool_.size(); }
     bool empty() const { return orderPool_.empty(); }
+    const Config& config() const { return config_; }
+
+    void clear();
+    bool installOrder(const Order& order);
+
+    std::uint64_t nextMatchId() const { return nextMatchId_; }
+    void setNextMatchId(std::uint64_t id) { nextMatchId_ = id; }
+
+    bool canFillFok(const Order& aggressor) const;
 
     // Serialization for snapshots
     template <typename Func>
     void forEachOrder(Func&& func) const {
         orderPool_.forEach([&](SlotIndex slot, const Order& order) { func(order); });
+    }
+
+    template <typename Func>
+    void forEachOrderInPriceTimeOrder(Func&& func) const {
+        // Bids: from highest price to lowest price
+        for (int wordIdx = static_cast<int>(bidOccupancy_.size()) - 1; wordIdx >= 0; --wordIdx) {
+            std::uint64_t word = bidOccupancy_[static_cast<std::size_t>(wordIdx)];
+            while (word != 0) {
+                int bitIdx = 63 - __builtin_clzll(word);
+                PriceOffset offset = static_cast<PriceOffset>(
+                    static_cast<std::uint32_t>(wordIdx) * 64 + static_cast<std::uint32_t>(bitIdx));
+                const PriceLevel& level = bidLevels_[offset];
+                SlotIndex curr = level.head;
+                while (curr != INVALID_SLOT) {
+                    func(orderPool_[curr]);
+                    curr = orderPool_[curr].next;
+                }
+                word &= ~(1ULL << bitIdx);
+            }
+        }
+        // Asks: from lowest price to highest price
+        for (std::size_t wordIdx = 0; wordIdx < askOccupancy_.size(); ++wordIdx) {
+            std::uint64_t word = askOccupancy_[wordIdx];
+            while (word != 0) {
+                int bitIdx = __builtin_ctzll(word);
+                PriceOffset offset = static_cast<PriceOffset>(
+                    static_cast<std::uint32_t>(wordIdx) * 64 + static_cast<std::uint32_t>(bitIdx));
+                const PriceLevel& level = askLevels_[offset];
+                SlotIndex curr = level.head;
+                while (curr != INVALID_SLOT) {
+                    func(orderPool_[curr]);
+                    curr = orderPool_[curr].next;
+                }
+                word &= ~(1ULL << bitIdx);
+            }
+        }
     }
 
     // Invariant checking

@@ -65,6 +65,10 @@ class RiskEngine {
     // Access client state
     ClientState* getClientState(ClientId clientId);
     const ClientState* getClientState(ClientId clientId) const;
+    const std::unordered_map<ClientId, ClientState>& clients() const { return clients_; }
+
+    void clear();
+    void installClientState(const ClientState& state);
 
     // Kill switch
     void setKillSwitch(bool active);

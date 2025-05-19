@@ -69,6 +69,13 @@ OrderBook::Result OrderBook::newOrder(Order& order) {
         return result;
     }
 
+    // Preflight FOK orders: must be able to fill completely without self-trading
+    if (order.tif == TimeInForce::FOK && !canFillFok(order)) {
+        result.success = false;
+        result.reason = RejectionReason::FOKCannotFill;
+        return result;
+    }
+
     // Check if marketable (crosses the spread)
     if (order.side == Side::Buy && bestAskOffset_ != INVALID_PRICE_OFFSET) {
         Price bestAskPrice = offsetToPrice(bestAskOffset_);
@@ -76,7 +83,6 @@ OrderBook::Result OrderBook::newOrder(Order& order) {
             // Marketable buy
             result = matchOrder(order);
             if (order.tif == TimeInForce::FOK && result.filledQuantity < order.quantity) {
-                // FOK failed - no mutation
                 result.success = false;
                 result.reason = RejectionReason::FOKCannotFill;
                 result.matches.clear();
@@ -106,6 +112,17 @@ OrderBook::Result OrderBook::newOrder(Order& order) {
                 return result;
             }
         }
+    }
+
+    // FOK and IOC orders must not rest in the book
+    if (order.tif == TimeInForce::FOK) {
+        result.success = false;
+        result.reason = RejectionReason::FOKCannotFill;
+        return result;
+    }
+    if (order.tif == TimeInForce::IOC) {
+        result.success = true;
+        return result;
     }
 
     // Rest the order
@@ -526,6 +543,8 @@ OrderBook::Result OrderBook::matchOrder(Order& aggressor) {
             match.matchId = nextMatchId_++;
             match.passiveOrderId = passive.orderId;
             match.aggressiveOrderId = aggressor.orderId;
+            match.passiveClientId = passive.clientId;
+            match.aggressiveClientId = aggressor.clientId;
             match.price = bestPrice;
             match.quantity = fillQty;
             match.aggressiveLiquidity = Liquidity::Aggressive;
@@ -616,20 +635,140 @@ bool OrderBook::checkInvariants(std::string& error) const {
     return true;
 }
 
+bool OrderBook::canFillFok(const Order& aggressor) const {
+    Quantity remaining = aggressor.quantity;
+    if (aggressor.side == Side::Buy) {
+        for (std::size_t wordIdx = 0; wordIdx < askOccupancy_.size(); ++wordIdx) {
+            std::uint64_t word = askOccupancy_[wordIdx];
+            while (word != 0) {
+                int bitIdx = __builtin_ctzll(word);
+                PriceOffset offset =
+                    static_cast<PriceOffset>(wordIdx * 64 + static_cast<std::uint32_t>(bitIdx));
+                Price bestPrice = offsetToPrice(offset);
+                if (aggressor.price < bestPrice)
+                    return false;
+                const PriceLevel& level = askLevels_[offset];
+                SlotIndex curr = level.head;
+                while (curr != INVALID_SLOT) {
+                    const Order& passive = orderPool_[curr];
+                    if (wouldSelfTrade(aggressor, passive))
+                        return false;
+                    Quantity fillQty = std::min(remaining, passive.remainingQuantity());
+                    remaining -= fillQty;
+                    if (remaining == 0)
+                        return true;
+                    curr = passive.next;
+                }
+                word &= ~(1ULL << bitIdx);
+            }
+        }
+    } else {
+        for (int wordIdx = static_cast<int>(bidOccupancy_.size()) - 1; wordIdx >= 0; --wordIdx) {
+            std::uint64_t word = bidOccupancy_[static_cast<std::size_t>(wordIdx)];
+            while (word != 0) {
+                int bitIdx = 63 - __builtin_clzll(word);
+                PriceOffset offset = static_cast<PriceOffset>(
+                    static_cast<std::uint32_t>(wordIdx) * 64 + static_cast<std::uint32_t>(bitIdx));
+                Price bestPrice = offsetToPrice(offset);
+                if (aggressor.price > bestPrice)
+                    return false;
+                const PriceLevel& level = bidLevels_[offset];
+                SlotIndex curr = level.head;
+                while (curr != INVALID_SLOT) {
+                    const Order& passive = orderPool_[curr];
+                    if (wouldSelfTrade(aggressor, passive))
+                        return false;
+                    Quantity fillQty = std::min(remaining, passive.remainingQuantity());
+                    remaining -= fillQty;
+                    if (remaining == 0)
+                        return true;
+                    curr = passive.next;
+                }
+                word &= ~(1ULL << bitIdx);
+            }
+        }
+    }
+    return false;
+}
+
+void OrderBook::clear() {
+    orderPool_.clear();
+    orderIndex_.clear();
+    for (auto& level : bidLevels_) {
+        level.head = INVALID_SLOT;
+        level.tail = INVALID_SLOT;
+        level.orderCount = 0;
+        level.totalQuantity = 0;
+    }
+    for (auto& level : askLevels_) {
+        level.head = INVALID_SLOT;
+        level.tail = INVALID_SLOT;
+        level.orderCount = 0;
+        level.totalQuantity = 0;
+    }
+    std::fill(bidOccupancy_.begin(), bidOccupancy_.end(), 0);
+    std::fill(askOccupancy_.begin(), askOccupancy_.end(), 0);
+    bestBidOffset_ = INVALID_PRICE_OFFSET;
+    bestAskOffset_ = INVALID_PRICE_OFFSET;
+    nextMatchId_ = 1;
+}
+
+bool OrderBook::installOrder(const Order& order) {
+    if (!isValidPrice(order.price) || order.quantity == 0 || order.remainingQuantity() == 0) {
+        return false;
+    }
+    OrderKey key{order.clientId, order.orderId};
+    if (orderIndex_.contains(key) || orderPool_.full()) {
+        return false;
+    }
+
+    SlotIndex slot = orderPool_.allocate();
+    if (slot == INVALID_SLOT) {
+        return false;
+    }
+
+    Order& newOrder = orderPool_[slot];
+    newOrder = order;
+    newOrder.status = OrderStatus::Live;
+
+    PriceOffset offset = priceToOffset(order.price);
+    newOrder.priceLevelOffset = offset;
+
+    PriceLevel& level = (order.side == Side::Buy) ? bidLevels_[offset] : askLevels_[offset];
+    enqueueOrder(slot, level);
+
+    std::uint32_t wordIdx = offset / 64;
+    std::uint32_t bitIdx = offset % 64;
+    if (order.side == Side::Buy) {
+        bidOccupancy_[wordIdx] |= (1ULL << bitIdx);
+        if (bestBidOffset_ == INVALID_PRICE_OFFSET || offset > bestBidOffset_) {
+            bestBidOffset_ = offset;
+        }
+    } else {
+        askOccupancy_[wordIdx] |= (1ULL << bitIdx);
+        if (bestAskOffset_ == INVALID_PRICE_OFFSET || offset < bestAskOffset_) {
+            bestAskOffset_ = offset;
+        }
+    }
+
+    orderIndex_.insert(key, slot);
+    return true;
+}
+
 std::uint64_t OrderBook::computeDigest() const {
     std::uint64_t digest = 0;
 
-    // Hash all orders in deterministic order (by price, then by time)
-    std::vector<std::pair<Price, SlotIndex>> orders;
+    // Hash all orders in deterministic order (by price, then by orderId, then by slot)
+    std::vector<std::tuple<Price, OrderId, SlotIndex>> orders;
     orderPool_.forEach([&](SlotIndex slot, const Order& order) {
         if (order.isActive()) {
-            orders.push_back({order.price, slot});
+            orders.push_back({order.price, order.orderId, slot});
         }
     });
 
     std::sort(orders.begin(), orders.end());
 
-    for (const auto& [price, slot] : orders) {
+    for (const auto& [price, orderId, slot] : orders) {
         const Order& order = orderPool_[slot];
         std::uint64_t h = static_cast<std::uint64_t>(price);
         h ^= static_cast<std::uint64_t>(order.orderId) * 0x9e3779b97f4a7c15ULL;

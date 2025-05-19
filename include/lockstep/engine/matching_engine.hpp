@@ -49,10 +49,21 @@ class MatchingEngine {
     std::uint64_t nextEventSeq() { return eventSeq_++; }
     std::uint64_t currentCommandSeq() const { return commandSeq_; }
     std::uint64_t currentEventSeq() const { return eventSeq_; }
+    void setSequences(std::uint64_t commandSeq, std::uint64_t eventSeq) {
+        commandSeq_ = commandSeq;
+        eventSeq_ = eventSeq;
+    }
+
+    void reset();
+    bool installOrder(const Order& order);
 
     // Access
     OrderBook* getBook(InstrumentId instrumentId);
     const OrderBook* getBook(InstrumentId instrumentId) const;
+
+    const Config& config() const { return config_; }
+    std::vector<InstrumentConfig> instrumentConfigs() const;
+    const InstrumentConfig* getInstrumentConfig(InstrumentId instrumentId) const;
 
     // Clock access
     VirtualClock& clock() { return clock_; }

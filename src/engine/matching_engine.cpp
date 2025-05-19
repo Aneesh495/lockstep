@@ -249,4 +249,43 @@ bool MatchingEngine::checkInvariants(std::string& error) const {
     return true;
 }
 
+void MatchingEngine::reset() {
+    for (auto& [id, book] : books_) {
+        book->clear();
+    }
+    for (auto& [id, refBook] : refBooks_) {
+        refBook->clear();
+    }
+    commandSeq_ = 1;
+    eventSeq_ = 1;
+    totalMatches_ = 0;
+    killSwitchActive_ = false;
+}
+
+bool MatchingEngine::installOrder(const Order& order) {
+    auto it = books_.find(order.instrumentId);
+    if (it == books_.end()) {
+        return false;
+    }
+    if (!it->second->installOrder(order)) {
+        return false;
+    }
+    if (config_.useReferenceBook) {
+        auto refIt = refBooks_.find(order.instrumentId);
+        if (refIt != refBooks_.end()) {
+            refIt->second->installOrder(order);
+        }
+    }
+    return true;
+}
+
+std::vector<InstrumentConfig> MatchingEngine::instrumentConfigs() const {
+    return config_.instruments;
+}
+
+const InstrumentConfig* MatchingEngine::getInstrumentConfig(InstrumentId instrumentId) const {
+    auto it = instrumentConfigs_.find(instrumentId);
+    return (it != instrumentConfigs_.end()) ? &it->second : nullptr;
+}
+
 }  // namespace lockstep

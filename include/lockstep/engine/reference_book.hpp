@@ -40,6 +40,14 @@ class ReferenceBook {
     std::uint32_t orderCount() const { return static_cast<std::uint32_t>(orders_.size()); }
     bool empty() const { return orders_.empty(); }
 
+    void clear();
+    bool installOrder(const Order& order);
+
+    std::uint64_t nextMatchId() const { return nextMatchId_; }
+    void setNextMatchId(std::uint64_t id) { nextMatchId_ = id; }
+
+    bool canFillFok(const Order& aggressor) const;
+
     // For differential comparison
     template <typename Func>
     void forEachOrder(Func&& func) const {

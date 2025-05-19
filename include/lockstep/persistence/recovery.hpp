@@ -19,10 +19,15 @@ class RecoveryManager {
     // Recover engine state
     bool recover(MatchingEngine& engine, RiskEngine& risk);
 
+    // Apply a single persisted command record
+    static bool applyRecord(MatchingEngine& engine, RiskEngine& risk, const WalRecord& record,
+                            std::string& error);
+
     // Get recovery stats
     std::uint64_t recoveredCommandSeq() const { return recoveredCommandSeq_; }
     std::uint64_t recoveredEventSeq() const { return recoveredEventSeq_; }
     std::uint32_t replayedRecords() const { return replayedRecords_; }
+    bool finalTailIncomplete() const { return finalTailIncomplete_; }
 
     std::string error() const { return error_; }
 
@@ -33,6 +38,7 @@ class RecoveryManager {
     std::uint64_t recoveredCommandSeq_ = 0;
     std::uint64_t recoveredEventSeq_ = 0;
     std::uint32_t replayedRecords_ = 0;
+    bool finalTailIncomplete_ = false;
     std::string error_;
 };
 

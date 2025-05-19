@@ -18,6 +18,11 @@ ReferenceBook::Result ReferenceBook::newOrder(Order& order) {
         return result;
     }
 
+    // Preflight FOK orders: must be able to fill completely without self-trading
+    if (order.tif == TimeInForce::FOK && !canFillFok(order)) {
+        return Result{false, RejectionReason::FOKCannotFill, 0, {}};
+    }
+
     // Try to match
     result = matchOrder(order);
 
@@ -27,6 +32,10 @@ ReferenceBook::Result ReferenceBook::newOrder(Order& order) {
 
     if (order.remainingQuantity() == 0 || order.tif == TimeInForce::IOC) {
         return Result{true, RejectionReason::None, result.filledQuantity, result.matches};
+    }
+
+    if (order.tif == TimeInForce::FOK) {
+        return Result{false, RejectionReason::FOKCannotFill, 0, {}};
     }
 
     // Rest the order
@@ -231,6 +240,8 @@ ReferenceBook::Result ReferenceBook::matchOrder(Order& aggressor) {
                 match.matchId = nextMatchId_++;
                 match.passiveOrderId = passive.orderId;
                 match.aggressiveOrderId = aggressor.orderId;
+                match.passiveClientId = passive.clientId;
+                match.aggressiveClientId = aggressor.clientId;
                 match.price = bestPrice;
                 match.quantity = fillQty;
 
@@ -283,6 +294,8 @@ ReferenceBook::Result ReferenceBook::matchOrder(Order& aggressor) {
                 match.matchId = nextMatchId_++;
                 match.passiveOrderId = passive.orderId;
                 match.aggressiveOrderId = aggressor.orderId;
+                match.passiveClientId = passive.clientId;
+                match.aggressiveClientId = aggressor.clientId;
                 match.price = bestPrice;
                 match.quantity = fillQty;
 
@@ -335,6 +348,61 @@ std::uint64_t ReferenceBook::computeDigest() const {
     }
 
     return digest;
+}
+
+bool ReferenceBook::canFillFok(const Order& aggressor) const {
+    Quantity remaining = aggressor.quantity;
+    if (aggressor.side == Side::Buy) {
+        for (const auto& [price, queue] : asks_) {
+            if (aggressor.price < price)
+                return false;
+            for (const auto& passive : queue) {
+                if (passive.clientId == aggressor.clientId)
+                    return false;
+                Quantity fillQty = std::min(remaining, passive.remainingQuantity());
+                remaining -= fillQty;
+                if (remaining == 0)
+                    return true;
+            }
+        }
+    } else {
+        for (const auto& [price, queue] : bids_) {
+            if (aggressor.price > price)
+                return false;
+            for (const auto& passive : queue) {
+                if (passive.clientId == aggressor.clientId)
+                    return false;
+                Quantity fillQty = std::min(remaining, passive.remainingQuantity());
+                remaining -= fillQty;
+                if (remaining == 0)
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+void ReferenceBook::clear() {
+    orders_.clear();
+    bids_.clear();
+    asks_.clear();
+    nextMatchId_ = 1;
+}
+
+bool ReferenceBook::installOrder(const Order& order) {
+    auto key = std::make_pair(order.clientId, order.orderId);
+    if (orders_.count(key) != 0 || order.quantity == 0 || order.remainingQuantity() == 0) {
+        return false;
+    }
+    Order o = order;
+    o.status = OrderStatus::Live;
+    if (o.side == Side::Buy) {
+        bids_[o.price].push_back(o);
+    } else {
+        asks_[o.price].push_back(o);
+    }
+    orders_[key] = o;
+    return true;
 }
 
 }  // namespace lockstep
