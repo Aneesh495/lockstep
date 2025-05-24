@@ -2,8 +2,17 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <cassert>
 #include <chrono>
+#include <cstdlib>
+
+#define TEST_ASSERT(cond)                                                                       \
+    do {                                                                                        \
+        if (!(cond)) {                                                                          \
+            std::cerr << "Assertion failed: " << #cond << " at " << __FILE__ << ":" << __LINE__ \
+                      << "\n";                                                                  \
+            std::abort();                                                                       \
+        }                                                                                       \
+    } while (0)
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -57,7 +66,7 @@ void testMalformedFrames() {
     // Invalid magic
     {
         std::vector<uint8_t> data(FrameHeader::SIZE, 0);
-        assert(!FrameHeader::parse(data.data(), data.size()).has_value());
+        TEST_ASSERT(!FrameHeader::parse(data.data(), data.size()).has_value());
     }
 
     // Invalid version
@@ -66,7 +75,7 @@ void testMalformedFrames() {
         ByteWriter writer(data.data(), data.size());
         writer.writeU32(FrameHeader::MAGIC);
         writer.writeU8(99);  // Invalid version
-        assert(!FrameHeader::parse(data.data(), data.size()).has_value());
+        TEST_ASSERT(!FrameHeader::parse(data.data(), data.size()).has_value());
     }
 
     // Non-zero reserved field
@@ -83,7 +92,7 @@ void testMalformedFrames() {
         writer.writeU64(1000000);
         writer.writeU32(0);
         writer.writeU32(1);  // Non-zero reserved
-        assert(!FrameHeader::parse(data.data(), data.size()).has_value());
+        TEST_ASSERT(!FrameHeader::parse(data.data(), data.size()).has_value());
     }
 
     // Oversized payload
@@ -95,7 +104,7 @@ void testMalformedFrames() {
         writer.writeU8(static_cast<uint8_t>(MessageType::Heartbeat));
         writer.writeU16(0);
         writer.writeU32(0xFFFFFFFF);  // Max payload
-        assert(!FrameHeader::parse(data.data(), data.size()).has_value());
+        TEST_ASSERT(!FrameHeader::parse(data.data(), data.size()).has_value());
     }
 
     std::cout << "    [PASS] Malformed frame rejection\n";
@@ -121,9 +130,9 @@ void testFeedArbiterDuplicates() {
     arbiter.onPacket('A', 1, 2, 100, 1, packetData.data(), packetData.size());
 
     // Should only emit one event
-    assert(arbiter.hasReadyEvents());
+    TEST_ASSERT(arbiter.hasReadyEvents());
     (void)arbiter.nextEvent();
-    assert(!arbiter.hasReadyEvents());
+    TEST_ASSERT(!arbiter.hasReadyEvents());
     std::cout << "    [PASS] Duplicate event handling\n";
 }
 
@@ -145,18 +154,18 @@ void testFeedArbiterGapDetection() {
     arbiter.onPacket('A', 1, 1, 100, 1, packetData.data(), packetData.size());
 
     // Should be able to read event 100
-    assert(arbiter.hasReadyEvents());
+    TEST_ASSERT(arbiter.hasReadyEvents());
     auto event = arbiter.nextEvent();
-    assert(event.has_value());
-    assert(event->eventSeq == 100);
+    TEST_ASSERT(event.has_value());
+    TEST_ASSERT(event->eventSeq == 100);
 
     // Skip to event 103 (gap at 101, 102)
     arbiter.onPacket('A', 1, 2, 103, 1, packetData.data(), packetData.size());
 
     // Should detect gap
-    assert(arbiter.hasGap());
-    assert(arbiter.gapStart() == 101);
-    assert(arbiter.gapEnd() == 103);
+    TEST_ASSERT(arbiter.hasGap());
+    TEST_ASSERT(arbiter.gapStart() == 101);
+    TEST_ASSERT(arbiter.gapEnd() == 103);
 
     std::cout << "    [PASS] Gap detection\n";
 }
@@ -195,7 +204,7 @@ void testFeedArbiterRedundantRecovery() {
     }
 
     // Should have processed 100, 101, 102, 103
-    assert(arbiter.state() == FeedArbiter::State::Healthy);
+    TEST_ASSERT(arbiter.state() == FeedArbiter::State::Healthy);
 
     std::cout << "    [PASS] Redundant feed recovery\n";
 }
@@ -229,16 +238,16 @@ void testFeedArbiterSnapshotRecovery() {
     arbiter.onPacket('A', 1, 2, 105, 1, packetData.data(), packetData.size());
 
     // Should be in gap state
-    assert(arbiter.hasGap());
+    TEST_ASSERT(arbiter.hasGap());
 
     // Apply snapshot at 104 (covering missing 101-104)
     arbiter.applySnapshot(104);
 
     // Should now be able to process 105 (after discarding <= 104)
-    assert(arbiter.hasReadyEvents());
+    TEST_ASSERT(arbiter.hasReadyEvents());
     auto event = arbiter.nextEvent();
-    assert(event.has_value());
-    assert(event->eventSeq == 105);
+    TEST_ASSERT(event.has_value());
+    TEST_ASSERT(event->eventSeq == 105);
 
     std::cout << "    [PASS] Snapshot recovery\n";
 }
@@ -259,11 +268,11 @@ void testFeedArbiterSessionChange() {
 
     // Session 1
     arbiter.onPacket('A', 1, 1, 100, 1, packetData.data(), packetData.size());
-    assert(arbiter.state() == FeedArbiter::State::Healthy);
+    TEST_ASSERT(arbiter.state() == FeedArbiter::State::Healthy);
 
     // Session 2 (session change)
     arbiter.onPacket('A', 2, 1, 100, 1, packetData.data(), packetData.size());
-    assert(arbiter.state() == FeedArbiter::State::Stale);
+    TEST_ASSERT(arbiter.state() == FeedArbiter::State::Stale);
 
     std::cout << "    [PASS] Session change detection\n";
 }
@@ -309,7 +318,7 @@ void testFrameRoundTrip() {
         std::vector<uint8_t> buffer(FrameHeader::SIZE);
         original.serialize(buffer.data(), buffer.size());
 
-        assert(FrameHeader::parse(buffer.data(), buffer.size()).has_value());
+        TEST_ASSERT(FrameHeader::parse(buffer.data(), buffer.size()).has_value());
     }
 
     std::cout << "    [PASS] Frame round-trip encoding\n";
@@ -331,7 +340,7 @@ void testTcpFrameFragmentation() {
 
     // Parse it back
     auto parsed = FrameHeader::parse(frame.data(), frame.size());
-    assert(parsed.has_value());
+    TEST_ASSERT(parsed.has_value());
     (void)parsed;
 
     std::cout << "    [PASS] Frame fragmentation parsing\\n";

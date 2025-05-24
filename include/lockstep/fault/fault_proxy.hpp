@@ -1,14 +1,29 @@
 #pragma once
 
 #include <cstdint>
+#include <deque>
 #include <random>
+#include <vector>
 #include "lockstep/common/types.hpp"
 
 namespace lockstep {
 
+// Observable delivery envelope with payload, session, sequence, channel,
+// and scheduled delivery information.
+struct DeliveryEnvelope {
+    char channel = 'A';
+    std::uint32_t sessionId = 1;
+    std::uint64_t packetSeq = 0;
+    std::uint64_t firstEventSeq = 0;
+    std::uint16_t eventCount = 0;
+    std::vector<std::uint8_t> payload;
+    std::uint64_t scheduledDeliveryNs = 0;
+    bool corrupted = false;
+};
+
 // Deterministic fault injection for dual-feed UDP / recovery testing.
 // Seeded PRNG for reproducible fault schedules (loss, duplicate, reorder,
-// corruption, channel outage). Stress gate: 100M logical events under faults
+// corruption, delay, channel outage). Stress gate: 100M logical events under faults
 // with zero state digest mismatches (docs/VERIFICATION.md, docs/DURABILITY.md).
 
 enum class FaultType : std::uint8_t {
@@ -45,7 +60,7 @@ class Pcg32 {
         return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
     }
 
-    std::uint32_t next(std::uint32_t max) { return next() % max; }
+    std::uint32_t next(std::uint32_t max) { return (max == 0) ? 0 : next() % max; }
 
     bool nextBool(double probability) {
         return static_cast<double>(next()) / static_cast<double>(UINT32_MAX) < probability;
@@ -65,8 +80,16 @@ class FaultProxy {
     void setDuplicateProbability(double prob);
     void setReorderProbability(double prob);
     void setCorruptionProbability(double prob);
+    void setDelayProbability(double prob, std::uint32_t delayNs = 1000);
+    void setChannelOutage(char channel, bool outage);
 
-    // Process a packet - returns true if packet should be forwarded
+    // Process a delivery envelope - returns zero, one, or multiple envelopes
+    std::vector<DeliveryEnvelope> submit(DeliveryEnvelope envelope, std::uint64_t currentNs = 0);
+
+    // Drain all buffered / reordered envelopes deterministically
+    std::vector<DeliveryEnvelope> drain();
+
+    // Legacy method - returns true if packet should be forwarded
     bool processPacket(char channel, std::uint64_t seq, std::vector<std::uint8_t>& packet);
 
     // Fault statistics
@@ -75,6 +98,8 @@ class FaultProxy {
     std::uint64_t packetsDuplicated() const { return duplicatedPackets_; }
     std::uint64_t packetsReordered() const { return reorderedPackets_; }
     std::uint64_t packetsCorrupted() const { return corruptedPackets_; }
+    std::uint64_t packetsDelayed() const { return delayedPackets_; }
+    std::uint64_t packetsOutage() const { return outagePackets_; }
 
     // Reset statistics
     void resetStats();
@@ -86,16 +111,22 @@ class FaultProxy {
     double dupProb_ = 0.0;
     double reorderProb_ = 0.0;
     double corruptProb_ = 0.0;
+    double delayProb_ = 0.0;
+    std::uint32_t delayNs_ = 1000;
+
+    bool outageA_ = false;
+    bool outageB_ = false;
 
     std::uint64_t totalPackets_ = 0;
     std::uint64_t droppedPackets_ = 0;
     std::uint64_t duplicatedPackets_ = 0;
     std::uint64_t reorderedPackets_ = 0;
     std::uint64_t corruptedPackets_ = 0;
+    std::uint64_t delayedPackets_ = 0;
+    std::uint64_t outagePackets_ = 0;
 
-    std::vector<std::uint8_t> heldPacket_;
-    std::uint64_t heldSeq_ = 0;
-    char heldChannel_ = 'A';
+    std::deque<DeliveryEnvelope> heldEnvelopes_;
+    static constexpr std::size_t MAX_REORDER_DEPTH = 8;
 };
 
 }  // namespace lockstep
