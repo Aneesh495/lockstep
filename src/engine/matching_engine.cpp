@@ -1,10 +1,15 @@
 #include "lockstep/engine/matching_engine.hpp"
 #include <algorithm>
+#include <stdexcept>
 
 namespace lockstep {
 
 MatchingEngine::MatchingEngine(const Config& config) : config_(config) {
     for (const auto& instr : config.instruments) {
+        if (instrumentConfigs_.contains(instr.id) || instr.maxOrdersPerLevel == 0 ||
+            instr.maxPriceLevels == 0 ||
+            static_cast<std::uint64_t>(instr.maxOrdersPerLevel) * instr.maxPriceLevels > 1000000)
+            throw std::invalid_argument("Invalid instrument capacity");
         instrumentConfigs_[instr.id] = instr;
 
         OrderBook::Config bookConfig;
@@ -25,6 +30,7 @@ MatchingEngine::MatchingEngine(const Config& config) : config_(config) {
 MatchingEngine::Result MatchingEngine::newOrder(const Order& order) {
     Result result;
 
+    result.commandSeq = nextCommandSeq();
     // Check kill switch
     if (killSwitchActive_) {
         result.reason = RejectionReason::KillSwitchActive;
@@ -40,8 +46,7 @@ MatchingEngine::Result MatchingEngine::newOrder(const Order& order) {
 
     OrderBook& book = *it->second;
 
-    // Assign sequences
-    result.commandSeq = nextCommandSeq();
+    // Sequence assigned before validation
 
     // Execute on optimized book
     Order mutableOrder = order;
@@ -142,6 +147,12 @@ MatchingEngine::Result MatchingEngine::replaceOrder(ClientId clientId, OrderId o
         it->second->replaceOrder(clientId, oldOrderId, newOrderId, newPrice, newQuantity);
     result.success = bookResult.success;
     result.reason = bookResult.reason;
+    result.matches = bookResult.matches;
+    totalMatches_ += result.matches.size();
+    for (auto& match : result.matches) {
+        match.timestamp = clock_.now();
+        result.eventSeq = nextEventSeq();
+    }
 
     if (config_.useReferenceBook) {
         auto refIt = refBooks_.find(instrumentId);
@@ -154,6 +165,7 @@ MatchingEngine::Result MatchingEngine::replaceOrder(ClientId clientId, OrderId o
 }
 
 std::uint32_t MatchingEngine::massCancel(ClientId clientId) {
+    nextCommandSeq();
     std::uint32_t total = 0;
 
     for (auto& [id, book] : books_) {
@@ -258,8 +270,21 @@ void MatchingEngine::reset() {
     }
     commandSeq_ = 1;
     eventSeq_ = 1;
+    clock_.reset();
     totalMatches_ = 0;
     killSwitchActive_ = false;
+}
+
+void MatchingEngine::swapState(MatchingEngine& other) {
+    books_.swap(other.books_);
+    refBooks_.swap(other.refBooks_);
+    std::swap(commandSeq_, other.commandSeq_);
+    std::swap(eventSeq_, other.eventSeq_);
+    std::swap(killSwitchActive_, other.killSwitchActive_);
+    std::swap(totalMatches_, other.totalMatches_);
+    const auto time = clock_.now();
+    clock_.set(other.clock_.now());
+    other.clock_.set(time);
 }
 
 bool MatchingEngine::installOrder(const Order& order) {

@@ -54,7 +54,7 @@ class RiskEngine {
 
     // Release reserved exposure when order is filled/canceled
     void releaseOrder(ClientId clientId, InstrumentId instrumentId, Side side, Price price,
-                      Quantity quantity);
+                      Quantity quantity, bool removesOrder = true);
 
     // Update position after execution
     void updatePosition(ClientId clientId, InstrumentId instrumentId, Side side, Quantity quantity);

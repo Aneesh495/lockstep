@@ -56,6 +56,19 @@ class ReferenceBook {
         }
     }
 
+    template <typename Func>
+    void forEachOrderInPriceTimeOrder(Func&& f) const {
+        for (const auto& [p, q] : bids_) {
+            (void)p;
+            for (const auto& o : q)
+                f(o);
+        }
+        for (const auto& [p, q] : asks_) {
+            (void)p;
+            for (const auto& o : q)
+                f(o);
+        }
+    }
     Quantity totalBidQuantity() const;
     Quantity totalAskQuantity() const;
 

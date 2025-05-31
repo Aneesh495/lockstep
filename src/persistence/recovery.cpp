@@ -1,259 +1,224 @@
 #include "lockstep/persistence/recovery.hpp"
-#include <cstring>
+#include <algorithm>
 #include <filesystem>
+#include "lockstep/common/crc32c.hpp"
 #include "lockstep/protocol/codec.hpp"
 #include "lockstep/protocol/frame.hpp"
 
 namespace lockstep {
-
 RecoveryManager::RecoveryManager(const std::string& snapshotPath, const std::string& walPath)
     : snapshotPath_(snapshotPath), walPath_(walPath) {}
 
 bool RecoveryManager::applyRecord(MatchingEngine& engine, RiskEngine& risk, const WalRecord& record,
-                                  std::string& error) {
-    const std::uint8_t* payloadData = record.payload.data();
-    std::size_t payloadSize = record.payload.size();
-
-    // Check if payload is framed with LKST header
-    MessageType msgType = static_cast<MessageType>(record.recordKind);
-    if (payloadSize >= FRAME_HEADER_SIZE && std::memcmp(payloadData, "LKST", 4) == 0) {
-        auto frameHdr = FrameHeader::parse(payloadData, payloadSize);
-        if (frameHdr) {
-            msgType = frameHdr->messageType();
-            payloadData += FRAME_HEADER_SIZE;
-            payloadSize = frameHdr->payloadLength();
-        }
-    }
-
-    if (msgType == MessageType::NewOrder) {
-        auto dec = Codec::decodeNewOrder(payloadData, payloadSize);
-        if (!dec) {
-            error = "Failed to decode NewOrderPayload";
+                                  std::string& error, MatchingEngine::Result* output) {
+    const auto* data = record.payload.data();
+    auto size = record.payload.size();
+    MessageType type = static_cast<MessageType>(record.recordKind);
+    if (size >= FrameHeader::SIZE && data[0] == 'L' && data[1] == 'K') {
+        auto h = FrameHeader::parse(data, size);
+        if (!h || h->totalSize() != size) {
+            error = "Invalid persisted frame";
             return false;
         }
-
-        Order order;
-        order.clientId = dec->clientId;
-        order.orderId = dec->orderId;
-        order.instrumentId = dec->instrumentId;
-        order.side = dec->side;
-        order.tif = dec->tif;
-        order.price = dec->price;
-        order.quantity = dec->quantity;
-        order.clientSeq = dec->clientSeq;
-
-        const InstrumentConfig* cfg = engine.getInstrumentConfig(order.instrumentId);
-        if (cfg == nullptr) {
-            error = "Unknown instrument " + std::to_string(order.instrumentId);
+        auto bytes = record.payload;
+        std::fill(bytes.begin() + 32, bytes.begin() + 36, 0);
+        if (Crc32C::compute(bytes.data(), bytes.size()) != h->crc32c()) {
+            error = "Persisted frame CRC";
             return false;
         }
-
-        if (risk.getClientState(order.clientId) == nullptr) {
-            RiskLimits limits;
-            limits.clientId = order.clientId;
-            risk.setClientLimits(order.clientId, limits);
-        }
-
-        auto [riskOk, reason] = risk.checkNewOrder(order.clientId, order.instrumentId, order.side,
-                                                   order.price, order.quantity, *cfg);
-        if (!riskOk) {
-            engine.nextCommandSeq();
-            return true;
-        }
-
-        auto result = engine.newOrder(order);
-        if (result.success) {
-            Quantity executedQty = 0;
-            for (const auto& match : result.matches) {
-                executedQty += match.quantity;
-                if (risk.getClientState(match.passiveClientId) == nullptr) {
-                    RiskLimits limits;
-                    limits.clientId = match.passiveClientId;
-                    risk.setClientLimits(match.passiveClientId, limits);
-                }
-                Side aggSide = order.side;
-                Side passSide = (aggSide == Side::Buy) ? Side::Sell : Side::Buy;
-                risk.updatePosition(match.aggressiveClientId, order.instrumentId, aggSide,
-                                    match.quantity);
-                risk.updatePosition(match.passiveClientId, order.instrumentId, passSide,
-                                    match.quantity);
-            }
-            Quantity remQty = (order.quantity > executedQty) ? (order.quantity - executedQty) : 0;
-            if (remQty > 0 && order.tif == TimeInForce::GTC) {
-                risk.reserveOrder(order.clientId, order.instrumentId, order.side, order.price,
-                                  remQty);
-            }
-        }
-        return true;
+        type = h->messageType();
+        data += FrameHeader::SIZE;
+        size = h->payloadLength();
     }
-
-    if (msgType == MessageType::CancelOrder) {
-        auto dec = Codec::decodeCancelOrder(payloadData, payloadSize);
-        if (!dec) {
-            error = "Failed to decode CancelOrderPayload";
+    if (record.commandSeq != engine.currentCommandSeq()) {
+        error = "Command sequence discontinuity";
+        return false;
+    }
+    engine.clock().set(record.timestamp);
+    MatchingEngine::Result result;
+    auto find = [&](ClientId client, OrderId id) -> std::optional<Order> {
+        for (const auto& cfg : engine.config().instruments) {
+            auto o = engine.getBook(cfg.id)->findOrder(client, id);
+            if (o)
+                return o->get();
+        }
+        return std::nullopt;
+    };
+    auto initialize = [&](ClientId id) {
+        if (!risk.getClientState(id)) {
+            RiskLimits lim;
+            lim.clientId = id;
+            risk.setClientLimits(id, lim);
+        }
+    };
+    Side aggressorSide = Side::Buy;
+    InstrumentId instrument = INVALID_INSTRUMENT_ID;
+    if (type == MessageType::NewOrder) {
+        auto p = Codec::decodeNewOrder(data, size);
+        if (!p || size != 56) {
+            error = "Invalid NewOrder payload";
             return false;
         }
-
-        Order restingOrder;
-        bool found = false;
-        for (const auto& cfg : engine.instrumentConfigs()) {
-            OrderBook* b = engine.getBook(cfg.id);
-            if (b != nullptr) {
-                auto oOpt = b->findOrder(dec->clientId, dec->orderId);
-                if (oOpt) {
-                    restingOrder = oOpt->get();
-                    found = true;
-                    break;
-                }
-            }
+        Order o;
+        o.clientId = p->clientId;
+        o.orderId = p->orderId;
+        o.instrumentId = p->instrumentId;
+        o.side = p->side;
+        o.tif = p->tif;
+        o.price = p->price;
+        o.quantity = p->quantity;
+        o.clientSeq = p->clientSeq;
+        aggressorSide = o.side;
+        instrument = o.instrumentId;
+        initialize(o.clientId);
+        auto cfg = engine.getInstrumentConfig(instrument);
+        if (!cfg)
+            result = engine.newOrder(o);
+        else {
+            auto [ok, reason] =
+                risk.checkNewOrder(o.clientId, instrument, o.side, o.price, o.quantity, *cfg);
+            if (!ok) {
+                result.reason = reason;
+                result.commandSeq = engine.nextCommandSeq();
+            } else
+                result = engine.newOrder(o);
         }
-
-        auto result = engine.cancelOrder(dec->clientId, dec->orderId);
-        if (result.success && found) {
-            risk.releaseOrder(restingOrder.clientId, restingOrder.instrumentId, restingOrder.side,
-                              restingOrder.price, restingOrder.remainingQuantity());
-        }
-        return true;
-    }
-
-    if (msgType == MessageType::ReplaceOrder) {
-        auto dec = Codec::decodeReplaceOrder(payloadData, payloadSize);
-        if (!dec) {
-            error = "Failed to decode ReplaceOrderPayload";
+    } else if (type == MessageType::CancelOrder) {
+        auto p = Codec::decodeCancelOrder(data, size);
+        if (!p || size != 32) {
+            error = "Invalid CancelOrder payload";
             return false;
         }
-
-        Order restingOrder;
-        bool found = false;
-        for (const auto& cfg : engine.instrumentConfigs()) {
-            OrderBook* b = engine.getBook(cfg.id);
-            if (b != nullptr) {
-                auto oOpt = b->findOrder(dec->clientId, dec->oldOrderId);
-                if (oOpt) {
-                    restingOrder = oOpt->get();
-                    found = true;
-                    break;
-                }
-            }
-        }
-
-        auto result =
-            engine.replaceOrder(dec->clientId, dec->oldOrderId, dec->newOrderId,
-                                restingOrder.instrumentId, dec->newPrice, dec->newQuantity);
-        if (result.success && found) {
-            risk.releaseOrder(restingOrder.clientId, restingOrder.instrumentId, restingOrder.side,
-                              restingOrder.price, restingOrder.remainingQuantity());
-            risk.reserveOrder(dec->clientId, restingOrder.instrumentId, restingOrder.side,
-                              dec->newPrice, dec->newQuantity);
-        }
-        return true;
-    }
-
-    if (msgType == MessageType::MassCancel) {
-        auto dec = Codec::decodeMassCancel(payloadData, payloadSize);
-        if (!dec) {
-            error = "Failed to decode MassCancelPayload";
+        result = engine.cancelOrder(p->clientId, p->orderId);
+    } else if (type == MessageType::ReplaceOrder) {
+        auto p = Codec::decodeReplaceOrder(data, size);
+        if (!p || size != 48) {
+            error = "Invalid ReplaceOrder payload";
             return false;
         }
-
-        engine.massCancel(dec->clientId);
-        risk.onMassCancel(dec->clientId);
-        return true;
+        auto old = find(p->clientId, p->oldOrderId);
+        if (!old) {
+            result.commandSeq = engine.nextCommandSeq();
+            result.reason = RejectionReason::OrderNotFound;
+        } else {
+            instrument = old->instrumentId;
+            aggressorSide = old->side;
+            auto state = *risk.getClientState(p->clientId);
+            // Replacement preflight evaluates exposure after releasing the old reservation.
+            risk.releaseOrder(old->clientId, instrument, old->side, old->price,
+                              old->remainingQuantity());
+            auto [ok, reason] =
+                risk.checkNewOrder(old->clientId, instrument, old->side, p->newPrice,
+                                   p->newQuantity, *engine.getInstrumentConfig(instrument));
+            risk.installClientState(state);
+            if (!ok) {
+                result.commandSeq = engine.nextCommandSeq();
+                result.reason = reason;
+            } else
+                result = engine.replaceOrder(p->clientId, p->oldOrderId, p->newOrderId, instrument,
+                                             p->newPrice, p->newQuantity);
+        }
+    } else if (type == MessageType::MassCancel) {
+        auto p = Codec::decodeMassCancel(data, size);
+        if (!p || size != 24) {
+            error = "Invalid MassCancel payload";
+            return false;
+        }
+        result.commandSeq = engine.currentCommandSeq();
+        engine.massCancel(p->clientId);
+        result.success = true;
+    } else {
+        error = "Unsupported WAL command";
+        return false;
     }
-
-    error = "Unsupported record kind or message type: " + std::to_string(static_cast<int>(msgType));
-    return false;
+    // Position updates and open exposure have distinct ownership. Rebuild exposure from
+    // resting orders, including partial fills and price-changing replacements.
+    for (const auto& m : result.matches) {
+        initialize(m.passiveClientId);
+        initialize(m.aggressiveClientId);
+        risk.updatePosition(m.aggressiveClientId, instrument, aggressorSide, m.quantity);
+        risk.updatePosition(m.passiveClientId, instrument,
+                            aggressorSide == Side::Buy ? Side::Sell : Side::Buy, m.quantity);
+    }
+    std::vector<ClientId> clients;
+    for (const auto& [id, state] : risk.clients()) {
+        (void)state;
+        clients.push_back(id);
+    }
+    for (auto id : clients)
+        risk.onMassCancel(id);
+    for (const auto& cfg : engine.config().instruments)
+        engine.getBook(cfg.id)->forEachOrder([&](const Order& o) {
+            initialize(o.clientId);
+            risk.reserveOrder(o.clientId, o.instrumentId, o.side, o.price, o.remainingQuantity());
+        });
+    if (output)
+        *output = result;
+    return true;
 }
 
-bool RecoveryManager::recover(MatchingEngine& engine, RiskEngine& risk) {
-    // 1. Try to load snapshot
-    if (!snapshotPath_.empty() && std::filesystem::exists(snapshotPath_)) {
+bool RecoveryManager::recover(MatchingEngine& destination, RiskEngine& destinationRisk) {
+    error_.clear();
+    replayedMatches_.clear();
+    recoveredCommandSeq_ = 0;
+    recoveredEventSeq_ = 0;
+    replayedRecords_ = 0;
+    finalTailIncomplete_ = false;
+    MatchingEngine engine(destination.config());
+    RiskEngine risk;
+    if (!snapshotPath_.empty()) {
         SnapshotReader reader(snapshotPath_);
         if (!reader.read(engine, risk)) {
-            error_ = "Failed to recover from snapshot: " + reader.error();
+            error_ = "Snapshot: " + reader.error();
             return false;
         }
         recoveredCommandSeq_ = reader.coveredWalSeq();
         recoveredEventSeq_ = reader.eventSeq();
     }
-
-    // 2. Replay WAL
-    if (!walPath_.empty() && std::filesystem::exists(walPath_)) {
-        WalReader walReader(walPath_);
-        if (!walReader.isOpen()) {
-            error_ = "Cannot open WAL: " + walPath_;
+    if (!walPath_.empty()) {
+        WalReader reader(walPath_);
+        if (!reader.isOpen()) {
+            error_ = "Cannot open WAL";
             return false;
         }
-
-        std::uint64_t snapshotCoveredSeq = recoveredCommandSeq_;
-        std::uint64_t expectedSeq = snapshotCoveredSeq + 1;
-        bool firstRecord = true;
-
+        const auto covered = recoveredCommandSeq_;
+        std::uint64_t previous = 0;
+        bool havePrevious = false;
         while (true) {
             WalRecord record;
-            WalStatus status = walReader.readRecord(record);
-
-            if (status == WalStatus::CleanEof) {
+            const auto status = reader.readRecord(record);
+            if (status == WalStatus::CleanEof)
                 break;
-            }
-
             if (status == WalStatus::IncompleteTail) {
-                // Recoverable final-tail case
                 finalTailIncomplete_ = true;
                 break;
             }
-
             if (status != WalStatus::Ok) {
-                error_ = "WAL replay error: " + walReader.error();
+                error_ = reader.error();
                 return false;
             }
-
-            // Skip records before or included in snapshot
-            if (record.commandSeq <= snapshotCoveredSeq) {
+            if ((havePrevious && record.commandSeq != previous + 1) || record.commandSeq == 0) {
+                error_ = "Duplicate or Missing WAL sequence gap";
+                return false;
+            }
+            previous = record.commandSeq;
+            havePrevious = true;
+            if (record.commandSeq <= covered)
                 continue;
-            }
-
-            if (firstRecord && snapshotCoveredSeq == 0) {
-                expectedSeq = record.commandSeq;
-                firstRecord = false;
-            }
-
-            if (record.commandSeq < expectedSeq) {
-                error_ = "Duplicate command sequence in WAL: expected " +
-                         std::to_string(expectedSeq) + " got " + std::to_string(record.commandSeq);
+            MatchingEngine::Result observed;
+            if (!applyRecord(engine, risk, record, error_, &observed))
                 return false;
-            }
-
-            if (record.commandSeq > expectedSeq) {
-                error_ = "Missing command sequence gap in WAL: expected " +
-                         std::to_string(expectedSeq) + " got " + std::to_string(record.commandSeq);
-                return false;
-            }
-
-            expectedSeq = record.commandSeq + 1;
-
-            std::string applyErr;
-            if (!applyRecord(engine, risk, record, applyErr)) {
-                error_ = "Failed to apply WAL command at seq " + std::to_string(record.commandSeq) +
-                         ": " + applyErr;
-                return false;
-            }
-
-            replayedRecords_++;
+            replayedMatches_.insert(replayedMatches_.end(), observed.matches.begin(),
+                                    observed.matches.end());
+            ++replayedRecords_;
             recoveredCommandSeq_ = record.commandSeq;
-            recoveredEventSeq_ = engine.currentEventSeq();
         }
     }
-
-    if (!engine.checkInvariants(error_)) {
+    if (!engine.checkInvariants(error_) || !risk.checkInvariants(error_))
         return false;
-    }
-
-    if (!risk.checkInvariants(error_)) {
-        return false;
-    }
-
+    recoveredEventSeq_ = engine.currentEventSeq();
+    destination.swapState(engine);
+    destinationRisk = std::move(risk);
     return true;
 }
-
 }  // namespace lockstep

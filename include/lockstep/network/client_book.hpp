@@ -16,6 +16,15 @@ class ClientBook {
 
     InstrumentId instrumentId() const { return instrumentId_; }
 
+    void copyFrom(const ClientBook& other) {
+        instrumentId_ = other.instrumentId_;
+        bids_ = other.bids_;
+        asks_ = other.asks_;
+        lastEngineSeq_ = other.lastEngineSeq_;
+
+        totalTrades_ = other.totalTrades_;
+    }
+
     void applyEvent(MessageType type, const std::uint8_t* data, std::size_t size) {
         if (type == MessageType::BookAdd) {
             auto dec = Codec::decodeBookAdd(data, size);
@@ -66,6 +75,15 @@ class ClientBook {
                 appliedEvents_++;
             }
         }
+    }
+
+    void installSnapshot(const std::map<Price, Quantity, std::greater<Price>>& bids,
+                         const std::map<Price, Quantity>& asks, std::uint64_t sequence,
+                         std::uint64_t trades) {
+        bids_ = bids;
+        asks_ = asks;
+        lastEngineSeq_ = sequence;
+        totalTrades_ = trades;
     }
 
     void clear() {

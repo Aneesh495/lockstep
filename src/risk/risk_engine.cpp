@@ -1,4 +1,5 @@
 #include "lockstep/risk/risk_engine.hpp"
+#include <map>
 #include <string>
 
 namespace lockstep {
@@ -21,6 +22,12 @@ std::pair<bool, RejectionReason> RiskEngine::checkNewOrder(
         return {false, RejectionReason::InvalidMessage};
     }
 
+    if (state->limits.killSwitchActive)
+        return {false, RejectionReason::KillSwitchActive};
+    if (side != Side::Buy && side != Side::Sell)
+        return {false, RejectionReason::InvalidSide};
+    if (quantity == 0)
+        return {false, RejectionReason::InvalidQuantity};
     // Check instrument is legal
     if (instrumentConfig.id != instrumentId) {
         return {false, RejectionReason::UnknownInstrument};
@@ -48,8 +55,11 @@ std::pair<bool, RejectionReason> RiskEngine::checkNewOrder(
     }
 
     // Check max open quantity
-    Quantity newOpenQty = (side == Side::Buy) ? state->openBuyQuantity + quantity
-                                              : state->openSellQuantity + quantity;
+    auto sum =
+        checkedAdd(side == Side::Buy ? state->openBuyQuantity : state->openSellQuantity, quantity);
+    if (!sum)
+        return {false, RejectionReason::MaxOpenQuantityExceeded};
+    Quantity newOpenQty = *sum;
     if (state->limits.maxOpenQuantity > 0 && newOpenQty > state->limits.maxOpenQuantity) {
         return {false, RejectionReason::MaxOpenQuantityExceeded};
     }
@@ -63,13 +73,16 @@ std::pair<bool, RejectionReason> RiskEngine::checkNewOrder(
 
     // Check max position (worst case)
     Position currentPosition = getOpenPosition(clientId, instrumentId);
-    Position worstCasePosition = (side == Side::Buy)
-                                     ? currentPosition + static_cast<Position>(quantity)
-                                     : currentPosition - static_cast<Position>(quantity);
+    Position delta =
+        side == Side::Buy ? static_cast<Position>(quantity) : -static_cast<Position>(quantity);
+    auto worst = checkedAdd(currentPosition, delta);
+    if (!worst)
+        return {false, RejectionReason::MaxPositionExceeded};
+    Position worstCasePosition = *worst;
 
     if (state->limits.maxPosition > 0) {
-        Position absWorstCase = (worstCasePosition >= 0) ? worstCasePosition : -worstCasePosition;
-        if (absWorstCase > static_cast<Position>(state->limits.maxPosition)) {
+        auto absolute = absPosition(worstCasePosition);
+        if (absolute > static_cast<std::uint64_t>(state->limits.maxPosition)) {
             return {false, RejectionReason::MaxPositionExceeded};
         }
     }
@@ -104,14 +117,14 @@ void RiskEngine::reserveOrder(ClientId clientId, InstrumentId instrumentId, Side
 }
 
 void RiskEngine::releaseOrder(ClientId clientId, InstrumentId instrumentId, Side side, Price price,
-                              Quantity quantity) {
+                              Quantity quantity, bool removesOrder) {
     ClientState* state = getClientState(clientId);
     if (!state)
         return;
 
     Notional notional = computeNotional(price, quantity);
 
-    if (state->openOrderCount > 0) {
+    if (removesOrder && state->openOrderCount > 0) {
         state->openOrderCount--;
     }
 
@@ -138,15 +151,6 @@ void RiskEngine::updatePosition(ClientId clientId, InstrumentId instrumentId, Si
         (side == Side::Buy) ? static_cast<Position>(quantity) : -static_cast<Position>(quantity);
 
     state->positions[instrumentId] += delta;
-
-    // Update open quantity (filled portion no longer open)
-    if (side == Side::Buy) {
-        state->openBuyQuantity =
-            (state->openBuyQuantity > quantity) ? state->openBuyQuantity - quantity : 0;
-    } else {
-        state->openSellQuantity =
-            (state->openSellQuantity > quantity) ? state->openSellQuantity - quantity : 0;
-    }
 }
 
 void RiskEngine::onMassCancel(ClientId clientId) {
@@ -193,18 +197,39 @@ bool RiskEngine::checkInvariants(std::string& error) const {
 }
 
 std::uint64_t RiskEngine::computeDigest() const {
-    std::uint64_t digest = 0;
-
-    for (const auto& [clientId, state] : clients_) {
-        digest ^= clientId * 0x9e3779b97f4a7c15ULL;
-        digest ^= static_cast<std::uint64_t>(state.openOrderCount) * 0xbf58476d1ce4e5b9ULL;
-
-        for (const auto& [instId, pos] : state.positions) {
-            digest ^= instId * 0x94d049bb133111ebULL;
-            digest ^= static_cast<std::uint64_t>(pos) * 0x9ddfea08eb382d69ULL;
+    std::uint64_t digest = 1469598103934665603ULL;
+    auto h = [&](std::uint64_t value) { digest = (digest ^ value) * 1099511628211ULL; };
+    auto wide = [&](Notional value) {
+        h(static_cast<std::uint64_t>(value));
+        h(static_cast<std::uint64_t>(value >> 64));
+    };
+    h(killSwitchActive_);
+    std::map<ClientId, const ClientState*> sorted;
+    for (const auto& [id, c] : clients_)
+        sorted[id] = &c;
+    for (const auto& [id, ptr] : sorted) {
+        const auto& c = *ptr;
+        h(id);
+        h(c.openOrderCount);
+        h(c.openBuyQuantity);
+        h(c.openSellQuantity);
+        wide(c.openBuyNotional);
+        wide(c.openSellNotional);
+        wide(c.reservedBuyNotional);
+        wide(c.reservedSellNotional);
+        h(c.limits.maxOrderQuantity);
+        h(c.limits.maxOpenOrders);
+        h(c.limits.maxOpenQuantity);
+        wide(c.limits.maxOrderNotional);
+        wide(c.limits.maxOpenNotional);
+        h(static_cast<std::uint64_t>(c.limits.maxPosition));
+        h(c.limits.killSwitchActive);
+        std::map<InstrumentId, Position> positions(c.positions.begin(), c.positions.end());
+        for (const auto& [inst, pos] : positions) {
+            h(inst);
+            h(static_cast<std::uint64_t>(pos));
         }
     }
-
     return digest;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 #include "lockstep/common/types.hpp"
@@ -18,7 +19,7 @@ namespace lockstep {
 
 struct SnapshotHeader {
     std::uint32_t magic = 0x534E4150;  // "SNAP"
-    std::uint8_t version = 1;
+    std::uint8_t version = 2;
     std::uint8_t reserved[3] = {0};
     std::uint64_t timestamp = 0;
     std::uint64_t commandSeq = 0;
@@ -27,6 +28,9 @@ struct SnapshotHeader {
     std::uint32_t instrumentCount = 0;
     std::uint32_t orderCount = 0;
     std::uint32_t clientCount = 0;
+    std::uint64_t totalMatches = 0;
+    bool engineHalted = false;
+    bool riskHalted = false;
 };
 
 class SnapshotWriter {
@@ -34,10 +38,12 @@ class SnapshotWriter {
     explicit SnapshotWriter(const std::string& path);
 
     bool write(const MatchingEngine& engine, const RiskEngine& risk);
+    void setPublicationHook(std::function<void(int)> hook) { publicationHook_ = std::move(hook); }
 
     std::string error() const { return error_; }
 
    private:
+    std::function<void(int)> publicationHook_;
     std::string path_;
     std::string error_;
 };

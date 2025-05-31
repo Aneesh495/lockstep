@@ -37,17 +37,18 @@ void FaultProxy::setChannelOutage(char channel, bool outage) {
 std::vector<DeliveryEnvelope> FaultProxy::submit(DeliveryEnvelope envelope,
                                                  std::uint64_t currentNs) {
     totalPackets_++;
+    auto due = drain(currentNs);
 
     // 1. Channel outage check
     if ((envelope.channel == 'A' && outageA_) || (envelope.channel == 'B' && outageB_)) {
         outagePackets_++;
-        return {};
+        return due;
     }
 
     // 2. Packet loss check
     if (lossProb_ > 0.0 && rng_.nextBool(lossProb_)) {
         droppedPackets_++;
-        return {};
+        return due;
     }
 
     // 3. Bit corruption check
@@ -76,7 +77,7 @@ std::vector<DeliveryEnvelope> FaultProxy::submit(DeliveryEnvelope envelope,
         heldEnvelopes_.size() < MAX_REORDER_DEPTH) {
         reorderedPackets_++;
         heldEnvelopes_.push_back(std::move(envelope));
-        return {};
+        return due;
     }
 
     std::vector<DeliveryEnvelope> out;
@@ -95,14 +96,31 @@ std::vector<DeliveryEnvelope> FaultProxy::submit(DeliveryEnvelope envelope,
         out.push_back(out.front());
     }
 
-    return out;
+    for (auto& e : out) {
+        if (e.scheduledDeliveryNs <= currentNs)
+            due.push_back(std::move(e));
+        else if (delayedEnvelopes_.size() < 128)
+            delayedEnvelopes_.push_back(std::move(e));
+        else
+            ++droppedPackets_;
+    }
+    return due;
 }
 
-std::vector<DeliveryEnvelope> FaultProxy::drain() {
+std::vector<DeliveryEnvelope> FaultProxy::drain(std::uint64_t currentNs) {
     std::vector<DeliveryEnvelope> out;
-    while (!heldEnvelopes_.empty()) {
-        out.push_back(std::move(heldEnvelopes_.front()));
-        heldEnvelopes_.pop_front();
+    if (currentNs == UINT64_MAX) {
+        while (!heldEnvelopes_.empty()) {
+            delayedEnvelopes_.push_back(std::move(heldEnvelopes_.front()));
+            heldEnvelopes_.pop_front();
+        }
+    }
+    for (auto it = delayedEnvelopes_.begin(); it != delayedEnvelopes_.end();) {
+        if (it->scheduledDeliveryNs <= currentNs) {
+            out.push_back(std::move(*it));
+            it = delayedEnvelopes_.erase(it);
+        } else
+            ++it;
     }
     return out;
 }
@@ -132,6 +150,7 @@ void FaultProxy::resetStats() {
     delayedPackets_ = 0;
     outagePackets_ = 0;
     heldEnvelopes_.clear();
+    delayedEnvelopes_.clear();
 }
 
 }  // namespace lockstep

@@ -4,9 +4,12 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <chrono>
+#include <stdexcept>
 #include <thread>
 #include <utility>
 #include <vector>
+#include "lockstep/common/crc32c.hpp"
+#include "lockstep/common/endian.hpp"
 
 namespace lockstep {
 
@@ -51,16 +54,16 @@ void UdpPublisher::stop() {
 
 void UdpPublisher::run() {
     std::vector<MarketEvent> batch;
-    batch.reserve(100);
+    batch.reserve(20);
 
     MarketDataPacket packetA, packetB;
 
-    while (running_) {
+    while (running_ || !eventQueue_.empty()) {
         // Collect events
         batch.clear();
         MarketEvent event;
 
-        while (eventQueue_.tryPop(event) && batch.size() < 100) {
+        while (batch.size() < 20 && eventQueue_.tryPop(event)) {
             batch.push_back(event);
         }
 
@@ -98,41 +101,70 @@ void UdpPublisher::run() {
     }
 }
 
+DeliveryEnvelope UdpPublisher::encodePacket(char channel, std::uint32_t session,
+                                            std::uint64_t packetSeq,
+                                            std::span<const MarketEvent> events) {
+    if (events.empty() || events.size() > 20)
+        throw std::invalid_argument("Invalid packet batch");
+    DeliveryEnvelope env;
+    env.channel = channel;
+    env.sessionId = session;
+    env.packetSeq = packetSeq;
+    env.firstEventSeq = events.front().eventSeq;
+    env.eventCount = static_cast<std::uint16_t>(events.size());
+    env.payload.resize(FrameHeader::SIZE + 20, 0);
+    ByteWriter md(env.payload.data() + FrameHeader::SIZE, 20);
+    md.writeU64(env.firstEventSeq);
+    md.writeU16(env.eventCount);
+    md.writeU64(0);
+    md.writeU16(0);
+    for (std::size_t i = 0; i < events.size(); ++i) {
+        const auto& e = events[i];
+        if (e.eventSeq != env.firstEventSeq + i || e.payload.size() > MAX_PAYLOAD_SIZE)
+            throw std::invalid_argument("Noncontiguous event batch");
+        env.payload.push_back(static_cast<std::uint8_t>(e.type));
+        env.payload.push_back(static_cast<std::uint8_t>(e.payload.size() >> 8));
+        env.payload.push_back(static_cast<std::uint8_t>(e.payload.size()));
+        env.payload.insert(env.payload.end(), e.payload.begin(), e.payload.end());
+    }
+    if (env.payload.size() - FrameHeader::SIZE > MAX_PAYLOAD_SIZE)
+        throw std::invalid_argument("Packet exceeds MTU");
+    FrameHeader h;
+    h.setMessageType(MessageType::SnapshotBegin);
+    h.setSessionId(session);
+    h.setSequence(packetSeq);
+    h.setPayloadLength(static_cast<std::uint32_t>(env.payload.size() - FrameHeader::SIZE));
+    h.serialize(env.payload.data(), env.payload.size());
+    h.setCrc32c(Crc32C::compute(env.payload.data(), env.payload.size()));
+    h.serialize(env.payload.data(), env.payload.size());
+    return env;
+}
+
 bool UdpPublisher::sendPacket(int fd, std::uint16_t port, const MarketDataPacket& packet) {
+    std::vector<MarketEvent> events;
+    std::size_t offset = 0;
+    for (std::uint16_t i = 0; i < packet.eventCount; ++i) {
+        if (offset + 3 > packet.payload.size())
+            return false;
+        MarketEvent e;
+        e.eventSeq = packet.firstEventSeq + i;
+        e.type = static_cast<MessageType>(packet.payload[offset]);
+        std::size_t length = readBeU16(packet.payload.data() + offset + 1);
+        offset += 3;
+        if (offset + length > packet.payload.size())
+            return false;
+        e.payload.assign(packet.payload.begin() + static_cast<std::ptrdiff_t>(offset),
+                         packet.payload.begin() + static_cast<std::ptrdiff_t>(offset + length));
+        offset += length;
+        events.push_back(std::move(e));
+    }
+    auto env = encodePacket('A', packet.sessionId, packet.packetSeq, events);
     sockaddr_in addr{};
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     addr.sin_port = htons(port);
-
-    // Build frame
-    std::vector<std::uint8_t> buffer;
-    buffer.reserve(FRAME_HEADER_SIZE + packet.payload.size() + 20);
-
-    // Frame header
-    FrameHeader header;
-    header.setMessageType(MessageType::SnapshotBegin);
-    header.setSessionId(packet.sessionId);
-    header.setSequence(packet.packetSeq);
-    header.setSendTimestampNs(0);
-    header.setPayloadLength(static_cast<std::uint32_t>(packet.payload.size() + 20));
-
-    std::vector<std::uint8_t> headerBytes(FRAME_HEADER_SIZE);
-    header.serialize(headerBytes.data(), headerBytes.size());
-    buffer.insert(buffer.end(), headerBytes.begin(), headerBytes.end());
-
-    // Market data header
-    std::uint8_t mdHeader[20];
-    std::memcpy(mdHeader, &packet.firstEventSeq, 8);
-    std::memcpy(mdHeader + 8, &packet.eventCount, 2);
-    buffer.insert(buffer.end(), mdHeader, mdHeader + 20);
-
-    // Payload
-    buffer.insert(buffer.end(), packet.payload.begin(), packet.payload.end());
-
-    ssize_t sent = sendto(fd, buffer.data(), buffer.size(), 0, reinterpret_cast<sockaddr*>(&addr),
-                          sizeof(addr));
-
-    return sent > 0;
+    ssize_t sent = sendto(fd, env.payload.data(), env.payload.size(), 0,
+                          reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
+    return sent == static_cast<ssize_t>(env.payload.size());
 }
-
 }  // namespace lockstep

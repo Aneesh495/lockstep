@@ -38,6 +38,20 @@ ReferenceBook::Result ReferenceBook::newOrder(Order& order) {
         return Result{false, RejectionReason::FOKCannotFill, 0, {}};
     }
 
+    // Check if remaining order would cross opposing book (stopped by self-trade prevention)
+    if (order.side == Side::Buy && !asks_.empty() && order.price >= asks_.begin()->first) {
+        if (result.filledQuantity == 0) {
+            return Result{false, RejectionReason::SelfTradePrevention, 0, {}};
+        }
+        return Result{true, RejectionReason::None, result.filledQuantity, result.matches};
+    }
+    if (order.side == Side::Sell && !bids_.empty() && order.price <= bids_.begin()->first) {
+        if (result.filledQuantity == 0) {
+            return Result{false, RejectionReason::SelfTradePrevention, 0, {}};
+        }
+        return Result{true, RejectionReason::None, result.filledQuantity, result.matches};
+    }
+
     // Rest the order
     order.status = OrderStatus::Live;
     order.executedQuantity = result.filledQuantity;
@@ -73,7 +87,9 @@ ReferenceBook::Result ReferenceBook::cancelOrder(ClientId clientId, OrderId orde
     if (order.side == Side::Buy) {
         auto& queue = bids_[order.price];
         queue.erase(std::remove_if(queue.begin(), queue.end(),
-                                   [&](const Order& o) { return o.orderId == orderId; }),
+                                   [&](const Order& o) {
+                                       return o.orderId == orderId && o.clientId == clientId;
+                                   }),
                     queue.end());
         if (queue.empty()) {
             bids_.erase(order.price);
@@ -81,7 +97,9 @@ ReferenceBook::Result ReferenceBook::cancelOrder(ClientId clientId, OrderId orde
     } else {
         auto& queue = asks_[order.price];
         queue.erase(std::remove_if(queue.begin(), queue.end(),
-                                   [&](const Order& o) { return o.orderId == orderId; }),
+                                   [&](const Order& o) {
+                                       return o.orderId == orderId && o.clientId == clientId;
+                                   }),
                     queue.end());
         if (queue.empty()) {
             asks_.erase(order.price);
@@ -111,17 +129,39 @@ ReferenceBook::Result ReferenceBook::replaceOrder(ClientId clientId, OrderId old
         return result;
     }
 
-    // Cancel old
-    auto cancelResult = cancelOrder(clientId, oldOrderId);
-    if (!cancelResult.success) {
-        return cancelResult;
+    if (orders_.contains({clientId, newOrderId}) && newOrderId != oldOrderId) {
+        result.reason = RejectionReason::DuplicateOrderId;
+        return result;
     }
-
-    // Create new
+    if (newQuantity == 0) {
+        result.reason = RejectionReason::InvalidQuantity;
+        return result;
+    }
+    if (newPrice == order.price && newQuantity <= order.remainingQuantity()) {
+        auto adjust = [&](auto& levels) {
+            for (auto& o : levels.at(order.price)) {
+                if (o.clientId == clientId && o.orderId == oldOrderId) {
+                    o.quantity = o.executedQuantity + newQuantity;
+                    o.orderId = newOrderId;
+                    orders_.erase(oldKey);
+                    orders_[{clientId, newOrderId}] = o;
+                    break;
+                }
+            }
+        };
+        if (order.side == Side::Buy)
+            adjust(bids_);
+        else
+            adjust(asks_);
+        result.success = true;
+        return result;
+    }
+    cancelOrder(clientId, oldOrderId);
     order.orderId = newOrderId;
     order.price = newPrice;
-    order.quantity = order.executedQuantity + newQuantity;
-
+    order.quantity = newQuantity;
+    order.executedQuantity = 0;
+    order.tif = TimeInForce::GTC;
     return newOrder(order);
 }
 
@@ -328,25 +368,20 @@ ReferenceBook::Result ReferenceBook::matchOrder(Order& aggressor) {
 }
 
 std::uint64_t ReferenceBook::computeDigest() const {
-    std::uint64_t digest = 0;
-
-    std::vector<std::tuple<Price, OrderId, Quantity, Quantity>> entries;
-    for (const auto& [key, order] : orders_) {
-        if (order.isActive()) {
-            entries.push_back({order.price, order.orderId, order.quantity, order.executedQuantity});
-        }
-    }
-
-    std::sort(entries.begin(), entries.end());
-
-    for (const auto& [price, orderId, qty, execQty] : entries) {
-        std::uint64_t h = static_cast<std::uint64_t>(price);
-        h ^= orderId * 0x9e3779b97f4a7c15ULL;
-        h ^= static_cast<std::uint64_t>(qty) * 0xbf58476d1ce4e5b9ULL;
-        h ^= static_cast<std::uint64_t>(execQty) * 0x94d049bb133111ebULL;
-        digest ^= h;
-    }
-
+    std::uint64_t digest = 1469598103934665603ULL;
+    auto hash = [&](const auto& levels) {
+        for (const auto& [price, queue] : levels)
+            for (const auto& o : queue) {
+                for (std::uint64_t v :
+                     {static_cast<std::uint64_t>(price), o.orderId,
+                      static_cast<std::uint64_t>(o.clientId), static_cast<std::uint64_t>(o.side),
+                      static_cast<std::uint64_t>(o.quantity),
+                      static_cast<std::uint64_t>(o.executedQuantity)})
+                    digest = (digest ^ v) * 1099511628211ULL;
+            }
+    };
+    hash(bids_);
+    hash(asks_);
     return digest;
 }
 

@@ -1,24 +1,32 @@
 #include "lockstep/network/feed_arbiter.hpp"
 #include <algorithm>
 #include "lockstep/common/crc32c.hpp"
+#include "lockstep/protocol/codec.hpp"
 
 namespace lockstep {
 
 FeedArbiter::FeedArbiter(std::uint32_t maxBufferSize) : maxBufferSize_(maxBufferSize) {}
 
 void FeedArbiter::onEnvelope(const DeliveryEnvelope& env) {
-    if (env.corrupted) {
-        corruptDiscarded_++;
+    auto h = FrameHeader::parse(env.payload.data(), env.payload.size());
+    if (!h || h->totalSize() != env.payload.size() ||
+        h->messageType() != MessageType::SnapshotBegin || h->payloadLength() < 20) {
+        ++corruptDiscarded_;
         return;
     }
-
-    onPacket(env.channel, env.sessionId, env.packetSeq, env.firstEventSeq, env.eventCount,
+    const auto* md = env.payload.data() + FrameHeader::SIZE;
+    onPacket(env.channel, h->sessionId(), h->sequence(), readBeU64(md), readBeU16(md + 8),
              env.payload.data(), env.payload.size());
 }
 
 void FeedArbiter::onPacket(char channel, std::uint32_t sessionId, std::uint64_t packetSeq,
                            std::uint64_t firstEventSeq, std::uint16_t eventCount,
                            const std::uint8_t* data, std::size_t length) {
+    if ((channel != 'A' && channel != 'B') || !data || firstEventSeq == 0 || eventCount == 0 ||
+        eventCount > 100 || firstEventSeq > UINT64_MAX - eventCount) {
+        ++corruptDiscarded_;
+        return;
+    }
     // Validate session
     if (sessionId_ == 0) {
         sessionId_ = sessionId;
@@ -50,8 +58,12 @@ void FeedArbiter::onPacket(char channel, std::uint32_t sessionId, std::uint64_t 
             return;
         }
 
-        // Check CRC if set
-        if (hdr->crc32c() != 0) {
+        if (hdr->totalSize() != length) {
+            ++corruptDiscarded_;
+            return;
+        }
+        // CRC verification is mandatory for wire packets.
+        {
             std::vector<std::uint8_t> temp(data, data + hdr->totalSize());
             temp[32] = 0;
             temp[33] = 0;
@@ -66,9 +78,19 @@ void FeedArbiter::onPacket(char channel, std::uint32_t sessionId, std::uint64_t 
 
         eventData = data + FrameHeader::SIZE;
         eventLenTotal = length - FrameHeader::SIZE;
+        if (hdr->messageType() == MessageType::SnapshotBegin) {
+            if (eventLenTotal < 20) {
+                ++corruptDiscarded_;
+                return;
+            }
+            eventData += 20;
+            eventLenTotal -= 20;
+        }
     }
 
-    // Buffer events
+    std::vector<BufferedEvent> parsed;
+    parsed.reserve(eventCount);
+    // Parse the entire packet before exposing any event
     std::uint64_t eventSeq = firstEventSeq;
     std::size_t offset = 0;
 
@@ -94,10 +116,45 @@ void FeedArbiter::onPacket(char channel, std::uint32_t sessionId, std::uint64_t 
         event.payload.assign(eventData + offset, eventData + offset + eventLen);
         event.channel = channel;
 
-        bufferEvent(event);
+        const bool framed = eventData != data;
+        if (framed) {
+            bool valid = false;
+            switch (event.type) {
+                case MessageType::BookAdd:
+                    valid = eventLen == sizeof(BookAddPayload) &&
+                            Codec::decodeBookAdd(event.payload.data(), eventLen).has_value();
+                    break;
+                case MessageType::BookChange:
+                    valid = eventLen == sizeof(BookChangePayload) &&
+                            Codec::decodeBookChange(event.payload.data(), eventLen).has_value();
+                    break;
+                case MessageType::BookDelete:
+                    valid = eventLen == sizeof(BookDeletePayload) &&
+                            Codec::decodeBookDelete(event.payload.data(), eventLen).has_value();
+                    break;
+                case MessageType::Trade:
+                    valid = eventLen == sizeof(TradePayload) &&
+                            Codec::decodeTrade(event.payload.data(), eventLen).has_value();
+                    break;
+                default:
+                    break;
+            }
+            if (!valid) {
+                ++corruptDiscarded_;
+                return;
+            }
+        }
+        parsed.push_back(std::move(event));
         offset += eventLen;
     }
 
+    if (offset != eventLenTotal) {
+        ++corruptDiscarded_;
+        return;
+    }
+    decodedRecords_ += parsed.size();
+    for (const auto& event : parsed)
+        bufferEvent(event);
     // Try to emit events in order
     tryEmitEvents();
 }
@@ -119,7 +176,8 @@ void FeedArbiter::bufferEvent(const BufferedEvent& event) {
         return;
     }
 
-    if (event.eventSeq >= nextExpectedSeq_ + maxBufferSize_) {
+    if (event.eventSeq - nextExpectedSeq_ >= maxBufferSize_ ||
+        readyEvents_.size() + eventBuffer_.size() >= maxBufferSize_) {
         // Buffer overflow
         state_ = State::Gap;
         bufferOverflows_++;
@@ -181,12 +239,18 @@ std::optional<BufferedEvent> FeedArbiter::nextEvent() {
 
 void FeedArbiter::applySnapshot(std::uint64_t snapshotSeq, std::uint32_t newSessionId) {
     if (newSessionId != 0) {
+        if (newSessionId != sessionId_) {
+            readyEvents_.clear();
+            eventBuffer_.clear();
+        }
         sessionId_ = newSessionId;
     }
 
-    // Discard ready events that are obsolete (<= snapshotSeq)
-    std::erase_if(readyEvents_,
-                  [snapshotSeq](const BufferedEvent& ev) { return ev.eventSeq <= snapshotSeq; });
+    // Ready events after the snapshot boundary must remain ordered and deduplicated.
+    for (auto& e : readyEvents_)
+        if (e.eventSeq > snapshotSeq)
+            eventBuffer_.emplace(e.eventSeq, std::move(e));
+    readyEvents_.clear();
 
     // Discard buffered events that are obsolete (<= snapshotSeq)
     std::erase_if(eventBuffer_,
@@ -207,6 +271,7 @@ void FeedArbiter::applySnapshot(std::uint64_t snapshotSeq, std::uint32_t newSess
 }
 
 void FeedArbiter::resetStats() {
+    decodedRecords_ = 0;
     processedEvents_ = 0;
     duplicatesDiscarded_ = 0;
     gapsDetected_ = 0;

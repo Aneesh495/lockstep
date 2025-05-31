@@ -21,7 +21,7 @@ class RecoveryManager {
 
     // Apply a single persisted command record
     static bool applyRecord(MatchingEngine& engine, RiskEngine& risk, const WalRecord& record,
-                            std::string& error);
+                            std::string& error, MatchingEngine::Result* output = nullptr);
 
     // Get recovery stats
     std::uint64_t recoveredCommandSeq() const { return recoveredCommandSeq_; }
@@ -29,9 +29,11 @@ class RecoveryManager {
     std::uint32_t replayedRecords() const { return replayedRecords_; }
     bool finalTailIncomplete() const { return finalTailIncomplete_; }
 
+    const std::vector<Match>& replayedMatches() const { return replayedMatches_; }
     std::string error() const { return error_; }
 
    private:
+    std::vector<Match> replayedMatches_;
     std::string snapshotPath_;
     std::string walPath_;
 

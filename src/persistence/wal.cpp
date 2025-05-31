@@ -1,6 +1,7 @@
 #include "lockstep/persistence/wal.hpp"
 #include <fcntl.h>
 #include <unistd.h>
+#include <cerrno>
 #include <cstring>
 #include <filesystem>
 #include "lockstep/common/endian.hpp"
@@ -66,10 +67,20 @@ bool WalWriter::append(std::uint64_t commandSeq, std::uint64_t timestamp, const 
     std::uint32_t crc = Crc32C::compute(buffer.data(), WAL_HEADER_SIZE + length);
     writer.writeU32(crc);
 
+    if (interruptionHook_) {
+        const auto cut = WAL_HEADER_SIZE + length / 2;
+        if (::write(fd_, buffer.data(), cut) != static_cast<ssize_t>(cut))
+            return false;
+        interruptionHook_();
+        // A returning hook is unsupported; this checkpoint is for process interruption.
+        return false;
+    }
     std::size_t totalBytes = buffer.size();
     const std::uint8_t* ptr = buffer.data();
     while (totalBytes > 0) {
         ssize_t written = ::write(fd_, ptr, totalBytes);
+        if (written < 0 && errno == EINTR)
+            continue;
         if (written <= 0) {
             return false;
         }
