@@ -27,25 +27,6 @@ void FeedArbiter::onPacket(char channel, std::uint32_t sessionId, std::uint64_t 
         ++corruptDiscarded_;
         return;
     }
-    // Validate session
-    if (sessionId_ == 0) {
-        sessionId_ = sessionId;
-    } else if (sessionId != sessionId_) {
-        // Session changed - need to resnapshot
-        state_ = State::Stale;
-        sessionChanges_++;
-        return;
-    }
-
-    if (state_ == State::Stale) {
-        return;
-    }
-
-    // Update channel state
-    auto& state = (channel == 'A') ? channelA_ : channelB_;
-    state.lastPacketSeq = packetSeq;
-    state.receivedPackets++;
-
     // Check if packet is encapsulated with a FrameHeader
     const std::uint8_t* eventData = data;
     std::size_t eventLenTotal = length;
@@ -152,6 +133,25 @@ void FeedArbiter::onPacket(char channel, std::uint32_t sessionId, std::uint64_t 
         ++corruptDiscarded_;
         return;
     }
+    // Validate session
+    if (sessionId_ == 0) {
+        sessionId_ = sessionId;
+    } else if (sessionId != sessionId_) {
+        // Session changed - need to resnapshot
+        state_ = State::Stale;
+        sessionChanges_++;
+        return;
+    }
+
+    if (state_ == State::Stale) {
+        return;
+    }
+
+    // Update channel state
+    auto& state = (channel == 'A') ? channelA_ : channelB_;
+    state.lastPacketSeq = packetSeq;
+    state.receivedPackets++;
+
     decodedRecords_ += parsed.size();
     for (const auto& event : parsed)
         bufferEvent(event);

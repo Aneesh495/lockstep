@@ -31,4 +31,3 @@ class ScopeAllocationCounter {
 };
 
 }  // namespace lockstep
-

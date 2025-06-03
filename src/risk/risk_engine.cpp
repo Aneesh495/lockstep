@@ -74,7 +74,7 @@ std::pair<bool, RejectionReason> RiskEngine::checkNewOrder(
     // Check max position (worst case)
     Position currentPosition = getOpenPosition(clientId, instrumentId);
     Position delta =
-        side == Side::Buy ? static_cast<Position>(quantity) : -static_cast<Position>(quantity);
+        side == Side::Buy ? static_cast<Position>(newOpenQty) : -static_cast<Position>(newOpenQty);
     auto worst = checkedAdd(currentPosition, delta);
     if (!worst)
         return {false, RejectionReason::MaxPositionExceeded};

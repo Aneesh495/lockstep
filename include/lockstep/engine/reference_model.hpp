@@ -163,9 +163,9 @@ class IndependentReferenceModel {
         n += o.side == Side::Buy ? c.openBuyNotional : c.openSellNotional;
         if (l.maxOpenNotional > 0 && n > l.maxOpenNotional)
             return RejectionReason::MaxOpenNotionalExceeded;
-        Notional worst = static_cast<Notional>(c.position) +
-                         (o.side == Side::Buy ? static_cast<Notional>(o.quantity)
-                                              : -static_cast<Notional>(o.quantity));
+        Notional worst =
+            static_cast<Notional>(c.position) +
+            (o.side == Side::Buy ? static_cast<Notional>(q) : -static_cast<Notional>(q));
         if (worst > INT64_MAX || worst < INT64_MIN ||
             (l.maxPosition > 0 && (worst < 0 ? -worst : worst) > l.maxPosition))
             return RejectionReason::MaxPositionExceeded;

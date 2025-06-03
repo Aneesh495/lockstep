@@ -121,8 +121,12 @@ void TcpGateway::run() {
             while (parseFrame(client)) {
             }
             if (!client.writeBuffer.empty()) {
+                int sendFlags = 0;
+#ifdef MSG_NOSIGNAL
+                sendFlags = MSG_NOSIGNAL;
+#endif
                 auto n = ::send(client.socketFd, client.writeBuffer.data(),
-                                client.writeBuffer.size(), 0);
+                                client.writeBuffer.size(), sendFlags);
                 if (n > 0)
                     client.writeBuffer.erase(client.writeBuffer.begin(),
                                              client.writeBuffer.begin() + n);
