@@ -25,7 +25,7 @@ def main():
     evidence = ROOT / 'results/evidence' / f'{revision[:12]}-{stamp}'
     evidence.mkdir(parents=True)
     (evidence/'logs').mkdir()
-    build = 'build-acceptance'
+    build = f'build-acceptance-{revision[:12]}'
     formatter = os.environ.get('CLANG_FORMAT', 'clang-format')
     compiler = os.environ.get('CXX', 'c++')
     commands = []
@@ -55,13 +55,13 @@ def main():
     report.write_json(evidence/'host.json', {'platform': platform.platform(), 'host': platform.node(), 'python': sys.version, 'implementation_revision': revision, 'source_manifest_sha256': report.sha(json.dumps(source, sort_keys=True).encode()), 'started': stamp, 'CXX': compiler, 'CLANG_FORMAT': formatter})
     save('', 'running')
     try:
-        run('release', [['cmake','-S','.','-B',build,'-DCMAKE_BUILD_TYPE=Release','-DLOCKSTEP_ENABLE_NATIVE=ON'], ['cmake','--build',build,'--parallel']])
+        run('release', [['make','build',f'BUILD_DIR={build}','CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON']])
         shutil.copyfile(ROOT/build/'compile_commands.json', evidence/'compile_commands.json')
         with (evidence/'test-discovery.json').open('w') as output:
             subprocess.run(['ctest','--test-dir',build,'--show-only=json-v1'],cwd=ROOT,stdout=output,check=True)
         discovery = report.read_json(evidence/'test-discovery.json')
         report.require(len(discovery['tests']) >= 19, 'Zero/short test discovery')
-        run('test', [['make','test','BUILD_DIR=build-acceptance-portable']])
+        run('test', [['make','test',f'BUILD_DIR={build}-portable']])
         run('sanitize', [['make','sanitize',f'BUILD_DIR={build}']])
         run('tsan', [['make','tsan',f'BUILD_DIR={build}']])
         run('fuzz', [['make','fuzz-smoke',f'BUILD_DIR={build}']])
