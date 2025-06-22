@@ -99,7 +99,8 @@ def benchmark(directory):
     throughput = statistics.median(throughputs)
     latency = statistics.median(p99s)
     allocation_count = sum(allocations)
-    return {'median_commands_per_second': throughput, 'median_p99_ns': latency, 'hot_path_allocations': allocation_count, 'repetitions': len(runs), 'eligible': throughput >= 5000000 and latency < 1000 and allocation_count == 0}
+    worst_p99 = max(p99s)
+    return {'median_commands_per_second': throughput, 'median_p99_ns': latency, 'max_p99_ns': worst_p99, 'hot_path_allocations': allocation_count, 'repetitions': len(runs), 'eligible': throughput >= 5000000 and worst_p99 < 1000 and allocation_count == 0}
 
 
 def fault_campaign(directory):
