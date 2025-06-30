@@ -160,11 +160,14 @@ inline void eventRow(std::ostream& out, const Match& m) {
 }
 inline std::string observed(const MatchingEngine& engine, const RiskEngine& risk,
                             const std::vector<Match>& events) {
+    const auto* book = engine.getBook(1);
+    if (!book)
+        throw std::runtime_error("Production campaign instrument missing");
     std::ostringstream out;
     out << "state " << engine.currentCommandSeq() << ' ' << engine.currentEventSeq() << ' '
-        << engine.totalMatchCount() << ' ' << engine.clock().now() << ' '
-        << engine.getBook(1)->nextMatchId() << '\n';
-    engine.getBook(1)->forEachOrderInPriceTimeOrder([&](const Order& o) { orderRow(out, o); });
+        << engine.totalMatchCount() << ' ' << engine.clock().now() << ' ' << book->nextMatchId()
+        << '\n';
+    book->forEachOrderInPriceTimeOrder([&](const Order& o) { orderRow(out, o); });
     std::map<ClientId, const ClientState*> clients;
     for (const auto& [id, c] : risk.clients())
         clients[id] = &c;
@@ -192,10 +195,13 @@ inline std::string expected(const std::vector<Spec>& cmds, std::size_t count, st
                 events.push_back(m);
             }
     }
+    const auto* book = ref.getBook(1);
+    if (!book)
+        throw std::runtime_error("Reference campaign instrument missing");
     std::ostringstream out;
     out << "state " << count + 1 << ' ' << matches + 1 << ' ' << matches << ' '
-        << (count ? count * 1000 : 0) << ' ' << ref.getBook(1)->nextMatchId() << '\n';
-    ref.getBook(1)->forEachOrderInPriceTimeOrder([&](const Order& o) { orderRow(out, o); });
+        << (count ? count * 1000 : 0) << ' ' << book->nextMatchId() << '\n';
+    book->forEachOrderInPriceTimeOrder([&](const Order& o) { orderRow(out, o); });
     std::map<ClientId, const RefClientExposure*> clients;
     for (const auto& [id, c] : ref.clients())
         clients[id] = &c;
