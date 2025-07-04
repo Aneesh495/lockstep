@@ -36,7 +36,7 @@ void testTcpFrameCoalescing() {
         header.setMessageType(MessageType::Heartbeat);
         header.setSessionId(1);
         header.setSequence(static_cast<uint64_t>(i + 1));
-        header.setSendTimestampNs(1000000ULL + static_cast<uint64_t>(i));
+        header.setSendTimestampNs(uint64_t{1000000} + static_cast<uint64_t>(i));
         header.setPayloadLength(0);
 
         std::vector<uint8_t> frame(FrameHeader::SIZE);
