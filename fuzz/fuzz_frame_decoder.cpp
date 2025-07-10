@@ -217,15 +217,15 @@ int main(int argc, char* argv[]) {
         // Write valid header
         ByteWriter writer(data.data(), data.size());
         writer.writeU32(FrameHeader::MAGIC);
-        writer.writeU8(1);                                             // version
-        writer.writeU8(static_cast<uint8_t>(MessageType::Heartbeat));  // type
-        writer.writeU16(0);                                            // flags
-        writer.writeU32(100);                                          // payload length
-        writer.writeU32(1);                                            // session ID
-        writer.writeU64(static_cast<uint64_t>(i));                     // sequence
-        writer.writeU64(1000000ULL + static_cast<uint64_t>(i));        // timestamp
-        writer.writeU32(0);                                            // CRC (placeholder)
-        writer.writeU32(0);                                            // reserved
+        writer.writeU8(1);                                              // version
+        writer.writeU8(static_cast<uint8_t>(MessageType::Heartbeat));   // type
+        writer.writeU16(0);                                             // flags
+        writer.writeU32(100);                                           // payload length
+        writer.writeU32(1);                                             // session ID
+        writer.writeU64(static_cast<uint64_t>(i));                      // sequence
+        writer.writeU64(uint64_t{1000000} + static_cast<uint64_t>(i));  // timestamp
+        writer.writeU32(0);                                             // CRC (placeholder)
+        writer.writeU32(0);                                             // reserved
 
         // Random payload
         for (size_t j = 0; j < 100; j++) {
