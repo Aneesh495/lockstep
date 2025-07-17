@@ -138,43 +138,53 @@ def crash_campaign(directory):
     require(len(trials) == summary['requested_trials'], 'Falsified crash trial total')
     totals = {k: 0 for k in summary['totals']}
     coverage = {}
-    with tarfile.open(directory / 'persisted-trials.tar.gz', 'r:gz') as archive:
-        members = {m.name: m for m in archive.getmembers()}
-        for index, trial in enumerate(trials):
-            require(trial['trial'] == index and trial['seed'] == summary['seed'] + index * 10007, 'Crash trial identity mismatch')
-            require(trial['writer_signal'] == 9, 'A trial did not interrupt a real child')
-            require(trial['recovered_prefix'] >= trial['acknowledged_prefix'] and trial['acknowledged_prefix'] > 0, 'Acknowledged prefix lost')
-            mode = trial['mode']
-            coverage[mode] = coverage.get(mode, 0) + 1
-            if mode.startswith('snapshot_before') or mode.startswith('snapshot_after'):
-                key = f'snapshot_stage_{trial["stage"]}'
-                coverage[key] = coverage.get(key, 0) + 1
-            def get(name):
-                member = members.get(f'trials/{index}/{name}')
-                require(member is not None and member.isfile() and member.size < 1000000, f'Missing persisted trial file {index}/{name}')
-                return archive.extractfile(member).read()
-            expected = get('expected.txt')
-            require(fnv(expected) == trial['expected_digest'], 'Expected trial state hash mismatch')
-            get('wal.log')
-            totals['trials_run'] += 1
-            totals['interrupted_processes'] += 1
-            totals['restarted_processes'] += 1
-            if mode == 'interior_corruption':
-                actual = get('recovery-error.txt')
-                require(trial['restart_exit'] == 2 and not trial['comparison_ran'] and b'CRC' in actual, 'Corruption counted as recovery')
-                totals['expected_corruption_rejections'] += 1
-                passed = True
-            else:
-                actual = get('actual.txt')
-                require(trial['comparison_ran'] and trial['restart_exit'] == 0, 'State comparison did not execute')
-                totals['state_comparisons'] += 1
-                passed = expected == actual
-                if passed:
-                    totals['successful_recoveries'] += 1
-            require(fnv(actual) == trial['actual_digest'], 'Actual trial state hash mismatch')
-            if not passed:
-                totals['unexpected_failures'] += 1
-            require(trial['passed'] == passed, 'Falsified trial outcome')
+    files = {}
+    retained_bytes = 0
+    # Read compressed evidence once. Random seeks would repeatedly decompress
+    # the complete preceding archive for every trial comparison.
+    with tarfile.open(directory / 'persisted-trials.tar.gz', 'r|gz') as archive:
+        for member in archive:
+            if Path(member.name).name not in {'expected.txt', 'actual.txt', 'recovery-error.txt', 'wal.log'}:
+                continue
+            require(member.isfile() and member.size < 1000000 and member.name not in files, 'Invalid persisted trial artifact')
+            retained_bytes += member.size
+            require(retained_bytes <= 512 * 1024 * 1024 and len(files) < 4 * len(trials), 'Oversized persisted evidence')
+            files[member.name] = archive.extractfile(member).read()
+    for index, trial in enumerate(trials):
+        require(trial['trial'] == index and trial['seed'] == summary['seed'] + index * 10007, 'Crash trial identity mismatch')
+        require(trial['writer_signal'] == 9, 'A trial did not interrupt a real child')
+        require(trial['recovered_prefix'] >= trial['acknowledged_prefix'] and trial['acknowledged_prefix'] > 0, 'Acknowledged prefix lost')
+        mode = trial['mode']
+        coverage[mode] = coverage.get(mode, 0) + 1
+        if mode.startswith('snapshot_before') or mode.startswith('snapshot_after'):
+            key = f'snapshot_stage_{trial["stage"]}'
+            coverage[key] = coverage.get(key, 0) + 1
+        def get(name):
+            data = files.get(f'trials/{index}/{name}')
+            require(data is not None, f'Missing persisted trial file {index}/{name}')
+            return data
+        expected = get('expected.txt')
+        require(fnv(expected) == trial['expected_digest'], 'Expected trial state hash mismatch')
+        get('wal.log')
+        totals['trials_run'] += 1
+        totals['interrupted_processes'] += 1
+        totals['restarted_processes'] += 1
+        if mode == 'interior_corruption':
+            actual = get('recovery-error.txt')
+            require(trial['restart_exit'] == 2 and not trial['comparison_ran'] and b'CRC' in actual, 'Corruption counted as recovery')
+            totals['expected_corruption_rejections'] += 1
+            passed = True
+        else:
+            actual = get('actual.txt')
+            require(trial['comparison_ran'] and trial['restart_exit'] == 0, 'State comparison did not execute')
+            totals['state_comparisons'] += 1
+            passed = expected == actual
+            if passed:
+                totals['successful_recoveries'] += 1
+        require(fnv(actual) == trial['actual_digest'], 'Actual trial state hash mismatch')
+        if not passed:
+            totals['unexpected_failures'] += 1
+        require(trial['passed'] == passed, 'Falsified trial outcome')
     require(totals == summary['totals'] and coverage == summary['coverage'], 'Falsified recovery aggregation')
     required_modes = {'wal_only', 'snapshot_plus_wal', 'periodic_sync', 'durable_prefix', 'torn_tail', 'interior_corruption', 'snapshot_before_rename', 'recovery_then_trading', 'random_timing', 'snapshot_after_rename'}
     require(required_modes.issubset(coverage) and all(coverage.get(f'snapshot_stage_{i}', 0) > 0 for i in range(4)), 'Missing crash scenario')
