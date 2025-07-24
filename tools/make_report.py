@@ -211,6 +211,8 @@ def calculate(root, manifest):
             require(re.search(r'Standalone headers compiled: [1-9]\d*', log), 'No standalone headers compiled')
         if name == 'format':
             require(re.search(r'Formatted inputs checked: [1-9]\d*', log), 'No formatting inputs')
+        if name == 'demo':
+            require('Invariants: OK' in log and 'Reference match: OK' in log and 'Demo complete!' in log and 'FAILED' not in log, 'Demo did not establish successful checks')
     directory = resolve(root, manifest['benchmark_summary']).parent
     perf = benchmark(directory)
     stress_dir = resolve(root, manifest['fault_summary']).parent
