@@ -10,7 +10,7 @@ and the fault story from the docs and harnesses alone.
 - **Single-threaded matching core** - one writer, deterministic book mutations
 - **Zero-allocation hot path** after init (fixed pools, fixed price levels)
 - **Isolated core benches** - throughput and latency measured separately (no
-  network, no WAL) against explicit resume gates
+  network, no WAL) against explicit performance gates
 - **Dual-feed UDP + WAL recovery** - redundant market-data channels and durable
   command log; stress and recovery matrices demand **zero state mismatches**
 
@@ -52,8 +52,8 @@ and isolation rules: [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md),
 | Correctness | **Zero** public L2 / L3 state digest mismatches | Across stress + recovery aggregates |
 
 Observed Apple Silicon Release medians on the same isolated core often land
-well above the throughput gate (tens of millions of ops/s). The **resume gate
-remains 5M+ / &lt;1 µs p99** so claims stay conservative and comparable.
+well above the throughput gate (tens of millions of ops/s). The **baseline design
+target remains 5M+ / &lt;1 µs p99** so benchmarks stay conservative and comparable.
 
 ## Features
 
@@ -119,7 +119,7 @@ make test              # unit + integration + differential
 make sanitize          # ASan + UBSan
 make tsan              # ThreadSanitizer
 make fuzz-smoke        # decoder fuzz targets
-make benchmark         # isolated throughput + latency (resume gates)
+make benchmark         # isolated throughput + latency verification
 make stress            # 100M fault events + 10K recovery aggregate
 ```
 
@@ -133,7 +133,6 @@ make stress            # 100M fault events + 10K recovery aggregate
 | [Durability](docs/DURABILITY.md) | WAL, snapshots, recovery semantics |
 | [Matching rules](docs/MATCHING_RULES.md) | Price-time, STP, order types |
 | [Protocol](docs/PROTOCOL.md) | Wire format |
-| [Resume](docs/RESUME.md) | Bullet ↔ evidence map |
 
 ## Build
 

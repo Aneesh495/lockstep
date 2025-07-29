@@ -38,7 +38,7 @@
 |------|----------|
 | test_golden.cpp | CRC32C / SHA256 check vectors |
 
-## Resilience gates (resume-facing)
+## Resilience and durability gates
 
 These sit beside unit tests and are required for the dual-feed / WAL story:
 

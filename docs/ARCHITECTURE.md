@@ -114,7 +114,7 @@ kernel panic survival.
 
 ## Performance characteristics (isolated core)
 
-Resume **gates** (must hold on Release Apple Silicon / documented CI hosts):
+Core **performance gates** (must hold on Release Apple Silicon / documented CI hosts):
 
 | Metric | Gate |
 | --- | --- |
@@ -132,8 +132,8 @@ the gate):
 | Cancel | ~30 ns | ~100 ns |
 | Replace | ~80 ns | ~300 ns |
 
-Bulk throughput medians often land ~20-30M ops/s; always report the **5M+**
-gate when summarizing for resume. Full method: `docs/BENCHMARKS.md`.
+Bulk throughput medians often land ~20-30M ops/s; the baseline documented gate
+remains **5M+** commands/s. Full method: `docs/BENCHMARKS.md`.
 
 ## Resilience characteristics
 

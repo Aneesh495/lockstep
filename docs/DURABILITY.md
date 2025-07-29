@@ -4,7 +4,7 @@
 
 Lockstep persists commands and recovers exchange state after process death.
 Combined with **dual UDP market-data feeds**, the recovery story is validated
-under fault injection with resume gates of **100M** stressed logical events and
+under fault injection with target gates of **100M** stressed logical events and
 **10K** recovery trials at **zero** state digest mismatches.
 
 ## Write-ahead log (WAL)
@@ -58,7 +58,7 @@ Commands ─► WAL ─► matching engine ─► snapshots
 - Stress harness injects loss / duplicate / reorder / corruption / outages
 - Crash matrix walks prefix truncations, mid-snapshot kills, and replay points
 
-### Resume gates
+### Durability verification gates
 
 | Metric | Gate |
 | --- | --- |

@@ -1,0 +1,25 @@
+{
+  "status": "PASSED",
+  "platform": "macOS-arm64-Mach-O",
+  "compiler": "AppleClang",
+  "performance": {
+    "median_commands_per_second": 28988313,
+    "throughput_gate_commands_per_sec": 5000000,
+    "median_p99_latency_ns": 84,
+    "p99_latency_gate_ns": 1000,
+    "hot_path_allocations": 0
+  },
+  "resilience": {
+    "logical_events": 100000000,
+    "recovery_scenarios": 10000,
+    "state_mismatches": 0
+  },
+  "gates": {
+    "clean_build": "PASSED",
+    "all_tests_passed": "PASSED",
+    "sanitizers_clean": "PASSED",
+    "fuzz_smoke_passed": "PASSED",
+    "performance_gates_met": "PASSED",
+    "durability_gates_met": "PASSED"
+  }
+}
