@@ -1,0 +1,57 @@
+# Build directories
+build/
+cmake-build-*/
+out/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compiled objects
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.exe
+
+# CMake generated
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile.bak
+
+# Test outputs
+Testing/
+CTestTestfile.cmake
+
+# Artifacts (transient, not tracked)
+artifacts/benchmarks/
+artifacts/demo/
+artifacts/acceptance/
+artifacts/stress/
+
+# Generated workloads (large)
+*.wal
+*.snapshot
+workloads/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Profiling
+*.profdata
+*.profraw
+perf.data
+perf.data.old
+
+# Fuzz corpus
+corpus/
