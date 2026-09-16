@@ -1,10 +1,8 @@
 # Verification
 
-## Test Categories
+## Test categories
 
-### Unit Tests
-
-Unit tests verify individual components in isolation:
+### Unit tests
 
 | File | Coverage |
 |------|----------|
@@ -21,75 +19,62 @@ Unit tests verify individual components in isolation:
 | test_wal.cpp | WAL read/write |
 | test_snapshot.cpp | Snapshot format |
 
-### Property Tests
-
-Property tests verify invariants across random inputs:
+### Property tests
 
 | File | Properties |
 |------|------------|
-| test_differential.cpp | Optimized vs reference book |
+| test_differential.cpp | Optimized vs reference book; digest equality |
 
-### Integration Tests
-
-Integration tests verify component interactions:
+### Integration tests
 
 | File | Coverage |
 |------|----------|
-| test_network.cpp | TCP/UDP operations |
-| test_recovery.cpp | Crash recovery |
+| test_network.cpp | TCP/UDP, dual-feed gaps |
+| test_recovery.cpp | Crash recovery paths |
 
-### Golden Tests
-
-Golden tests verify against known outputs:
+### Golden tests
 
 | File | Coverage |
 |------|----------|
-| test_golden.cpp | CRC32C and SHA256 check vectors |
+| test_golden.cpp | CRC32C / SHA256 check vectors |
 
-## Invariant Checking
+## Resilience gates (resume-facing)
 
-The invariant checker verifies:
+These sit beside unit tests and are required for the dual-feed / WAL story:
+
+| Gate | Requirement |
+| --- | --- |
+| Fault stress | **≥100,000,000** logical events processed under fault injection |
+| Fault actions | Concrete drops / dupes / reorders / corruptions / outage suppressions across required profiles |
+| Recovery matrix | **≥10,000** distinct recovery scenarios (snapshot + WAL prefix / kill / truncate) |
+| Mismatches | **0** public L2 digest mismatches; **0** recovered L3 state digest mismatches |
+
+Harnesses: `bench/lockstep_fault_stress.cpp`, `bench/lockstep_crash_matrix.cpp`.
+Logical events count unique intended positions on the dual-feed → arbiter →
+digest path (not duplicate packets or redundant-channel copies). Profiles
+include loss, duplicate, reorder, corruption, and single/both-channel gap or
+outage schedules (seeded, deterministic).
+
+Performance gates (isolated core **≥5M commands/s**, **p99 &lt;1 µs**, zero
+allocs) are documented in `docs/BENCHMARKS.md` and are measured separately from
+this stress path.
+
+## Invariant checking
 
 1. Book is not crossed
-2. Order counts match pool size
-3. Price level quantities match sum of orders
+2. Order counts match pool accounting
+3. Price-level quantities match sum of orders
 4. Order indices are consistent
 5. Free list is correct
 6. Sequences are monotonic
 
-Run with `checkInvariants()` after each operation in tests.
-
 ## Sanitizers
 
-### AddressSanitizer (ASan)
-
-Detects memory errors:
-- Buffer overflows
-- Use-after-free
-- Memory leaks
-
-Run: `make sanitize`
-
-### ThreadSanitizer (TSan)
-
-Detects data races:
-- Concurrent access
-- Missing synchronization
-
-Run: `make tsan`
-
-### UndefinedBehaviorSanitizer (UBSan)
-
-Detects undefined behavior:
-- Integer overflow
-- Null pointer dereference
-- Misaligned access
-
-Run with sanitize target (includes UBSan).
+- **ASan** - overflows, UAF, leaks (`make sanitize`)
+- **TSan** - data races (`make tsan`)
+- **UBSan** - overflow / null / alignment (with sanitize)
 
 ## Fuzzing
-
-Fuzz targets exercise parsing with random input:
 
 | Target | Coverage |
 |--------|----------|
@@ -97,33 +82,16 @@ Fuzz targets exercise parsing with random input:
 | fuzz_wal_decoder.cpp | WAL record parsing |
 | fuzz_snapshot_decoder.cpp | Snapshot parsing |
 
-Run: `make fuzz-smoke`
-
-## Coverage
-
-Coverage is measured for:
-
-- Line coverage
-- Branch coverage
-- Function coverage
-
-Target: 80%+ line coverage on core components.
+`make fuzz-smoke`
 
 ## Commands
 
 ```bash
-# Run all tests
 make test
-
-# Run with sanitizers
 make sanitize
-
-# Run ThreadSanitizer
 make tsan
-
-# Run fuzz smoke tests
 make fuzz-smoke
-
-# Verify build and tests
+make benchmark
+make stress          # aggregate 100M fault events + 10K recoveries
 make verify
 ```

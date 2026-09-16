@@ -10,9 +10,10 @@
 
 namespace lockstep {
 
-// Matching engine for multiple instruments
-// Single-threaded deterministic execution
-// Maintains both optimized and reference books for differential testing
+// Matching engine for multiple instruments.
+// Single-threaded deterministic execution; fixed-capacity / zero-allocation
+// hot path after init. Maintains optimized + reference books for differential
+// testing. Isolated core gates: >=5M commands/s and p99 <1us (docs/BENCHMARKS.md).
 
 class MatchingEngine {
 public:

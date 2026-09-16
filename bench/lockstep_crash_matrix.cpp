@@ -11,6 +11,8 @@ int main(int argc, char** argv) {
     std::cout << "Lockstep Crash Recovery Matrix\n";
     std::cout << "==============================\n\n";
     
+    // 10K recovery scenarios; gate requires mismatchedDigests == 0
+    // (dual-feed UDP + WAL/snapshot recovery; docs/DURABILITY.md).
     constexpr uint64_t RECOVERY_SCENARIOS = 10000;
     
     std::cout << "Running " << RECOVERY_SCENARIOS << " recovery scenarios...\n";
