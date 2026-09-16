@@ -6,7 +6,7 @@ Lockstep is a complete implementation of an electronic trading exchange in C++20
 
 ## What This Is
 
-This is a functioning exchange engine—the kind of software that sits at the heart of electronic markets. Given the same sequence of orders, it produces identical results every time. That determinism matters for regulatory compliance, debugging production incidents, and ensuring audit trails match reality.
+This is a functioning exchange engine: the kind of software that sits at the heart of electronic markets. Given the same sequence of orders, it produces identical results every time. That determinism matters for regulatory compliance, debugging production incidents, and ensuring audit trails match reality.
 
 The design trades raw throughput for correctness. Single-threaded matching eliminates synchronization overhead and the subtle non-determinism that creeps into concurrent systems. Fixed memory allocation means no garbage collection pauses or allocator fragmentation. Fixed-point arithmetic avoids the chaos of IEEE 754 rounding.
 
@@ -154,7 +154,7 @@ make tsan              # ThreadSanitizer
 make fuzz-smoke        # Fuzz targets
 ```
 
-The test suite includes differential testing—running the same operations against both the optimized order book and a reference implementation, verifying identical results.
+The test suite includes differential testing: running the same operations against both the optimized order book and a reference implementation, verifying identical results.
 
 ## Documentation
 
