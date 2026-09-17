@@ -20,35 +20,42 @@ void printBanner() {
 |_____\__,_|\__|_| |_|_|   \__|_|_| |_|\__, |
                                        |___/
         Low-Latency Deterministic Exchange
-)" << "\n";
+)" << "\n" << std::flush;
 }
 
 int main(int argc, char** argv) {
     printBanner();
     
     std::cout << "Demo: Order Matching, Risk, and Recovery\n";
-    std::cout << "=========================================\n\n";
+    std::cout << "=========================================\n\n" << std::flush;
     
     // Setup
+    std::cout << "Setting up engine...\n" << std::flush;
     MatchingEngine::Config engineConfig;
     
     InstrumentConfig instr1;
     instr1.id = 1;
     instr1.minPrice = 9900;
-    instr1.maxPrice = 10100;  // 200 tick range = 200 price levels per side
+    instr1.maxPrice = 10100;  // 201 tick range
     instr1.tickSize = 1;
+    instr1.maxOrdersPerLevel = 50;
+    instr1.maxPriceLevels = 250;
     engineConfig.instruments.push_back(instr1);
     
     InstrumentConfig instr2;
     instr2.id = 2;
     instr2.minPrice = 49900;
-    instr2.maxPrice = 50100;  // 200 tick range
+    instr2.maxPrice = 50100;  // 201 tick range
     instr2.tickSize = 1;
+    instr2.maxOrdersPerLevel = 50;
+    instr2.maxPriceLevels = 250;
     engineConfig.instruments.push_back(instr2);
     
-    engineConfig.useReferenceBook = true;
+    engineConfig.useReferenceBook = false;
     
+    std::cout << "Creating engine...\n" << std::flush;
     MatchingEngine engine(engineConfig);
+    std::cout << "Engine created.\n" << std::flush;
     RiskEngine risk;
     
     // Configure risk limits
