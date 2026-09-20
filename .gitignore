@@ -6,6 +6,12 @@ out/
 # IDE and editor files
 .idea/
 .vscode/
+.codex/
+.kiro/
+.cursor/
+.claude/
+.gemini/
+.agents/
 *.swp
 *.swo
 *~
