@@ -2,6 +2,4 @@
 
 // Histogram is header-only
 
-namespace lockstep {
-
-} // namespace lockstep
+namespace lockstep {}  // namespace lockstep

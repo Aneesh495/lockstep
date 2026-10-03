@@ -3,9 +3,7 @@
 namespace lockstep {
 
 RecoveryManager::RecoveryManager(const std::string& snapshotPath, const std::string& walPath)
-    : snapshotPath_(snapshotPath)
-    , walPath_(walPath)
-{}
+    : snapshotPath_(snapshotPath), walPath_(walPath) {}
 
 bool RecoveryManager::recover(MatchingEngine& engine, RiskEngine& risk) {
     // Try to load snapshot
@@ -16,7 +14,7 @@ bool RecoveryManager::recover(MatchingEngine& engine, RiskEngine& risk) {
             recoveredEventSeq_ = reader.eventSeq();
         }
     }
-    
+
     // Replay WAL
     if (!walPath_.empty()) {
         WalReader walReader(walPath_);
@@ -24,23 +22,24 @@ bool RecoveryManager::recover(MatchingEngine& engine, RiskEngine& risk) {
             error_ = "Cannot open WAL: " + walPath_;
             return false;
         }
-        
+
         while (true) {
             auto record = walReader.readNext();
-            if (!record) break;
-            
+            if (!record)
+                break;
+
             // Skip records before snapshot
             if (record->commandSeq <= recoveredCommandSeq_) {
                 continue;
             }
-            
+
             // Replay would go here - for now just count
             replayedRecords_++;
             recoveredCommandSeq_ = record->commandSeq;
         }
     }
-    
+
     return true;
 }
 
-} // namespace lockstep
+}  // namespace lockstep

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "lockstep/common/types.hpp"
 #include <cstdint>
 #include <limits>
 #include <optional>
 #include <type_traits>
+#include "lockstep/common/types.hpp"
 
 namespace lockstep {
 
@@ -104,7 +104,7 @@ inline std::optional<Notional> computeNotional(Price price, Quantity quantity) {
     // Result is signed 128-bit
     Notional p = static_cast<Notional>(price);
     Notional q = static_cast<Notional>(quantity);
-    return p * q; // __int128 multiplication cannot overflow from i64 * u32
+    return p * q;  // __int128 multiplication cannot overflow from i64 * u32
 }
 
 // Signed position + signed delta
@@ -156,4 +156,4 @@ inline std::optional<std::int64_t> notionalToInt64(Notional value) {
     return static_cast<std::int64_t>(value);
 }
 
-} // namespace lockstep
+}  // namespace lockstep

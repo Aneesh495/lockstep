@@ -1,8 +1,8 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <cstring>
-#include <array>
 
 namespace lockstep {
 
@@ -124,62 +124,68 @@ inline void writeBeI64(void* ptr, std::int64_t value) {
 
 // Byte-by-byte read for bounds checking
 class ByteReader {
-public:
-    ByteReader(const std::uint8_t* data, std::size_t size)
-        : data_(data), size_(size), pos_(0) {}
-    
+   public:
+    ByteReader(const std::uint8_t* data, std::size_t size) : data_(data), size_(size), pos_(0) {}
+
     bool readU8(std::uint8_t& out) {
-        if (pos_ >= size_) return false;
+        if (pos_ >= size_)
+            return false;
         out = data_[pos_++];
         return true;
     }
-    
+
     bool readU16(std::uint16_t& out) {
-        if (pos_ + 2 > size_) return false;
+        if (pos_ + 2 > size_)
+            return false;
         out = readBeU16(data_ + pos_);
         pos_ += 2;
         return true;
     }
-    
+
     bool readU32(std::uint32_t& out) {
-        if (pos_ + 4 > size_) return false;
+        if (pos_ + 4 > size_)
+            return false;
         out = readBeU32(data_ + pos_);
         pos_ += 4;
         return true;
     }
-    
+
     bool readU64(std::uint64_t& out) {
-        if (pos_ + 8 > size_) return false;
+        if (pos_ + 8 > size_)
+            return false;
         out = readBeU64(data_ + pos_);
         pos_ += 8;
         return true;
     }
-    
+
     bool readI64(std::int64_t& out) {
-        if (pos_ + 8 > size_) return false;
+        if (pos_ + 8 > size_)
+            return false;
         out = readBeI64(data_ + pos_);
         pos_ += 8;
         return true;
     }
-    
+
     bool readBytes(void* out, std::size_t len) {
-        if (pos_ + len > size_) return false;
+        if (pos_ + len > size_)
+            return false;
         std::memcpy(out, data_ + pos_, len);
         pos_ += len;
         return true;
     }
-    
+
     bool skip(std::size_t len) {
-        if (pos_ + len > size_) return false;
+        if (pos_ + len > size_)
+            return false;
         pos_ += len;
         return true;
     }
-    
+
     std::size_t pos() const { return pos_; }
     std::size_t remaining() const { return size_ - pos_; }
     const std::uint8_t* data() const { return data_; }
-    
-private:
+
+   private:
     const std::uint8_t* data_;
     std::size_t size_;
     std::size_t pos_;
@@ -187,65 +193,71 @@ private:
 
 // Byte-by-byte write
 class ByteWriter {
-public:
-    ByteWriter(std::uint8_t* data, std::size_t size)
-        : data_(data), size_(size), pos_(0) {}
-    
+   public:
+    ByteWriter(std::uint8_t* data, std::size_t size) : data_(data), size_(size), pos_(0) {}
+
     bool writeU8(std::uint8_t value) {
-        if (pos_ >= size_) return false;
+        if (pos_ >= size_)
+            return false;
         data_[pos_++] = value;
         return true;
     }
-    
+
     bool writeU16(std::uint16_t value) {
-        if (pos_ + 2 > size_) return false;
+        if (pos_ + 2 > size_)
+            return false;
         writeBeU16(data_ + pos_, value);
         pos_ += 2;
         return true;
     }
-    
+
     bool writeU32(std::uint32_t value) {
-        if (pos_ + 4 > size_) return false;
+        if (pos_ + 4 > size_)
+            return false;
         writeBeU32(data_ + pos_, value);
         pos_ += 4;
         return true;
     }
-    
+
     bool writeU64(std::uint64_t value) {
-        if (pos_ + 8 > size_) return false;
+        if (pos_ + 8 > size_)
+            return false;
         writeBeU64(data_ + pos_, value);
         pos_ += 8;
         return true;
     }
-    
+
     bool writeI64(std::int64_t value) {
-        if (pos_ + 8 > size_) return false;
+        if (pos_ + 8 > size_)
+            return false;
         writeBeI64(data_ + pos_, value);
         pos_ += 8;
         return true;
     }
-    
+
     bool writeBytes(const void* value, std::size_t len) {
-        if (pos_ + len > size_) return false;
+        if (pos_ + len > size_)
+            return false;
         std::memcpy(data_ + pos_, value, len);
         pos_ += len;
         return true;
     }
-    
+
     bool skip(std::size_t len) {
-        if (pos_ + len > size_) return false;
+        if (pos_ + len > size_)
+            return false;
         pos_ += len;
         return true;
     }
-    
+
     std::size_t pos() const { return pos_; }
     std::size_t remaining() const { return size_ - pos_; }
     std::uint8_t* data() { return data_; }
-    
-private:
+
+   private:
     std::uint8_t* data_;
     std::size_t size_;
     std::size_t pos_;
 };
 
-} // namespace lockstep
+}  // namespace lockstep

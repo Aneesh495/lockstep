@@ -1,40 +1,36 @@
 #pragma once
 
-#include <cstdint>
 #include <atomic>
+#include <cstdint>
 
 namespace lockstep {
 
 // Global allocation counter for verifying zero-allocation hot path
 
 class AllocationCounter {
-public:
+   public:
     static std::uint64_t total() { return total_.load(std::memory_order_relaxed); }
     static void increment() { total_.fetch_add(1, std::memory_order_relaxed); }
     static void reset() { total_.store(0, std::memory_order_relaxed); }
 
-private:
+   private:
     static std::atomic<std::uint64_t> total_;
 };
 
 // RAII scope allocation counter
 class ScopeAllocationCounter {
-public:
+   public:
     ScopeAllocationCounter() : start_(AllocationCounter::total()) {}
-    
-    std::uint64_t allocations() const {
-        return AllocationCounter::total() - start_;
-    }
-    
-    bool zeroAllocations() const {
-        return allocations() == 0;
-    }
 
-private:
+    std::uint64_t allocations() const { return AllocationCounter::total() - start_; }
+
+    bool zeroAllocations() const { return allocations() == 0; }
+
+   private:
     std::uint64_t start_;
 };
 
-} // namespace lockstep
+}  // namespace lockstep
 
 // Global new/delete overrides for tracking
 #ifdef LOCKSTEP_TRACK_ALLOCATIONS

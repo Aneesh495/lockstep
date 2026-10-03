@@ -1,0 +1,73 @@
+[  1%] Building CXX object CMakeFiles/lockstep_core.dir/src/common/crc32c.cpp.o
+[  3%] Building CXX object CMakeFiles/lockstep_core.dir/src/common/stable_digest.cpp.o
+[  4%] Building CXX object CMakeFiles/lockstep_core.dir/src/common/virtual_clock.cpp.o
+[  6%] Building CXX object CMakeFiles/lockstep_core.dir/src/risk/risk_engine.cpp.o
+[  9%] Building CXX object CMakeFiles/lockstep_core.dir/src/engine/order_book.cpp.o
+[ 11%] Building CXX object CMakeFiles/lockstep_core.dir/src/persistence/recovery.cpp.o
+[ 11%] Building CXX object CMakeFiles/lockstep_core.dir/src/engine/matching_engine.cpp.o
+[ 13%] Building CXX object CMakeFiles/lockstep_core.dir/src/engine/reference_book.cpp.o
+[ 14%] Building CXX object CMakeFiles/lockstep_core.dir/src/protocol/codec.cpp.o
+[ 16%] Building CXX object CMakeFiles/lockstep_core.dir/src/persistence/wal.cpp.o
+[ 18%] Building CXX object CMakeFiles/lockstep_core.dir/src/network/tcp_gateway.cpp.o
+[ 19%] Building CXX object CMakeFiles/lockstep_core.dir/src/persistence/snapshot.cpp.o
+[ 21%] Building CXX object CMakeFiles/lockstep_core.dir/src/network/udp_publisher.cpp.o
+[ 22%] Building CXX object CMakeFiles/lockstep_core.dir/src/network/feed_arbiter.cpp.o
+[ 24%] Building CXX object CMakeFiles/lockstep_core.dir/src/metrics/histogram.cpp.o
+[ 26%] Building CXX object CMakeFiles/lockstep_core.dir/src/network/snapshot_client.cpp.o
+[ 27%] Building CXX object CMakeFiles/lockstep_core.dir/src/metrics/system_info.cpp.o
+[ 29%] Building CXX object CMakeFiles/lockstep_core.dir/src/fault/fault_proxy.cpp.o
+[ 31%] Building CXX object CMakeFiles/lockstep_core.dir/src/metrics/allocation_counter.cpp.o
+[ 32%] Linking CXX static library liblockstep_core.a
+[ 32%] Built target lockstep_core
+[ 34%] Building CXX object CMakeFiles/fuzz_wal_decoder.dir/fuzz/fuzz_wal_decoder.cpp.o
+[ 36%] Building CXX object CMakeFiles/lockstep_fault_stress.dir/bench/lockstep_fault_stress.cpp.o
+[ 37%] Building CXX object CMakeFiles/fuzz_snapshot_decoder.dir/fuzz/fuzz_snapshot_decoder.cpp.o
+[ 40%] Building CXX object CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o
+[ 39%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/test_runners.cpp.o
+[ 44%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/test_main.cpp.o
+[ 44%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_endian.cpp.o
+[ 45%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_checked_math.cpp.o
+[ 49%] Building CXX object CMakeFiles/lockstep_client.dir/apps/lockstep_client.cpp.o
+[ 50%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_robin_hood_map.cpp.o
+[ 50%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_crc32c.cpp.o
+[ 52%] Building CXX object CMakeFiles/lockstep_bench.dir/bench/lockstep_bench.cpp.o
+[ 54%] Building CXX object CMakeFiles/lockstep_replay.dir/apps/lockstep_replay.cpp.o
+[ 55%] Building CXX object CMakeFiles/fuzz_frame_decoder.dir/fuzz/fuzz_frame_decoder.cpp.o
+[ 57%] Building CXX object CMakeFiles/lockstep_exchange.dir/apps/lockstep_exchange.cpp.o
+[ 59%] Building CXX object CMakeFiles/lockstep_demo.dir/apps/lockstep_demo.cpp.o
+[ 62%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_spsc_ring.cpp.o
+[ 63%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_matching_engine.cpp.o
+[ 63%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_object_pool.cpp.o
+[ 65%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_snapshot.cpp.o
+[ 67%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_risk_engine.cpp.o
+[ 70%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_codec.cpp.o
+[ 72%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o
+[ 70%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book.cpp.o
+[ 73%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_wal.cpp.o
+[ 75%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book_detail.cpp.o
+[ 77%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/integration/test_network.cpp.o
+[ 78%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/recovery/test_recovery.cpp.o
+[ 80%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/network/test_udp.cpp.o
+[ 81%] Building CXX object CMakeFiles/lockstep_tests.dir/tests/golden/test_golden.cpp.o
+[ 83%] Linking CXX executable lockstep_client
+[ 83%] Built target lockstep_client
+[ 85%] Linking CXX executable fuzz_wal_decoder
+[ 86%] Linking CXX executable fuzz_snapshot_decoder
+[ 86%] Built target fuzz_wal_decoder
+[ 86%] Built target fuzz_snapshot_decoder
+[ 88%] Linking CXX executable fuzz_frame_decoder
+[ 90%] Linking CXX executable lockstep_crash_matrix
+[ 90%] Built target fuzz_frame_decoder
+[ 90%] Built target lockstep_crash_matrix
+[ 91%] Linking CXX executable lockstep_replay
+[ 91%] Built target lockstep_replay
+[ 93%] Linking CXX executable lockstep_fault_stress
+[ 93%] Built target lockstep_fault_stress
+[ 95%] Linking CXX executable lockstep_tests
+[ 96%] Linking CXX executable lockstep_exchange
+[ 96%] Built target lockstep_exchange
+[ 96%] Built target lockstep_tests
+[ 98%] Linking CXX executable lockstep_demo
+[ 98%] Built target lockstep_demo
+[100%] Linking CXX executable lockstep_bench
+[100%] Built target lockstep_bench
