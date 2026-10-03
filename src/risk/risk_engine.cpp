@@ -221,4 +221,13 @@ Position RiskEngine::getOpenPosition(ClientId clientId, InstrumentId instrumentI
     return (it != state->positions.end()) ? it->second : 0;
 }
 
+void RiskEngine::clear() {
+    clients_.clear();
+    killSwitchActive_ = false;
+}
+
+void RiskEngine::installClientState(const ClientState& state) {
+    clients_[state.clientId] = state;
+}
+
 }  // namespace lockstep
