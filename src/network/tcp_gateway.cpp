@@ -82,19 +82,24 @@ void TcpGateway::run() {
 
         // Poll existing clients
         std::vector<pollfd> pollfds;
+        std::vector<std::size_t> clientIndices;
+        pollfds.reserve(clients_.size() + 1);
+        clientIndices.reserve(clients_.size());
+
         pollfds.push_back({listenFd_, POLLIN, 0});
 
-        for (auto& client : clients_) {
-            if (client.connected) {
-                pollfds.push_back({client.socketFd, POLLIN, 0});
+        for (std::size_t c = 0; c < clients_.size(); ++c) {
+            if (clients_[c].connected && clients_[c].socketFd >= 0) {
+                pollfds.push_back({clients_[c].socketFd, POLLIN, 0});
+                clientIndices.push_back(c);
             }
         }
 
-        if (poll(&pollfds[0], static_cast<nfds_t>(pollfds.size()), 10) > 0) {
+        if (poll(pollfds.data(), static_cast<nfds_t>(pollfds.size()), 10) > 0) {
             // Handle client data
             for (std::size_t i = 1; i < pollfds.size(); ++i) {
-                if (pollfds[i].revents & POLLIN) {
-                    handleClient(clients_[i - 1]);
+                if (pollfds[i].revents & (POLLIN | POLLERR | POLLHUP)) {
+                    handleClient(clients_[clientIndices[i - 1]]);
                 }
             }
         }
