@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
@@ -63,6 +64,7 @@ class WalWriter {
 
     // Sync to disk
     bool sync();
+    void setInterruptionHook(std::function<void()> hook) { interruptionHook_ = std::move(hook); }
 
     // Close the WAL
     void close();
@@ -71,6 +73,7 @@ class WalWriter {
     std::uint64_t position() const { return position_; }
 
    private:
+    std::function<void()> interruptionHook_;
     std::string path_;
     int fd_ = -1;
     std::uint64_t position_ = 0;

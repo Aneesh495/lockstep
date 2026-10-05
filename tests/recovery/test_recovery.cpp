@@ -142,6 +142,9 @@ void testSnapshotSaveAndRestore() {
     s1.quantity = 30;
     s1.tif = lockstep::TimeInForce::GTC;
     TEST_ASSERT(engine.newOrder(s1).success);
+    lockstep::RiskLimits l2;
+    l2.clientId = 2;
+    risk.setClientLimits(2, l2);
     risk.reserveOrder(2, 1, lockstep::Side::Sell, 160, 30);
 
     uint64_t engineDigest = engine.computeStateDigest();
@@ -246,6 +249,7 @@ void testSnapshotPlusSubsequentWalReplay() {
     TEST_ASSERT(r2.success);
     liveRisk.updatePosition(2, 1, lockstep::Side::Sell, 40);
     liveRisk.updatePosition(1, 1, lockstep::Side::Buy, 40);
+    liveRisk.releaseOrder(1, 1, lockstep::Side::Buy, 150, 40, false);
 
     // Recover using both snapshot and WAL
     lockstep::MatchingEngine recoveredEngine(config);

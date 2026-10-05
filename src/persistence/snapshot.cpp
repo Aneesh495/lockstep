@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstring>
 #include <filesystem>
+#include <set>
 #include "lockstep/common/crc32c.hpp"
 #include "lockstep/common/endian.hpp"
 
@@ -12,10 +13,10 @@ namespace lockstep {
 namespace {
 
 constexpr std::uint32_t SNAP_MAGIC = 0x534E4150;  // "SNAP"
-constexpr std::uint8_t SNAP_VERSION = 1;
+constexpr std::uint8_t SNAP_VERSION = 2;
 constexpr std::uint32_t MAX_SNAPSHOT_ELEMENTS = 1000000;
 
-void syncDirectory(const std::string& path) {
+bool syncDirectory(const std::string& path) {
     std::filesystem::path p(path);
     std::string dir = p.parent_path().string();
     if (dir.empty()) {
@@ -23,9 +24,24 @@ void syncDirectory(const std::string& path) {
     }
     int dirFd = ::open(dir.c_str(), O_RDONLY);
     if (dirFd >= 0) {
-        ::fsync(dirFd);
+        bool ok = ::fsync(dirFd) == 0;
         ::close(dirFd);
+        return ok;
     }
+    return false;
+}
+
+void writeWide(ByteWriter& writer, Notional value) {
+    writer.writeU64(static_cast<std::uint64_t>(value));
+    writer.writeI64(static_cast<std::int64_t>(value >> 64));
+}
+bool readWide(ByteReader& reader, Notional& value) {
+    std::uint64_t low;
+    std::int64_t high;
+    if (!reader.readU64(low) || !reader.readI64(high))
+        return false;
+    value = static_cast<Notional>(high) * (static_cast<Notional>(1) << 64) + low;
+    return true;
 }
 
 }  // namespace
@@ -36,7 +52,7 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
     std::vector<std::uint8_t> buffer;
     buffer.reserve(65536);
 
-    SnapshotHeader header;
+    SnapshotHeader header{};
     header.magic = SNAP_MAGIC;
     header.version = SNAP_VERSION;
     header.timestamp = engine.clock().now();
@@ -47,17 +63,35 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
     auto instrumentConfigs = engine.instrumentConfigs();
     header.instrumentCount = static_cast<std::uint32_t>(instrumentConfigs.size());
     header.orderCount = engine.totalOrderCount();
+    header.totalMatches = engine.totalMatchCount();
+    header.engineHalted = engine.isKillSwitchActive();
+    header.riskHalted = risk.isKillSwitchActive();
     header.clientCount = static_cast<std::uint32_t>(risk.clients().size());
 
     // 1. Serialize Header (56 bytes)
-    std::size_t headerOffset = buffer.size();
-    buffer.resize(headerOffset + sizeof(SnapshotHeader));
-    std::memcpy(buffer.data() + headerOffset, &header, sizeof(SnapshotHeader));
+    constexpr std::size_t headerSize = 72;
+    buffer.resize(headerSize);
+    ByteWriter hw(buffer.data(), headerSize);
+    hw.writeU32(header.magic);
+    hw.writeU8(header.version);
+    hw.writeU8(header.engineHalted ? 1 : 0);
+    hw.writeU8(header.riskHalted ? 1 : 0);
+    hw.writeU8(0);
+    hw.writeU64(header.timestamp);
+    hw.writeU64(header.commandSeq);
+    hw.writeU64(header.eventSeq);
+    hw.writeU64(header.coveredWalSeq);
+    hw.writeU32(header.instrumentCount);
+    hw.writeU32(header.orderCount);
+    hw.writeU32(header.clientCount);
+    hw.writeU32(0);
+    hw.writeU64(header.totalMatches);
+    hw.writeU64(0);
 
     // 2. Serialize Instruments
     for (const auto& instr : instrumentConfigs) {
         std::size_t offset = buffer.size();
-        buffer.resize(offset + 4 + 8 + 8 + 8 + 4 + 4 + 8);
+        buffer.resize(offset + 4 + 8 + 8 + 8 + 4 + 4 + 8 + 4);
         ByteWriter writer(buffer.data() + offset, buffer.size() - offset);
         writer.writeU32(instr.id);
         writer.writeI64(instr.minPrice);
@@ -68,6 +102,7 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
         const OrderBook* book = engine.getBook(instr.id);
         std::uint64_t nextMatchId = (book != nullptr) ? book->nextMatchId() : 1;
         writer.writeU64(nextMatchId);
+        writer.writeU32(instr.maxQuantity);
     }
 
     // 3. Serialize Resting Orders in exact price-time priority
@@ -99,22 +134,23 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
     // 4. Serialize Risk State
     for (const auto& [clientId, client] : risk.clients()) {
         std::size_t offset = buffer.size();
-        buffer.resize(offset + 4 + 4 + 4 + 4 + 8 + 8 + 8 + 8 + 4 + 4 + 4 + 8 + 8 + 8 + 1 + 7 + 4);
+        buffer.resize(offset + 4 + 4 + 4 + 4 + 16 + 16 + 16 + 16 + 4 + 4 + 4 + 16 + 16 + 8 + 1 + 7 +
+                      4);
         ByteWriter writer(buffer.data() + offset, buffer.size() - offset);
         writer.writeU32(client.clientId);
         writer.writeU32(client.openOrderCount);
         writer.writeU32(client.openBuyQuantity);
         writer.writeU32(client.openSellQuantity);
-        writer.writeI64(static_cast<std::int64_t>(client.openBuyNotional));
-        writer.writeI64(static_cast<std::int64_t>(client.openSellNotional));
-        writer.writeI64(static_cast<std::int64_t>(client.reservedBuyNotional));
-        writer.writeI64(static_cast<std::int64_t>(client.reservedSellNotional));
+        writeWide(writer, client.openBuyNotional);
+        writeWide(writer, client.openSellNotional);
+        writeWide(writer, client.reservedBuyNotional);
+        writeWide(writer, client.reservedSellNotional);
 
         writer.writeU32(client.limits.maxOrderQuantity);
         writer.writeU32(client.limits.maxOpenOrders);
         writer.writeU32(client.limits.maxOpenQuantity);
-        writer.writeI64(static_cast<std::int64_t>(client.limits.maxOrderNotional));
-        writer.writeI64(static_cast<std::int64_t>(client.limits.maxOpenNotional));
+        writeWide(writer, client.limits.maxOrderNotional);
+        writeWide(writer, client.limits.maxOpenNotional);
         writer.writeI64(client.limits.maxPosition);
         writer.writeU8(client.limits.killSwitchActive ? 1 : 0);
         writer.writeBytes(reinterpret_cast<const std::uint8_t*>("\0\0\0\0\0\0\0"), 7);
@@ -154,6 +190,19 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
         return false;
     }
 
+    if (publicationHook_) {
+        const auto cut = buffer.size() / 2;
+        if (::write(fd, buffer.data(), cut) != static_cast<ssize_t>(cut)) {
+            ::close(fd);
+            error_ = "Snapshot partial write failed";
+            return false;
+        }
+        publicationHook_(0);
+        if (::lseek(fd, 0, SEEK_SET) < 0) {
+            ::close(fd);
+            return false;
+        }
+    }
     std::size_t remaining = buffer.size();
     const std::uint8_t* ptr = buffer.data();
     while (remaining > 0) {
@@ -176,6 +225,8 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
     }
 
     ::close(fd);
+    if (publicationHook_)
+        publicationHook_(1);
 
     if (std::rename(tempPath.c_str(), path_.c_str()) != 0) {
         error_ = "Failed to atomically rename snapshot file";
@@ -183,13 +234,22 @@ bool SnapshotWriter::write(const MatchingEngine& engine, const RiskEngine& risk)
         return false;
     }
 
-    syncDirectory(path_);
+    if (publicationHook_)
+        publicationHook_(2);
+    if (!syncDirectory(path_)) {
+        error_ = "Snapshot directory sync failed";
+        return false;
+    }
+    if (publicationHook_)
+        publicationHook_(3);
     return true;
 }
 
 SnapshotReader::SnapshotReader(const std::string& path) : path_(path) {}
 
-bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
+bool SnapshotReader::read(MatchingEngine& destination, RiskEngine& destinationRisk) {
+    MatchingEngine engine(destination.config());
+    RiskEngine risk;
     int fd = ::open(path_.c_str(), O_RDONLY);
     if (fd < 0) {
         error_ = "Cannot open snapshot file: " + path_;
@@ -197,7 +257,7 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
     }
 
     off_t fileSize = ::lseek(fd, 0, SEEK_END);
-    if (fileSize < static_cast<off_t>(sizeof(SnapshotHeader) + 20)) {
+    if (fileSize < static_cast<off_t>(72 + 20)) {
         error_ = "Snapshot file too small";
         ::close(fd);
         return false;
@@ -235,7 +295,28 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
     }
 
     // 2. Parse Header
-    std::memcpy(&header_, buffer.data(), sizeof(SnapshotHeader));
+    ByteReader hr(buffer.data(), 72);
+    std::uint8_t engineHalted, riskHalted, reserved;
+    std::uint32_t reserved32;
+    std::uint64_t reserved64;
+    if (!hr.readU32(header_.magic) || !hr.readU8(header_.version) || !hr.readU8(engineHalted) ||
+        !hr.readU8(riskHalted) || !hr.readU8(reserved) || !hr.readU64(header_.timestamp) ||
+        !hr.readU64(header_.commandSeq) || !hr.readU64(header_.eventSeq) ||
+        !hr.readU64(header_.coveredWalSeq) || !hr.readU32(header_.instrumentCount) ||
+        !hr.readU32(header_.orderCount) || !hr.readU32(header_.clientCount) ||
+        !hr.readU32(reserved32) || !hr.readU64(header_.totalMatches) || !hr.readU64(reserved64) ||
+        reserved || reserved32 || reserved64 || engineHalted > 1 || riskHalted > 1 ||
+        header_.commandSeq == 0 || header_.eventSeq == 0 ||
+        header_.coveredWalSeq != header_.commandSeq - 1) {
+        error_ = "Invalid snapshot header";
+        return false;
+    }
+    header_.engineHalted = engineHalted != 0;
+    header_.riskHalted = riskHalted != 0;
+    if (header_.instrumentCount != engine.config().instruments.size()) {
+        error_ = "Instrument count mismatch";
+        return false;
+    }
 
     if (header_.magic != SNAP_MAGIC) {
         error_ = "Invalid snapshot magic";
@@ -253,34 +334,42 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
         return false;
     }
 
-    ByteReader reader(buffer.data() + sizeof(SnapshotHeader),
-                      buffer.size() - sizeof(SnapshotHeader));
+    ByteReader reader(buffer.data() + 72, buffer.size() - 72);
 
     // 3. Parse and Validate Instruments
     engine.reset();
     engine.setSequences(header_.commandSeq, header_.eventSeq);
     risk.clear();
+    engine.clock().set(header_.timestamp);
+    engine.setKillSwitch(header_.engineHalted);
+    risk.setKillSwitch(header_.riskHalted);
+    engine.setTotalMatches(header_.totalMatches);
+    std::set<InstrumentId> seenInstruments;
 
     for (std::uint32_t i = 0; i < header_.instrumentCount; ++i) {
         InstrumentId id;
         Price minPrice, maxPrice, tickSize;
         std::uint32_t maxOrdersPerLevel, maxPriceLevels;
         std::uint64_t nextMatchId;
+        Quantity maxQuantity;
 
         if (!reader.readU32(id) || !reader.readI64(minPrice) || !reader.readI64(maxPrice) ||
             !reader.readI64(tickSize) || !reader.readU32(maxOrdersPerLevel) ||
-            !reader.readU32(maxPriceLevels) || !reader.readU64(nextMatchId)) {
+            !reader.readU32(maxPriceLevels) || !reader.readU64(nextMatchId) ||
+            !reader.readU32(maxQuantity)) {
             error_ = "Truncated instrument section in snapshot";
             return false;
         }
 
         const InstrumentConfig* cfg = engine.getInstrumentConfig(id);
-        if (cfg == nullptr) {
+        if (cfg == nullptr || !seenInstruments.insert(id).second || nextMatchId == 0) {
             error_ = "Snapshot contains unknown instrument: " + std::to_string(id);
             return false;
         }
 
-        if (cfg->minPrice != minPrice || cfg->maxPrice != maxPrice || cfg->tickSize != tickSize) {
+        if (cfg->minPrice != minPrice || cfg->maxPrice != maxPrice || cfg->tickSize != tickSize ||
+            cfg->maxOrdersPerLevel != maxOrdersPerLevel || cfg->maxPriceLevels != maxPriceLevels ||
+            cfg->maxQuantity != maxQuantity) {
             error_ = "Snapshot instrument configuration mismatch for ID " + std::to_string(id);
             return false;
         }
@@ -292,6 +381,7 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
     }
 
     // 4. Parse and Install Orders
+    std::unordered_map<ClientId, ClientState> expectedExposure;
     std::unordered_map<ClientId, std::pair<Quantity, Quantity>> clientExpectedQty;
     for (std::uint32_t i = 0; i < header_.orderCount; ++i) {
         Order order;
@@ -306,6 +396,12 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
             return false;
         }
 
+        if (sideByte > 1 || tifByte != 0 || (statusByte != 1 && statusByte != 2) ||
+            order.executedQuantity >= order.quantity || order.clientId == INVALID_CLIENT_ID ||
+            order.orderId == INVALID_ORDER_ID) {
+            error_ = "Invalid snapshot order";
+            return false;
+        }
         order.side = static_cast<Side>(sideByte);
         order.tif = static_cast<TimeInForce>(tifByte);
         order.status = static_cast<OrderStatus>(statusByte);
@@ -322,6 +418,15 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
             return false;
         }
 
+        auto& exposure = expectedExposure[order.clientId];
+        ++exposure.openOrderCount;
+        if (order.side == Side::Buy) {
+            exposure.openBuyNotional +=
+                static_cast<Notional>(order.price) * order.remainingQuantity();
+        } else {
+            exposure.openSellNotional +=
+                static_cast<Notional>(order.price) * order.remainingQuantity();
+        }
         if (order.side == Side::Buy) {
             clientExpectedQty[order.clientId].first += order.remainingQuantity();
         } else {
@@ -329,27 +434,36 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
         }
     }
 
+    std::set<ClientId> seenClients;
     // 5. Parse and Install Risk State
     for (std::uint32_t i = 0; i < header_.clientCount; ++i) {
         ClientState client;
-        std::int64_t buyNotional, sellNotional, resBuyNotional, resSellNotional;
-        std::int64_t limitBuyNotional, limitSellNotional, maxPos;
+        Notional buyNotional, sellNotional, resBuyNotional, resSellNotional;
+        Notional limitBuyNotional, limitSellNotional;
+        Position maxPos;
         std::uint8_t killSwitch;
         std::uint32_t posCount;
 
         if (!reader.readU32(client.clientId) || !reader.readU32(client.openOrderCount) ||
             !reader.readU32(client.openBuyQuantity) || !reader.readU32(client.openSellQuantity) ||
-            !reader.readI64(buyNotional) || !reader.readI64(sellNotional) ||
-            !reader.readI64(resBuyNotional) || !reader.readI64(resSellNotional) ||
+            !readWide(reader, buyNotional) || !readWide(reader, sellNotional) ||
+            !readWide(reader, resBuyNotional) || !readWide(reader, resSellNotional) ||
             !reader.readU32(client.limits.maxOrderQuantity) ||
             !reader.readU32(client.limits.maxOpenOrders) ||
-            !reader.readU32(client.limits.maxOpenQuantity) || !reader.readI64(limitBuyNotional) ||
-            !reader.readI64(limitSellNotional) || !reader.readI64(maxPos) ||
+            !reader.readU32(client.limits.maxOpenQuantity) || !readWide(reader, limitBuyNotional) ||
+            !readWide(reader, limitSellNotional) || !reader.readI64(maxPos) ||
             !reader.readU8(killSwitch) || !reader.skip(7) || !reader.readU32(posCount)) {
             error_ = "Truncated risk section in snapshot";
             return false;
         }
 
+        if (!seenClients.insert(client.clientId).second || killSwitch > 1 || buyNotional < 0 ||
+            sellNotional < 0 || resBuyNotional < 0 || resSellNotional < 0 || limitBuyNotional < 0 ||
+            limitSellNotional < 0 || maxPos < 0) {
+            error_ = "Invalid snapshot risk state";
+            return false;
+        }
+        client.limits.clientId = client.clientId;
         client.openBuyNotional = buyNotional;
         client.openSellNotional = sellNotional;
         client.reservedBuyNotional = resBuyNotional;
@@ -371,6 +485,10 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
                 error_ = "Truncated position section in snapshot";
                 return false;
             }
+            if (!engine.getInstrumentConfig(instId) || client.positions.contains(instId)) {
+                error_ = "Invalid position instrument";
+                return false;
+            }
             client.positions[instId] = pos;
         }
 
@@ -383,9 +501,23 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
             return false;
         }
 
+        const auto& expected = expectedExposure[client.clientId];
+        if (client.openOrderCount != expected.openOrderCount ||
+            client.openBuyNotional != expected.openBuyNotional ||
+            client.openSellNotional != expected.openSellNotional) {
+            error_ = "Snapshot exposure count/notional mismatch";
+            return false;
+        }
         risk.installClientState(client);
     }
 
+    for (const auto& [id, qty] : clientExpectedQty) {
+        (void)qty;
+        if (!risk.getClientState(id)) {
+            error_ = "Missing risk client";
+            return false;
+        }
+    }
     // 6. Validate State Digests
     std::uint64_t storedEngineDigest, storedRiskDigest;
     if (!reader.readU64(storedEngineDigest) || !reader.readU64(storedRiskDigest)) {
@@ -393,6 +525,10 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
         return false;
     }
 
+    if (reader.remaining() != 4) {
+        error_ = "Trailing snapshot bytes";
+        return false;
+    }
     if (engine.computeStateDigest() != storedEngineDigest) {
         error_ = "Snapshot engine state digest mismatch";
         return false;
@@ -412,6 +548,8 @@ bool SnapshotReader::read(MatchingEngine& engine, RiskEngine& risk) {
     }
 
     engine.setSequences(header_.commandSeq, header_.eventSeq);
+    destination.swapState(engine);
+    destinationRisk = std::move(risk);
     return true;
 }
 

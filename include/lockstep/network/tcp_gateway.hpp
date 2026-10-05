@@ -22,6 +22,7 @@ struct ClientConnection {
     std::uint64_t highWaterMark = 0;
     bool connected = false;
     std::vector<std::uint8_t> readBuffer;
+    std::vector<std::uint8_t> writeBuffer;
 };
 
 struct CommandMessage {
@@ -54,6 +55,7 @@ class TcpGateway {
     // Response queue (consumer)
     SpscRing<ResponseMessage>& responseQueue() { return responseQueue_; }
 
+    std::uint16_t port() const { return port_; }
     bool isRunning() const { return running_; }
 
    private:

@@ -6,6 +6,8 @@
 #include <poll.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <algorithm>
+#include <cerrno>
 
 namespace lockstep {
 
@@ -37,14 +39,23 @@ bool TcpGateway::start() {
 
     if (bind(listenFd_, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
         ::close(listenFd_);
+        listenFd_ = -1;
         return false;
     }
 
     if (listen(listenFd_, 10) < 0) {
         ::close(listenFd_);
+        listenFd_ = -1;
         return false;
     }
 
+    socklen_t boundLen = sizeof(addr);
+    if (getsockname(listenFd_, reinterpret_cast<sockaddr*>(&addr), &boundLen) != 0) {
+        ::close(listenFd_);
+        listenFd_ = -1;
+        return false;
+    }
+    port_ = ntohs(addr.sin_port);
     // Set non-blocking
     int flags = fcntl(listenFd_, F_GETFL, 0);
     fcntl(listenFd_, F_SETFL, flags | O_NONBLOCK);
@@ -104,6 +115,24 @@ void TcpGateway::run() {
             }
         }
 
+        for (auto& client : clients_) {
+            if (!client.connected)
+                continue;
+            while (parseFrame(client)) {
+            }
+            if (!client.writeBuffer.empty()) {
+                auto n = ::send(client.socketFd, client.writeBuffer.data(),
+                                client.writeBuffer.size(), 0);
+                if (n > 0)
+                    client.writeBuffer.erase(client.writeBuffer.begin(),
+                                             client.writeBuffer.begin() + n);
+                else if (n < 0 && errno != EAGAIN && errno != EWOULDBLOCK && errno != EINTR) {
+                    client.connected = false;
+                    ::close(client.socketFd);
+                    client.socketFd = -1;
+                }
+            }
+        }
         // Send responses
         ResponseMessage response;
         while (responseQueue_.tryPop(response)) {
@@ -130,6 +159,10 @@ void TcpGateway::acceptClient() {
         return;
     }
 
+#ifdef SO_NOSIGPIPE
+    int noSignal = 1;
+    setsockopt(clientFd, SOL_SOCKET, SO_NOSIGPIPE, &noSignal, sizeof(noSignal));
+#endif
     // Set TCP_NODELAY for low latency
     int flag = 1;
     setsockopt(clientFd, IPPROTO_TCP, TCP_NODELAY, &flag, sizeof(flag));
@@ -151,6 +184,8 @@ void TcpGateway::handleClient(ClientConnection& client) {
     std::uint8_t buffer[4096];
 
     ssize_t bytesRead = read(client.socketFd, buffer, sizeof(buffer));
+    if (bytesRead < 0 && (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR))
+        return;
     if (bytesRead <= 0) {
         client.connected = false;
         ::close(client.socketFd);
@@ -158,6 +193,12 @@ void TcpGateway::handleClient(ClientConnection& client) {
         return;
     }
 
+    if (client.readBuffer.size() + static_cast<std::size_t>(bytesRead) > 65536) {
+        client.connected = false;
+        ::close(client.socketFd);
+        client.socketFd = -1;
+        return;
+    }
     client.readBuffer.insert(client.readBuffer.end(), buffer, buffer + bytesRead);
 
     // Try to parse complete frames
@@ -172,6 +213,10 @@ bool TcpGateway::parseFrame(ClientConnection& client) {
 
     auto header = FrameHeader::parse(client.readBuffer.data(), client.readBuffer.size());
     if (!header) {
+        client.connected = false;
+        ::close(client.socketFd);
+        client.socketFd = -1;
+        client.readBuffer.clear();
         return false;
     }
 
@@ -185,6 +230,7 @@ bool TcpGateway::parseFrame(ClientConnection& client) {
     cmd.clientId = client.clientId;
     cmd.type = header->messageType();
     cmd.timestamp = header->sendTimestampNs();
+    cmd.clientSeq = header->sequence();
 
     if (header->payloadLength() > 0) {
         cmd.payload.assign(
@@ -194,7 +240,7 @@ bool TcpGateway::parseFrame(ClientConnection& client) {
 
     // Try to push to queue
     if (!commandQueue_.tryPush(cmd)) {
-        // Queue full - drop
+        return false;  // Keep the complete frame for the next queue-drain opportunity.
     }
 
     // Remove processed bytes
@@ -216,7 +262,13 @@ void TcpGateway::sendResponse(ClientConnection& client, const ResponseMessage& r
     header.serialize(buffer.data(), buffer.size());
     std::copy(response.payload.begin(), response.payload.end(), buffer.begin() + FRAME_HEADER_SIZE);
 
-    write(client.socketFd, buffer.data(), buffer.size());
+    if (client.writeBuffer.size() + buffer.size() > 65536) {
+        client.connected = false;
+        ::close(client.socketFd);
+        client.socketFd = -1;
+        return;
+    }
+    client.writeBuffer.insert(client.writeBuffer.end(), buffer.begin(), buffer.end());
 }
 
 }  // namespace lockstep

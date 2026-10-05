@@ -56,6 +56,7 @@ void testTcpFrameCoalescing() {
         offset += header->totalSize();
     }
 
+    TEST_ASSERT(offset == combinedData.size());
     std::cout << "    [PASS] Frame coalescing parsing\n";
 }
 
@@ -281,17 +282,40 @@ void testFeedArbiterSessionChange() {
 void testTcpGatewayCreation() {
     std::cout << "  Testing TCP gateway creation...\n";
 
-    // Find an available port
-    uint16_t testPort = 19000;
-
-    for (int i = 0; i < 100; i++) {
-        TcpGateway gateway(static_cast<uint16_t>(testPort + i), 10);
-        if (gateway.start()) {
-            gateway.stop();
-            break;
-        }
+    TcpGateway gateway(0, 10);
+    TEST_ASSERT(gateway.start());
+    int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+    TEST_ASSERT(fd >= 0);
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    addr.sin_port = htons(gateway.port());
+    TEST_ASSERT(::connect(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0);
+    std::vector<uint8_t> frames(FrameHeader::SIZE * 3);
+    for (uint64_t i = 0; i < 3; ++i) {
+        FrameHeader h;
+        h.setMessageType(MessageType::Heartbeat);
+        h.setSequence(i + 1);
+        h.serialize(frames.data() + i * FrameHeader::SIZE, FrameHeader::SIZE);
     }
-    std::cout << "    [PASS] TCP gateway creation and binding\n";
+    TEST_ASSERT(::write(fd, frames.data(), 7) == 7);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    TEST_ASSERT(::write(fd, frames.data() + 7, frames.size() - 7) ==
+                static_cast<ssize_t>(frames.size() - 7));
+    uint64_t count = 0;
+    CommandMessage cmd;
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+    while (count < 3 && std::chrono::steady_clock::now() < deadline) {
+        if (gateway.commandQueue().tryPop(cmd)) {
+            ++count;
+            TEST_ASSERT(cmd.clientSeq == count);
+        } else
+            std::this_thread::yield();
+    }
+    TEST_ASSERT(count == 3);
+    ::close(fd);
+    gateway.stop();
+    std::cout << "    [PASS] Real TCP fragmented/coalesced frames: 3 commands\n";
 }
 
 // Test 10: Round-trip frame encoding

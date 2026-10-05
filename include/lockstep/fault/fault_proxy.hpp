@@ -87,7 +87,7 @@ class FaultProxy {
     std::vector<DeliveryEnvelope> submit(DeliveryEnvelope envelope, std::uint64_t currentNs = 0);
 
     // Drain all buffered / reordered envelopes deterministically
-    std::vector<DeliveryEnvelope> drain();
+    std::vector<DeliveryEnvelope> drain(std::uint64_t currentNs = UINT64_MAX);
 
     // Legacy method - returns true if packet should be forwarded
     bool processPacket(char channel, std::uint64_t seq, std::vector<std::uint8_t>& packet);
@@ -125,6 +125,7 @@ class FaultProxy {
     std::uint64_t delayedPackets_ = 0;
     std::uint64_t outagePackets_ = 0;
 
+    std::deque<DeliveryEnvelope> delayedEnvelopes_;
     std::deque<DeliveryEnvelope> heldEnvelopes_;
     static constexpr std::size_t MAX_REORDER_DEPTH = 8;
 };

@@ -25,7 +25,7 @@ class MatchingEngine {
     struct Result {
         bool success = false;
         RejectionReason reason = RejectionReason::None;
-        std::vector<Match> matches;
+        std::span<Match> matches;
         std::uint64_t commandSeq = 0;
         std::uint64_t eventSeq = 0;
     };
@@ -55,6 +55,8 @@ class MatchingEngine {
     }
 
     void reset();
+    void swapState(MatchingEngine& other);
+    void setTotalMatches(std::uint64_t count) { totalMatches_ = count; }
     bool installOrder(const Order& order);
 
     // Access

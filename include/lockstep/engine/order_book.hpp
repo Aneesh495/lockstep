@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <functional>
 #include <optional>
+#include <span>
+#include <string>
 #include <vector>
 #include "lockstep/common/checked_math.hpp"
 #include "lockstep/common/types.hpp"
@@ -27,7 +29,8 @@ class OrderBook {
         bool success = false;
         RejectionReason reason = RejectionReason::None;
         Quantity filledQuantity = 0;
-        std::vector<Match> matches;
+        // View remains valid until the next operation on this book.
+        std::span<Match> matches;
     };
 
     // Configuration
@@ -170,6 +173,7 @@ class OrderBook {
     void updateLevelAfterFill(PriceLevel& level, const Order& order, Quantity fillQty);
 
    private:
+    std::vector<Match> matchBuffer_;
     Config config_;
     std::uint32_t numPriceLevels_;
 

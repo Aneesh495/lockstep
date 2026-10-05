@@ -2,11 +2,13 @@
 
 #include <atomic>
 #include <cstdint>
+#include <span>
 #include <string>
 #include <thread>
 #include <vector>
 #include "lockstep/common/types.hpp"
 #include "lockstep/concurrency/spsc_ring.hpp"
+#include "lockstep/fault/fault_proxy.hpp"
 #include "lockstep/protocol/frame.hpp"
 
 namespace lockstep {
@@ -36,6 +38,9 @@ class UdpPublisher {
 
     bool start();
     void stop();
+    static DeliveryEnvelope encodePacket(char channel, std::uint32_t session,
+                                         std::uint64_t packetSeq,
+                                         std::span<const MarketEvent> events);
 
     // Event queue (consumer)
     SpscRing<MarketEvent>& eventQueue() { return eventQueue_; }

@@ -56,6 +56,7 @@ class FeedArbiter {
     void setSessionId(std::uint32_t id) { sessionId_ = id; }
 
     // Metrics
+    std::uint64_t decodedRecords() const { return decodedRecords_; }
     std::uint64_t processedEvents() const { return processedEvents_; }
     std::uint64_t duplicatesDiscarded() const { return duplicatesDiscarded_; }
     std::uint64_t gapsDetected() const { return gapsDetected_; }
@@ -80,6 +81,7 @@ class FeedArbiter {
 
     State state_ = State::Healthy;
     std::uint64_t nextExpectedSeq_ = 0;
+    std::uint64_t decodedRecords_ = 0;
     std::uint64_t processedEvents_ = 0;
     std::uint64_t duplicatesDiscarded_ = 0;
     std::uint64_t gapsDetected_ = 0;
