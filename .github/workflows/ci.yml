@@ -1,92 +1,98 @@
 name: CI
-
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
-  build-linux-gcc:
+  release:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: build-linux-gcc
+            os: ubuntu-latest
+            compiler: g++
+          - name: build-linux-clang
+            os: ubuntu-latest
+            compiler: clang++
+          - name: build-macos-arm64
+            os: macos-15
+            compiler: clang++
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Host and compiler
+        run: |
+          uname -a
+          ${{ matrix.compiler }} --version
+          if [ '${{ matrix.name }}' = build-macos-arm64 ]; then test "$(uname -m)" = arm64; fi
+      - name: Release, assertions, headers, real networking
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/ci
+          make test CMAKE_FLAGS='-DCMAKE_CXX_COMPILER=${{ matrix.compiler }}' 2>&1 | tee artifacts/ci/test.log
+          python3 tools/check_headers.py --compiler '${{ matrix.compiler }}' 2>&1 | tee artifacts/ci/headers.log
+          make demo 2>&1 | tee artifacts/ci/demo.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ${{ matrix.name }}-logs
+          path: |
+            artifacts/ci
+            build/Testing
+            build/compile_commands.json
+  sanitizers:
+    name: sanitize-linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: ASan, UBSan, bounded instrumented fuzzers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/ci
+          make sanitize CMAKE_FLAGS=-DCMAKE_CXX_COMPILER=clang++ 2>&1 | tee artifacts/ci/sanitize.log
+          make fuzz-smoke CMAKE_FLAGS=-DCMAKE_CXX_COMPILER=clang++ 2>&1 | tee artifacts/ci/fuzz.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sanitizer-logs
+          path: |
+            artifacts/ci
+            build-asan/Testing
+            build-fuzz/compile_commands.json
+  tsan:
+    name: tsan-linux
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actual SPSC, TCP, UDP under TSan
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/ci
+          make tsan CMAKE_FLAGS=-DCMAKE_CXX_COMPILER=clang++ 2>&1 | tee artifacts/ci/tsan.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tsan-logs
+          path: |
+            artifacts/ci
+            build-tsan/Testing
+            build-tsan/compile_commands.json
+  format:
+    name: format-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++ cmake make
-      
-      - name: Configure
-        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-      
-      - name: Build
-        run: cmake --build build --parallel
-      
-      - name: Test
-        run: cd build && ctest --output-on-failure
-
-  build-linux-clang:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang cmake make
-      
-      - name: Configure
-        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++
-      
-      - name: Build
-        run: cmake --build build --parallel
-      
-      - name: Test
-        run: cd build && ctest --output-on-failure
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Configure
-        run: cmake -S . -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-      
-      - name: Build
-        run: cmake --build build --parallel
-      
-      - name: Test
-        run: cd build && ctest --output-on-failure
-
-  sanitize-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang cmake make
-      
-      - name: Configure
-        run: cmake -S . -B build-asan -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -DLOCKSTEP_ENABLE_SANITIZERS=ON -DLOCKSTEP_BUILD_BENCHMARKS=OFF
-      
-      - name: Build
-        run: cmake --build build-asan --parallel
-      
-      - name: Test
-        run: cd build-asan && ctest --output-on-failure
-
-  format-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install clang-format
-        run: sudo apt-get install -y clang-format
-      
-      - name: Check formatting
-        run: |
-          find include src apps tests bench -name "*.cpp" -o -name "*.hpp" | \
-          xargs clang-format --dry-run --Werror
+      - run: sudo apt-get update && sudo apt-get install -y clang-format-18
+      - run: make format CLANG_FORMAT=clang-format-18
