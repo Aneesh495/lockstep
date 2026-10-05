@@ -1,162 +1,80 @@
-// Fuzz target for snapshot decoder
-// Tests robustness of snapshot parsing against malformed input
-// Can be built with libFuzzer (Clang) or run standalone
-
-#include <cstdint>
-#include <cstddef>
-#include <cstring>
-#include <string>
-#include <vector>
+#include <unistd.h>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <random>
+#include <string>
+#include "../bench/campaign_support.hpp"
 #include "lockstep/common/endian.hpp"
-
-using namespace lockstep;
-
-// Test function called by both libFuzzer and standalone
-static int test_snapshot_decoder(const uint8_t* data, size_t size) {
-    if (size < 1) return 0;
-    
-    // Snapshot header size: magic(4) + version(1) + reserved(3) + timestamp(8) + 
-    //                        cmdSeq(8) + eventSeq(8) + coveredWalSeq(8) +
-    //                        instCount(4) + orderCount(4) + clientCount(4) = 52 bytes
-    constexpr size_t MIN_HEADER_SIZE = 52;
-    
-    // Test 1: Parse snapshot header
-    if (size >= MIN_HEADER_SIZE) {
-        ByteReader reader(data, size);
-        
-        uint32_t magic = 0;
-        uint8_t version = 0;
-        uint8_t reserved[3] = {0};
-        uint64_t timestamp = 0;
-        uint64_t cmdSeq = 0;
-        uint64_t eventSeq = 0;
-        uint64_t coveredWalSeq = 0;
-        uint32_t instCount = 0;
-        uint32_t orderCount = 0;
-        uint32_t clientCount = 0;
-        
-        if (reader.readU32(magic) &&
-            reader.readU8(version) &&
-            reader.readBytes(reserved, 3) &&
-            reader.readU64(timestamp) &&
-            reader.readU64(cmdSeq) &&
-            reader.readU64(eventSeq) &&
-            reader.readU64(coveredWalSeq) &&
-            reader.readU32(instCount) &&
-            reader.readU32(orderCount) &&
-            reader.readU32(clientCount)) {
-            
-            // Validate magic
-            if (magic == 0x534E4150) { // "SNAP"
-                if (version == 1) {
-                    // Check reserved is zero
-                    (void)reserved;
-                    
-                    // Validate counts are reasonable
-                    if (instCount > 10000 || orderCount > 1000000 || clientCount > 10000) {
-                        // Unreasonably large counts - might be corrupt
-                    }
-                }
+int main(int argc, char** argv) {
+    try {
+        uint64_t runs = 2000, seed = 12345;
+        for (int i = 1; i < argc; ++i) {
+            std::string arg = argv[i];
+            if (i + 1 >= argc)
+                throw std::invalid_argument("Missing fuzz option");
+            auto n = std::stoull(argv[++i]);
+            if (arg == "--runs")
+                runs = n;
+            else if (arg == "--seed")
+                seed = n;
+            else
+                throw std::invalid_argument("Unknown fuzz option");
+        }
+        if (!runs || runs > 1000000)
+            throw std::invalid_argument("Invalid fuzz bound");
+        auto dir = std::filesystem::temp_directory_path() /
+                   ("lockstep-snapshot-fuzz-" + std::to_string(getpid()));
+        std::filesystem::create_directory(dir);
+        auto base = dir / "base";
+        lockstep::MatchingEngine initial(campaign::config());
+        lockstep::RiskEngine initialRisk;
+        for (const auto& s : campaign::commands(seed, 20)) {
+            std::string error;
+            if (!lockstep::RecoveryManager::applyRecord(initial, initialRisk, s.record, error))
+                throw std::runtime_error(error);
+        }
+        lockstep::SnapshotWriter writer(base.string());
+        if (!writer.write(initial, initialRisk))
+            throw std::runtime_error(writer.error());
+        std::ifstream in(base, std::ios::binary);
+        std::vector<uint8_t> valid{std::istreambuf_iterator<char>(in), {}};
+        std::mt19937_64 rng(seed);
+        uint64_t accepted = 0, rejected = 0;
+        for (uint64_t i = 0; i < runs; ++i) {
+            auto bytes = valid;
+            if (i % 4 == 0)
+                bytes.resize(static_cast<size_t>(rng() % (bytes.size() + 1)));
+            else if (i % 4 < 3) {
+                bytes[static_cast<size_t>(rng() % (bytes.size() - 4))] ^=
+                    static_cast<uint8_t>(1u << (rng() % 8));
+                if (i % 4 == 2)
+                    lockstep::writeBeU32(bytes.data() + bytes.size() - 4,
+                                         lockstep::Crc32C::compute(bytes.data(), bytes.size() - 4));
             }
+            auto path = dir / "mutant";
+            {
+                std::ofstream out(path, std::ios::binary);
+                out.write(reinterpret_cast<const char*>(bytes.data()),
+                          static_cast<std::streamsize>(bytes.size()));
+            }
+            lockstep::MatchingEngine engine(campaign::config());
+            lockstep::RiskEngine risk;
+            lockstep::SnapshotReader reader(path.string());
+            bool ok = reader.read(engine, risk);
+            if (i % 4 == 3 && (!ok || engine.computeStateDigest() != initial.computeStateDigest() ||
+                               risk.computeDigest() != initialRisk.computeDigest()))
+                throw std::runtime_error("Valid snapshot state changed");
+            if (!ok && (engine.totalOrderCount() != 0 || !risk.clients().empty()))
+                throw std::runtime_error("Rejected snapshot partially installed");
+            ok ? ++accepted : ++rejected;
         }
+        std::filesystem::remove_all(dir);
+        std::cout << "Total tests: " << runs << "; accepted=" << accepted
+                  << "; rejected=" << rejected << "; seed=" << seed << "\n";
+        return 0;
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << "\n";
+        return 1;
     }
-    
-    return 0;
-}
-
-// Fuzz entry point for libFuzzer
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
-    return test_snapshot_decoder(data, size);
-}
-
-// Standalone entry point for smoke testing
-int main(int argc, char* argv[]) {
-    std::cout << "Snapshot Decoder Fuzz Smoke Test\n";
-    std::cout << "================================\n\n";
-    
-    uint32_t seed = 12345;
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg.rfind("-max_total_time=", 0) == 0 || arg.rfind("--max_total_time=", 0) == 0) {
-            continue;
-        }
-        if (arg.rfind("-runs=", 0) == 0 || arg.rfind("--runs=", 0) == 0) {
-            continue;
-        }
-        if (arg.rfind("-seed=", 0) == 0 || arg.rfind("--seed=", 0) == 0) {
-            auto pos = arg.find('=');
-            try { seed = static_cast<uint32_t>(std::stoul(arg.substr(pos + 1))); } catch (...) {}
-            continue;
-        }
-        try {
-            seed = static_cast<uint32_t>(std::stoul(arg));
-        } catch (...) {}
-    }
-    std::cout << "Seed: " << seed << "\n";
-    
-    std::mt19937 rng(seed);
-    std::uniform_int_distribution<uint32_t> lenDist(0, 512);
-    std::uniform_int_distribution<uint8_t> byteDist(0, 255);
-    
-    int passed = 0;
-    
-    // Test random sequences
-    std::cout << "Testing 5000 random byte sequences...\n";
-    for (int i = 0; i < 5000; i++) {
-        size_t size = lenDist(rng);
-        std::vector<uint8_t> data(size);
-        for (auto& b : data) {
-            b = byteDist(rng);
-        }
-        test_snapshot_decoder(data.data(), data.size());
-        passed++;
-    }
-    std::cout << "  Passed: " << passed << "\n";
-    
-    // Test valid snapshot headers
-    std::cout << "Testing valid snapshot headers...\n";
-    for (int i = 0; i < 100; i++) {
-        std::vector<uint8_t> data(52 + 4);  // header + CRC
-        ByteWriter writer(data.data(), data.size());
-        
-        writer.writeU32(0x534E4150);  // SNAP magic
-        writer.writeU8(1);  // version
-        writer.writeBytes("\x00\x00\x00", 3);  // reserved
-        writer.writeU64(1000000ULL + static_cast<uint64_t>(i));  // timestamp
-        writer.writeU64(static_cast<uint64_t>(i + 1));  // command sequence
-        writer.writeU64(static_cast<uint64_t>(i + 1));  // event sequence
-        writer.writeU64(0);  // covered WAL sequence
-        writer.writeU32(1);  // instrument count
-        writer.writeU32(0);  // order count
-        writer.writeU32(0);  // client count
-        
-        // CRC placeholder
-        writer.writeU32(0);
-        
-        test_snapshot_decoder(data.data(), data.size());
-        passed++;
-    }
-    std::cout << "  Total passed: " << passed << "\n";
-    
-    // Edge cases
-    std::cout << "Testing edge cases...\n";
-    
-    uint8_t single = byteDist(rng);
-    test_snapshot_decoder(&single, 1);
-    passed++;
-    
-    std::vector<uint8_t> magicOnly(4);
-    ByteWriter mw(magicOnly.data(), 4);
-    mw.writeU32(0x534E4150);
-    test_snapshot_decoder(magicOnly.data(), magicOnly.size());
-    passed++;
-    
-    std::cout << "  Total passed: " << passed << "\n";
-    
-    std::cout << "\nAll smoke tests passed!\n";
-    std::cout << "Total tests: " << passed << "\n";
-    
-    return 0;
 }

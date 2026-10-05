@@ -17,7 +17,7 @@ namespace lockstep {
 constexpr std::uint32_t WAL_MAGIC = 0x57414C4B;  // "WALK"
 constexpr std::uint8_t WAL_VERSION = 1;
 constexpr std::size_t WAL_HEADER_SIZE = 24;
-constexpr std::uint16_t WAL_MAX_PAYLOAD = 65535;
+constexpr std::uint16_t WAL_MAX_PAYLOAD = 1440;
 
 enum class WalStatus {
     Ok,

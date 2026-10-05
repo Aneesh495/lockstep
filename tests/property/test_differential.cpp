@@ -16,6 +16,7 @@
         }                                                                                          \
     } while (0)
 
+#include "../../bench/campaign_support.hpp"
 #include "lockstep/engine/reference_model.hpp"
 
 namespace {
@@ -329,10 +330,36 @@ void testAllOrderPolicies() {
     std::cout << "  [PASS] All order policies (GTC, IOC, FOK, STP)\n";
 }
 
+void testFullIndependentCommandState() {
+    for (uint64_t seed = 1; seed <= 500; ++seed) {
+        auto specs = campaign::commands(seed);
+        lockstep::MatchingEngine engine(campaign::config());
+        lockstep::RiskEngine risk;
+        std::vector<lockstep::Match> events;
+        for (size_t i = 0; i < specs.size(); ++i) {
+            lockstep::MatchingEngine::Result result;
+            std::string error;
+            TEST_ASSERT(lockstep::RecoveryManager::applyRecord(engine, risk, specs[i].record, error,
+                                                               &result));
+            events.insert(events.end(), result.matches.begin(), result.matches.end());
+            auto actual = campaign::observed(engine, risk, events);
+            auto expected = campaign::expected(specs, i + 1, 0);
+            if (actual != expected)
+                std::cerr << "seed=" << seed << " command=" << i + 1 << "\nactual:\n"
+                          << actual << "expected:\n"
+                          << expected;
+            TEST_ASSERT(actual == expected);
+        }
+    }
+    std::cout
+        << "  [PASS] 12000 independently compared mixed commands, complete FIFO/risk/trade state\n";
+}
+
 }  // namespace
 
 int runDifferentialTests() {
     testSeededMixedWorkload();
+    testFullIndependentCommandState();
     testCapacityExhaustion();
     testInvalidIdsAndInputs();
     testAllOrderPolicies();

@@ -160,6 +160,7 @@ bool RecoveryManager::applyRecord(MatchingEngine& engine, RiskEngine& risk, cons
 bool RecoveryManager::recover(MatchingEngine& destination, RiskEngine& destinationRisk) {
     error_.clear();
     replayedMatches_.clear();
+    validWalBytes_ = 0;
     recoveredCommandSeq_ = 0;
     recoveredEventSeq_ = 0;
     replayedRecords_ = 0;
@@ -203,13 +204,16 @@ bool RecoveryManager::recover(MatchingEngine& destination, RiskEngine& destinati
             }
             previous = record.commandSeq;
             havePrevious = true;
-            if (record.commandSeq <= covered)
+            if (record.commandSeq <= covered) {
+                validWalBytes_ = reader.position();
                 continue;
+            }
             MatchingEngine::Result observed;
             if (!applyRecord(engine, risk, record, error_, &observed))
                 return false;
             replayedMatches_.insert(replayedMatches_.end(), observed.matches.begin(),
                                     observed.matches.end());
+            validWalBytes_ = reader.position();
             ++replayedRecords_;
             recoveredCommandSeq_ = record.commandSeq;
         }

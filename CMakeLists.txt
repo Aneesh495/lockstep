@@ -147,6 +147,7 @@ if(LOCKSTEP_BUILD_TESTS)
     add_executable(lockstep_tests ${TEST_SOURCES})
     target_link_libraries(lockstep_tests PRIVATE lockstep_core)
     set_target_warnings(lockstep_tests)
+    target_compile_options(lockstep_tests PRIVATE -UNDEBUG)
     
     if(LOCKSTEP_ENABLE_SANITIZERS)
         set_target_sanitizer(lockstep_tests address)
@@ -176,11 +177,12 @@ if(LOCKSTEP_BUILD_TESTS)
     add_test(NAME differential COMMAND lockstep_tests differential)
     add_test(NAME recovery COMMAND lockstep_tests recovery)
     add_test(NAME golden COMMAND lockstep_tests golden)
+    set_tests_properties(LockstepTests spsc network udp endian crc32c checked_math object_pool robin_hood_map order_book order_book_detail matching_engine risk_engine codec wal snapshot differential recovery golden PROPERTIES TIMEOUT 300)
 endif()
 
 # Benchmarks
 if(LOCKSTEP_BUILD_BENCHMARKS)
-    add_executable(lockstep_bench bench/lockstep_bench.cpp)
+    add_executable(lockstep_bench bench/lockstep_bench.cpp bench/allocation_probe.cpp)
     target_link_libraries(lockstep_bench PRIVATE lockstep_core)
     set_target_warnings(lockstep_bench)
     

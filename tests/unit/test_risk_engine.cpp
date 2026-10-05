@@ -80,5 +80,20 @@ int runRiskEngineTests() {
     testQuantityLimit();
     testPositionLimit();
     testKillSwitch();
+    {
+        lockstep::RiskEngine risk;
+        lockstep::RiskLimits limits;
+        limits.clientId = 1;
+        limits.maxPosition = 100;
+        risk.setClientLimits(1, limits);
+        lockstep::InstrumentConfig instr;
+        instr.id = 1;
+        instr.minPrice = 100;
+        instr.maxPrice = 200;
+        risk.reserveOrder(1, 1, lockstep::Side::Buy, 150, 100);
+        auto check = risk.checkNewOrder(1, 1, lockstep::Side::Buy, 150, 1, instr);
+        assert(!check.first && check.second == lockstep::RejectionReason::MaxPositionExceeded);
+        std::cout << "  [PASS] Position risk includes existing open orders\n";
+    }
     return 0;
 }

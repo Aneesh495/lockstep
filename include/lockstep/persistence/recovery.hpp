@@ -24,6 +24,7 @@ class RecoveryManager {
                             std::string& error, MatchingEngine::Result* output = nullptr);
 
     // Get recovery stats
+    std::uint64_t validWalBytes() const { return validWalBytes_; }
     std::uint64_t recoveredCommandSeq() const { return recoveredCommandSeq_; }
     std::uint64_t recoveredEventSeq() const { return recoveredEventSeq_; }
     std::uint32_t replayedRecords() const { return replayedRecords_; }
@@ -37,6 +38,7 @@ class RecoveryManager {
     std::string snapshotPath_;
     std::string walPath_;
 
+    std::uint64_t validWalBytes_ = 0;
     std::uint64_t recoveredCommandSeq_ = 0;
     std::uint64_t recoveredEventSeq_ = 0;
     std::uint32_t replayedRecords_ = 0;

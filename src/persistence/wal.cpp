@@ -232,6 +232,31 @@ WalStatus WalReader::readRecord(WalRecord& record) {
         return lastStatus_;
     }
 
+    std::size_t expectedLength = 0;
+    switch (static_cast<MessageType>(recordKind)) {
+        case MessageType::NewOrder:
+            expectedLength = sizeof(NewOrderPayload);
+            break;
+        case MessageType::CancelOrder:
+            expectedLength = sizeof(CancelOrderPayload);
+            break;
+        case MessageType::ReplaceOrder:
+            expectedLength = sizeof(ReplaceOrderPayload);
+            break;
+        case MessageType::MassCancel:
+            expectedLength = sizeof(MassCancelPayload);
+            break;
+        default:
+            lastStatus_ = WalStatus::InvalidLength;
+            error_ = "Unsupported WAL record kind";
+            return lastStatus_;
+    }
+    if (payloadLength != expectedLength && payloadLength != expectedLength + FRAME_HEADER_SIZE) {
+        lastStatus_ = WalStatus::InvalidLength;
+        error_ = "Invalid WAL command length";
+        return lastStatus_;
+    }
+
     std::size_t neededRemaining = static_cast<std::size_t>(payloadLength) + 4;
     if (remainingBytes - WAL_HEADER_SIZE < neededRemaining) {
         lastStatus_ = WalStatus::IncompleteTail;
