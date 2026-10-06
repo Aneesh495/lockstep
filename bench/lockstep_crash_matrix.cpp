@@ -22,8 +22,15 @@ void require(bool ok, const char* message) {
         throw std::runtime_error(message);
 }
 std::string readFile(const std::filesystem::path& p) {
-    std::ifstream in(p, std::ios::binary);
-    return {std::istreambuf_iterator<char>(in), {}};
+    std::ifstream in(p, std::ios::binary | std::ios::ate);
+    require(static_cast<bool>(in), "Trial artifact open failed");
+    const auto size = in.tellg();
+    require(size >= 0 && size < 1000000, "Trial artifact length invalid");
+    std::string bytes(static_cast<size_t>(size), '\0');
+    in.seekg(0);
+    in.read(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+    require(in.gcount() == static_cast<std::streamsize>(bytes.size()), "Trial artifact truncated");
+    return bytes;
 }
 uint64_t digest(const std::string& bytes) {
     uint64_t h = 1469598103934665603ULL;
