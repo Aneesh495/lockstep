@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     instr2.maxPriceLevels = 250;
     engineConfig.instruments.push_back(instr2);
 
-    engineConfig.useReferenceBook = false;
+    engineConfig.useReferenceBook = true;
 
     std::cout << "Creating engine...\n" << std::flush;
     MatchingEngine engine(engineConfig);
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
     for (const auto& m : r5.matches) {
         r5Filled += m.quantity;
     }
-    std::cout << "  Client 1: IOC Buy 200 @ 15100 -> Filled " << r5Filled << "\n";
+    std::cout << "  Client 1: IOC Buy 200 @ 10050 -> Filled " << r5Filled << "\n";
 
     // FOK order (should fail - not enough liquidity)
     Order fok;
@@ -204,9 +204,16 @@ int main(int argc, char** argv) {
     std::cout << "  Digest: 0x" << std::hex << engine.computeStateDigest() << std::dec << "\n";
 
     std::string error;
-    std::cout << "  Invariants: " << (engine.checkInvariants(error) ? "OK" : "FAILED") << "\n";
-    std::cout << "  Reference match: " << (engine.verifyAgainstReference(error) ? "OK" : "FAILED")
-              << "\n";
+    const bool invariants = engine.checkInvariants(error);
+    std::cout << "  Invariants: " << (invariants ? "OK" : "FAILED") << "\n";
+    const bool reference = engine.verifyAgainstReference(error);
+    std::cout << "  Reference match: " << (reference ? "OK" : "FAILED") << "\n";
+    if (!invariants || !reference || !r1.success || !r2.success || !r3.success || !r4.success ||
+        r4Filled != 50 || !r5.success || r5Filled != 150 || r6.success || !r7.success ||
+        !r8.success || check.first || check.second != RejectionReason::MaxOrderQuantityExceeded) {
+        std::cerr << "Demo verification failed: " << error << "\n";
+        return 1;
+    }
 
     // Save demo artifacts
     std::filesystem::create_directories("artifacts/demo");
@@ -219,6 +226,10 @@ int main(int argc, char** argv) {
             << "\"\n";
     summary << "}\n";
     summary.close();
+    if (!summary) {
+        std::cerr << "Demo artifact write failed\n";
+        return 1;
+    }
 
     std::cout << "\nDemo artifacts saved to artifacts/demo/\n";
     std::cout << "\nDemo complete!\n";
