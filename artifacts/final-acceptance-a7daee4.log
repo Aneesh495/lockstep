@@ -1,0 +1,10 @@
+python3 tools/run_acceptance.py
+Acceptance: release: ['make', 'build', 'BUILD_DIR=build-acceptance-a7daee4136e7', 'CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON']
+Acceptance: test: ['make', 'test', 'BUILD_DIR=build-acceptance-a7daee4136e7-portable']
+Acceptance: sanitize: ['make', 'sanitize', 'BUILD_DIR=build-acceptance-a7daee4136e7']
+Acceptance: tsan: ['make', 'tsan', 'BUILD_DIR=build-acceptance-a7daee4136e7']
+Acceptance: fuzz: ['make', 'fuzz-smoke', 'BUILD_DIR=build-acceptance-a7daee4136e7']
+Acceptance: demo: ['make', 'demo', 'BUILD_DIR=build-acceptance-a7daee4136e7']
+Acceptance: headers: ['/Library/Frameworks/Python.framework/Versions/3.14/bin/python3', 'tools/check_headers.py', '--compiler', 'c++']
+Source changed during acceptance
+make: *** [acceptance] Error 1

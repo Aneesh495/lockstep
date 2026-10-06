@@ -1,0 +1,11 @@
+Lockstep Test Suite
+===================
+
+Running differential tests...
+  [PASS] Seeded mixed workload
+  [PASS] 12000 independently compared mixed commands, complete FIFO/risk/trade state
+  [PASS] Capacity exhaustion
+  [PASS] Invalid IDs and inputs
+  [PASS] All order policies (GTC, IOC, FOK, STP)
+
+All selected tests passed!

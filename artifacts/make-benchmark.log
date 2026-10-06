@@ -1,0 +1,47 @@
+=== Configuring Lockstep ===
+cmake -S . -B build-gcc-repair -G "Ninja" -DCMAKE_BUILD_TYPE=Release 
+-- 
+-- Lockstep Configuration Summary
+-- ================================
+-- Build type: Release
+-- C++ Standard: 20
+-- Compiler: GNU 15.2.0
+-- System: Darwin arm64
+-- Native CPU flag: -mcpu=native
+-- Build tests: ON
+-- Build benchmarks: ON
+-- Build apps: ON
+-- Enable sanitizers: OFF
+-- Enable TSan: OFF
+-- Enable native: OFF
+-- 
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-gcc-repair
+=== Building Lockstep ===
+cmake --build build-gcc-repair --parallel
+[1/4] Building CXX object CMakeFiles/fuzz_frame_decoder.dir/fuzz/fuzz_frame_decoder.cpp.o
+[2/4] Linking CXX executable fuzz_frame_decoder
+[3/4] Building CXX object CMakeFiles/lockstep_tests.dir/tests/integration/test_network.cpp.o
+[4/4] Linking CXX executable lockstep_tests
+=== Running Benchmarks ===
+build-gcc-repair/lockstep_bench --output artifacts/benchmarks/raw
+Run 0: 6.14628e+07 commands/s; p99=1000 ns; allocations=0
+Run 1: 6.83995e+07 commands/s; p99=1000 ns; allocations=0
+Run 2: 6.81013e+07 commands/s; p99=1000 ns; allocations=0
+Run 3: 6.76911e+07 commands/s; p99=1000 ns; allocations=0
+Run 4: 6.85636e+07 commands/s; p99=1000 ns; allocations=0
+Run 5: 6.79302e+07 commands/s; p99=1000 ns; allocations=0
+Run 6: 6.84556e+07 commands/s; p99=1000 ns; allocations=0
+Run 7: 6.83434e+07 commands/s; p99=1000 ns; allocations=0
+Run 8: 6.6357e+07 commands/s; p99=1000 ns; allocations=0
+Run 9: 6.70871e+07 commands/s; p99=1000 ns; allocations=0
+python3 tools/make_report.py --benchmark artifacts/benchmarks/raw
+{
+  "median_commands_per_second": 68015751.28683811,
+  "median_p99_ns": 1000.0,
+  "max_p99_ns": 1000,
+  "hot_path_allocations": 0,
+  "repetitions": 10,
+  "eligible": false
+}

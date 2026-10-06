@@ -1,0 +1,48 @@
+{
+  "commands": [
+    {
+      "commands": [
+        [
+          "make",
+          "build",
+          "BUILD_DIR=build-acceptance-43777b266bb1",
+          "CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON"
+        ]
+      ],
+      "duration_seconds": 39.50277525000274,
+      "exit_status": 0,
+      "log": "results/evidence/43777b266bb1-20261005T161724/logs/release.log",
+      "name": "release",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "test",
+          "BUILD_DIR=build-acceptance-43777b266bb1-portable"
+        ]
+      ],
+      "duration_seconds": 20.1407826669747,
+      "exit_status": 0,
+      "log": "results/evidence/43777b266bb1-20261005T161724/logs/test.log",
+      "name": "test",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "sanitize",
+          "BUILD_DIR=build-acceptance-43777b266bb1"
+        ]
+      ],
+      "duration_seconds": 30.178163416974712,
+      "exit_status": 0,
+      "log": "results/evidence/43777b266bb1-20261005T161724/logs/sanitize.log",
+      "name": "sanitize",
+      "skipped": false
+    }
+  ],
+  "error": "Source changed during acceptance"
+}

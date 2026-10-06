@@ -1,0 +1,24 @@
+=== Configuring Lockstep ===
+cmake -S . -B build-gcc-repair -G "Ninja" -DCMAKE_BUILD_TYPE=Release 
+-- 
+-- Lockstep Configuration Summary
+-- ================================
+-- Build type: Release
+-- C++ Standard: 20
+-- Compiler: GNU 15.2.0
+-- System: Darwin arm64
+-- Native CPU flag: -mcpu=native
+-- Build tests: ON
+-- Build benchmarks: ON
+-- Build apps: ON
+-- Enable sanitizers: OFF
+-- Enable TSan: OFF
+-- Enable native: OFF
+-- 
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-gcc-repair
+=== Building Lockstep ===
+cmake --build build-gcc-repair --parallel
+[1/2] Building CXX object CMakeFiles/lockstep_replay.dir/apps/lockstep_replay.cpp.o
+[2/2] Linking CXX executable lockstep_replay

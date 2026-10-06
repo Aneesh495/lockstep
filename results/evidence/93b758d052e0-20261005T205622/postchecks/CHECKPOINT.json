@@ -1,0 +1,310 @@
+{
+  "commands": [
+    {
+      "commands": [
+        [
+          "make",
+          "build",
+          "BUILD_DIR=build-acceptance-93b758d052e0",
+          "CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON"
+        ]
+      ],
+      "duration_seconds": 18.570298750011716,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/release.log",
+      "name": "release",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "test",
+          "BUILD_DIR=build-acceptance-93b758d052e0-portable"
+        ]
+      ],
+      "duration_seconds": 15.997191458009183,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/test.log",
+      "name": "test",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "sanitize",
+          "BUILD_DIR=build-acceptance-93b758d052e0"
+        ]
+      ],
+      "duration_seconds": 22.320261375047266,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/sanitize.log",
+      "name": "sanitize",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "tsan",
+          "BUILD_DIR=build-acceptance-93b758d052e0"
+        ]
+      ],
+      "duration_seconds": 17.107233833987266,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/tsan.log",
+      "name": "tsan",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "fuzz-smoke",
+          "BUILD_DIR=build-acceptance-93b758d052e0"
+        ]
+      ],
+      "duration_seconds": 23.209276958019473,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/fuzz.log",
+      "name": "fuzz",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "demo",
+          "BUILD_DIR=build-acceptance-93b758d052e0"
+        ]
+      ],
+      "duration_seconds": 0.4076986250001937,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/demo.log",
+      "name": "demo",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "tools/check_headers.py",
+          "--compiler",
+          "c++"
+        ]
+      ],
+      "duration_seconds": 16.029857584042475,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/headers.log",
+      "name": "headers",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "tools/check_headers.py",
+          "--format-only",
+          "--clang-format",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/format-env/bin/clang-format"
+        ]
+      ],
+      "duration_seconds": 0.4119080000091344,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/format.log",
+      "name": "format",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "build-acceptance-93b758d052e0/lockstep_bench",
+          "--output",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/93b758d052e0-20261005T205622/benchmark",
+          "--repetitions",
+          "10",
+          "--operations",
+          "1000000",
+          "--latency-operations",
+          "100000"
+        ]
+      ],
+      "duration_seconds": 0.7468672919785604,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/benchmark.log",
+      "name": "benchmark",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "build-acceptance-93b758d052e0/lockstep_fault_stress",
+          "--events",
+          "100000000",
+          "--shards",
+          "4",
+          "--seed",
+          "12345",
+          "--output",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/93b758d052e0-20261005T205622/stress"
+        ]
+      ],
+      "duration_seconds": 40.054133208002895,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/fault.log",
+      "name": "fault",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "build-acceptance-93b758d052e0/lockstep_crash_matrix",
+          "--trials",
+          "10000",
+          "--seed",
+          "12345",
+          "--output",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/93b758d052e0-20261005T205622/stress"
+        ]
+      ],
+      "duration_seconds": 125.86060591699788,
+      "exit_status": 0,
+      "log": "results/evidence/93b758d052e0-20261005T205622/logs/crash.log",
+      "name": "crash",
+      "skipped": false
+    }
+  ],
+  "completed_phases": [
+    "baseline",
+    "portable_builds_and_sanitizers",
+    "deterministic_matching_and_recovery",
+    "dual_feed_delivery",
+    "full_resilience_campaigns",
+    "measured_core_performance",
+    "hashed_evidence_verification",
+    "negative_verifier_tests",
+    "hosted_ci"
+  ],
+  "current_command": "verify",
+  "evidence_dir": "results/evidence/93b758d052e0-20261005T205622",
+  "final_checks": {
+    "make_verify_exit_status": 0,
+    "negative_verifier_case_count": 5,
+    "negative_verifier_exit_statuses": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "implementation_revision": "93b758d052e095176b465520f3d3d57b16e72da9",
+  "remaining": [],
+  "source_manifest": {
+    ".clang-format": "102260619450c48732d01dace3edeedc2ad1470b749a8dfce31195e1011a12ab",
+    ".clang-tidy": "f35424db37ac734d416c39c5ed7efa316b714c4b46fef2e9ec735f05d06779e2",
+    ".github/workflows/ci.yml": "70152aa0c3e8405476ad96a6d81d5b870e7ecfa480fe85516ce7c9eba2562ce6",
+    ".gitignore": "55599226e49046f8029195ef102970d882b882d434a52381e394dc43e56c0bb6",
+    "CMakeLists.txt": "bbaeafe0716cfbce4bb654b2d49dcb3b31eda83ad15cbacf50c0a2900d575636",
+    "Makefile": "5c0960ab4815a94af5759c7b2138f743372286a34637e8eeb3e35760f552b820",
+    "apps/lockstep_client.cpp": "d73d64d2d74ca842a4fc43fa698eb5f0b8ae7ca58aec83912d181360f7121e56",
+    "apps/lockstep_demo.cpp": "8b5f7776a429b81a5b269ff125b2ea83a71c7ef40057e4b79a91c4a5be81e6cc",
+    "apps/lockstep_exchange.cpp": "73b003352f6105878a7852990fa4d1dc26510698844a8ba7c1407031a3f55123",
+    "apps/lockstep_replay.cpp": "40254ae5b1025d1aa375642830fb6e9ce692ab24bbd90d82640dc48552670b19",
+    "bench/allocation_probe.cpp": "da853ce959fc13395a5e1fd4cd7d575e355c3ddab46a561b36a541dc920ddb3c",
+    "bench/campaign_support.hpp": "0f69a9c4f0b34ef165f442fb975715ca7dcee1843d2ef5a1142f6da83812b2d1",
+    "bench/lockstep_bench.cpp": "5724194c16b793edeb4a341df46626e936b98968f5ad513a518fbdc6ce88e0d5",
+    "bench/lockstep_crash_matrix.cpp": "9d311bab01a6108ebbbb1e9c6f9215f6a26aeaea76853583bd86978fc35ba7fb",
+    "bench/lockstep_fault_stress.cpp": "d186b10ef3e073fe370a7c3db04c9dd282997bed41df80cde63070d5d202ee8d",
+    "cmake/CompilerWarnings.cmake": "e738616bd73daa445fedea4ea7a6e07fa950d1dae85dd09b63feae53bf094d07",
+    "cmake/Sanitizers.cmake": "21565233d29dedc7645d4f5c53975e57cc40189cff478a2d7cdd9279d9f6b88a",
+    "config/instruments.csv": "6b06dca3fd42ea6170de46c8babeda60506717b389fce73ce129a446636c6829",
+    "config/risk_limits.csv": "46d3ec8dd23959aecc291442a35049e556e4b67d46133f5ddfdfb354a8002e94",
+    "fuzz/fuzz_frame_decoder.cpp": "d184bb2eb5e5bf4c93f12df7ef3cc6b56a079d927d80832189595d69600bb259",
+    "fuzz/fuzz_snapshot_decoder.cpp": "1170ecddd8a815b8710ec4c2a271e4e4dc1cbd11adf1ba882b03d6cab8c2e315",
+    "fuzz/fuzz_wal_decoder.cpp": "34102f96daf8519029783d009343b7441ea79c4b088b9b27955d8c393df27b7d",
+    "include/lockstep/common/checked_math.hpp": "dc38408d45e993fce7e69980ad2453988843b3f786fa59488b7ce02639925a48",
+    "include/lockstep/common/crc32c.hpp": "92f7e4ec7c52f987cbb42f3f51c1eeb31ded9faaf51e6e71ad13904750909f9d",
+    "include/lockstep/common/endian.hpp": "9c85938bd4f2230f27c11dae42d5edbda48f7d0c1f0113d635c8c6cef3cdb702",
+    "include/lockstep/common/stable_digest.hpp": "977967bd7c9cfcdd18a730128991256c250ec926fe107497ccd28a3f5da10063",
+    "include/lockstep/common/types.hpp": "c85d16eccd8656731cc4f01527fc055b12dc979836459a71f28ae9a591afd363",
+    "include/lockstep/common/virtual_clock.hpp": "530c626f4a8a33c94bc00cb218323d16cfab17454ae488eab11fb44fc2bdd2a1",
+    "include/lockstep/concurrency/spsc_ring.hpp": "ef895673137d76509348ea28f2e5de855ab750655a1aa3f0ae093a5862e58679",
+    "include/lockstep/containers/fixed_robin_hood_map.hpp": "7093b8e704fcec07566d08d5061be6aa41c4e40d5e3b8ff95596f318a325e0dd",
+    "include/lockstep/containers/object_pool.hpp": "b561018f57adbcf11f57c3b41e9b0b77c83f87df16763868c46655794ec38fa3",
+    "include/lockstep/engine/matching_engine.hpp": "d101ba2bb9f56768e5b855c726d1cec0ab0587a9517974e4b9e4d23d6699427b",
+    "include/lockstep/engine/order.hpp": "8f1820385da4957867590085c653f6ec584c54d073c585dd2587efd43e1f5621",
+    "include/lockstep/engine/order_book.hpp": "54009c133c40c63e4b3235ddb34acac2b4de4f88106aa332a4cb68c270c7d2e6",
+    "include/lockstep/engine/price_level.hpp": "6c2b8ae5c03642fe1697db968c298fbd40c793b31b303ff23c3125f67f4e6205",
+    "include/lockstep/engine/reference_book.hpp": "09831c22cd0e5145b3c980024dbb1d49778d1bd5b88395ada3b5e7c874b8d183",
+    "include/lockstep/engine/reference_model.hpp": "9bbc457608e7702eca95e8bfc62d50e667ff7f5bc4b8a037dff198c92a8a9898",
+    "include/lockstep/fault/fault_proxy.hpp": "769d929d7e3bd878af310e41dc4dec8eaac59892ba3daf2f3f5fd8c5ae392f53",
+    "include/lockstep/metrics/allocation_counter.hpp": "3e17ff2ea369dee15e8c6f5b4239e411bc6a847594139b8d066e122d5c94e270",
+    "include/lockstep/metrics/histogram.hpp": "311d4460fb3036601e3cba2a17070c546b737b469da6fa36fbc6be1cec2ad2ef",
+    "include/lockstep/metrics/system_info.hpp": "52bcb07b78fdd2f19169d183e11cf1216077d69f89d539efe134a588e9fc3138",
+    "include/lockstep/network/client_book.hpp": "d29e0d217f5af203ca45f2cab25e5911636f32f694010a3afb2632a13397df34",
+    "include/lockstep/network/feed_arbiter.hpp": "1904019ed6ae61cd2036c781e150b23b4eea7f3793989479c2f0c9d7458dce59",
+    "include/lockstep/network/snapshot_client.hpp": "c0d6efd180de1e0e636249aae7b732db2b34f92056fd365e4dbf5af16f55328d",
+    "include/lockstep/network/tcp_gateway.hpp": "81d3e27cd2cf4c59679fb442b737204bd8e88a05e35a30fdd0c2ccc5cc203426",
+    "include/lockstep/network/udp_publisher.hpp": "11d5efca36ae0a7ddb65bb00ed0cb240de42cb1c89cd25b5dcf63b5ea021eacc",
+    "include/lockstep/persistence/recovery.hpp": "5a0ac12da9a18567be07750106091f4d67945055b74a583f4d16a91cd39dde46",
+    "include/lockstep/persistence/snapshot.hpp": "cbc079ad04e448fcb28efd9e9a005fe00d643fe96bb7082b8a4c964f9403a271",
+    "include/lockstep/persistence/wal.hpp": "62ff17120f1f1ea425f7197f789fd3d76e8eb77774d0d36ea47eb79e71cc49bf",
+    "include/lockstep/protocol/codec.hpp": "8686c364e73747743acf894c15472699989ea9bbc83e0f842b3c040e90c06042",
+    "include/lockstep/protocol/frame.hpp": "5e99111d38a8104094f0bd6aef1a1dbedb12b0120b1641a42fb198bb6683cc2c",
+    "include/lockstep/protocol/messages.hpp": "498a12745f2edff503320d399d480fd6dc970b0688ac9630145ab8309ff6bc57",
+    "include/lockstep/risk/risk_engine.hpp": "3c71d50f6ba346b07b13a2a6f4aaac13a47d072ceb091ecc6389d4c700797fad",
+    "scripts/acceptance.sh": "955f91c2cd2ef5ce13b60f57142e79712a5e83454cace97dd56b9b220dcbaa12",
+    "scripts/benchmark.sh": "c18e91fb9c6555a17bba2aee98e76234226d70e0fa9fd241b34c47132cb342d2",
+    "scripts/configure.sh": "761ddd665d28c05746ba0cc16ae25492964eaf350331273e90145e290eed843a",
+    "scripts/demo.sh": "79cbd70893361801432d8bcd476040b66de94b9ee7dd919758833da2fd4459e5",
+    "scripts/profile.sh": "0a4ef46f69441a2254b233c7946adace6ba4642399a3da5a7d3ae7ff3b17c212",
+    "scripts/verify.sh": "331ed4569f25c3f5d227352ad879d28a999b8a1c02cbfde333b02c29423b75c1",
+    "src/common/crc32c.cpp": "be23469632af77bee1bdaf854d5201a0ba2565e28f778c981d68824ee564856b",
+    "src/common/stable_digest.cpp": "f50ee3db7add76d4241f45c397780b6b075ec00add7d579baa160d2c0bdfbe9c",
+    "src/common/virtual_clock.cpp": "2863ae8a4a8d769aecc6ee47386a2d30b8cdd6c09f8eac077caabf1eaf899016",
+    "src/engine/matching_engine.cpp": "ddeffb8a4a7ee17c303df0d443e558256e51bf44aa43aa0e6bb163fcb79ca508",
+    "src/engine/order_book.cpp": "a9d6a71bf737691dea18482962d954f8e2c75304630e9372072a2131243f8548",
+    "src/engine/reference_book.cpp": "9d72f54544649e98a347c975d6cb186392897d2ec0de46ddc57912f34ac4f701",
+    "src/fault/fault_proxy.cpp": "46017cd2e43a7fa4b39d121353eb1e606b148ca5932aefdd3b7834449fb15fac",
+    "src/metrics/allocation_counter.cpp": "3cc5e21d745d8a62027d2a3e4205e3cf99dc244d34a988ab6dc94862dacfb5ad",
+    "src/metrics/histogram.cpp": "bf4424a0a25a2e238b677000e9e1c11a30e03bf572588796bc71d9e0e186631f",
+    "src/metrics/system_info.cpp": "5b452a4739ba8f048de715141b77fb8e39674b909f76e4e9497318178b8b9f3a",
+    "src/network/feed_arbiter.cpp": "ed3c0a9da806e6964bee634f17953c0dd7b06ed07b741c2983eeb4303385a6e8",
+    "src/network/snapshot_client.cpp": "d78bf802235387da84e929d48dc366e87c247ed7031abaf3f3ac396ccaad3ef6",
+    "src/network/tcp_gateway.cpp": "5db68e25450ac5eb0e9d589036c69a29182e99571bec245ca05ed2a572cdde71",
+    "src/network/udp_publisher.cpp": "cf0775da91a2df6453d6290d213014de1dd4703f633609abd3fbd7d5f83800d9",
+    "src/persistence/recovery.cpp": "792156d16db52da67e10c90c3b1b9bc144e47f684ab263ba2566ccd5decb0fff",
+    "src/persistence/snapshot.cpp": "0493dec440159b9e5e9c785acf974de0d36a801f14a11256b6c323ec73842d85",
+    "src/persistence/wal.cpp": "f09d3a60811a2dedf8e5bed8c0bbbdb51dff57ff256d0881c14731b25dd8e753",
+    "src/protocol/codec.cpp": "695c6620f9747476a249f243abaa166286b7f5b8da2f2bda12833005918f19d5",
+    "src/risk/risk_engine.cpp": "848595c876c5d648cdb8b2a76191420a963371e02c32cd77f00a5f1e625d78e7",
+    "tests/golden/test_golden.cpp": "bd72ae6ad823fa5e0f69e874f571eea342876609ecc12ff68ba1ebfb7ef431a9",
+    "tests/integration/test_network.cpp": "5bfb8858a68ffbae89aa2a509cdb65a3231125bc6b202c51ec6705874610294a",
+    "tests/network/test_udp.cpp": "d7f25d8ce20e0262ba5c100f04fc6248da3eff6c2d38db04fadd05cd04c91a84",
+    "tests/property/test_differential.cpp": "e9e481d35f14f4c868fd16571f3841dffaf5f848f2ebafaaa467fd5d6030a687",
+    "tests/recovery/test_recovery.cpp": "170a69de39c7af2e1d60a253f2005296df9efd31c40271cf4f89b7c403e1090a",
+    "tests/test_main.cpp": "1c44dafb4dae22a1b2cd2012257bea01daccf6f0ef469203836484b9bc209328",
+    "tests/test_runners.cpp": "916b2595e781e45fa14d232a59d3c6b5ae51aaaa2fcdb840bbf52151000b632d",
+    "tests/unit/test_checked_math.cpp": "87a159fac71195382a773dcaab96a33a2ed2685ed159d695360bb66d667e8755",
+    "tests/unit/test_codec.cpp": "e82257b6ebf210ebee3559307f5228accc04d154e8478fc6835afdd84a89edc0",
+    "tests/unit/test_crc32c.cpp": "69dfe272cbf4db4403bfae8c84189bb225f857670ee1414274dce21bfcee5e9d",
+    "tests/unit/test_endian.cpp": "feeb0b3b73696246d3e8c3c077b70bebf2473d1d783122be983e19dfc1ecf397",
+    "tests/unit/test_matching_engine.cpp": "5e8c45f67a656305c9193c38c9bb59bd23669e3ff5902edd4df5ae2df8fa26f7",
+    "tests/unit/test_object_pool.cpp": "72ec9fd126fd95f45de39ab1d969e374fdcd2a1d40f1a5aa062cecec656c6a51",
+    "tests/unit/test_order_book.cpp": "3cbb219595f387afc85c11533d6584e32f36f4af15557a5b833b8624b9b0d9e7",
+    "tests/unit/test_order_book_detail.cpp": "2989cadc560d0d92fcf439469c3098d92c0e35305bb340720caf9ee187b3d01c",
+    "tests/unit/test_risk_engine.cpp": "760fbbb8967bdf1ca2dcdfe766a8ffb833566b40e576dfdcc55cd2e8f4c18247",
+    "tests/unit/test_robin_hood_map.cpp": "0a8d2291fcd86622f7c69e7064c7d47e33338cfea8fa667f5c1cc83e2d53ed93",
+    "tests/unit/test_snapshot.cpp": "1bab7ff43fb39d7fad1d869ffe2b23c844270ec33057d9990964867a860851af",
+    "tests/unit/test_spsc_ring.cpp": "1d281a1c80ee3c38c947e1829f537b8af394953b2453f2474e8fffd0c5f3ce6d",
+    "tests/unit/test_wal.cpp": "5435bffbb479e96ebffd46ddda4caa800ea5b3f7738b52879721d52030862823",
+    "tools/check_headers.py": "d740da2d073a77254601de34e9523feee3125b064a46db16a62be9a78366c497",
+    "tools/generate_workload.py": "7558a656a017ccb2263cc0e2b4e822704b7b946adc6cd4c097ea16594a44b0b0",
+    "tools/make_report.py": "ac85c8310bc37682509baee5e534e786263d98fe75d7f3e5a0a94c302c202430",
+    "tools/run_acceptance.py": "53ee634cbf68098e0beee9e631867a1941314123839eff308ff4367f9ffa0d99",
+    "tools/test_verify.py": "252c4ab8427f15cc6f7997e266cba20425b2ef55318ba921e674f4d3cbbb13bb"
+  },
+  "status": "complete"
+}

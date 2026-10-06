@@ -1,0 +1,53 @@
+[
+  {
+    "command": [
+      "git",
+      "status",
+      "--short"
+    ],
+    "exit_status": 0,
+    "log": "artifacts/resume-baseline/0.log"
+  },
+  {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_status": 0,
+    "log": "artifacts/resume-baseline/1.log"
+  },
+  {
+    "command": [
+      "cmake",
+      "-S",
+      ".",
+      "-B",
+      "build-baseline",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    "exit_status": 0,
+    "log": "artifacts/resume-baseline/2.log"
+  },
+  {
+    "command": [
+      "cmake",
+      "--build",
+      "build-baseline",
+      "--parallel"
+    ],
+    "exit_status": 0,
+    "log": "artifacts/resume-baseline/3.log"
+  },
+  {
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build-baseline",
+      "--output-on-failure",
+      "--no-tests=error"
+    ],
+    "exit_status": 8,
+    "log": "artifacts/resume-baseline/4.log"
+  }
+]

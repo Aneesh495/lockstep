@@ -1,0 +1,161 @@
+{
+  "commands": [
+    {
+      "commands": [
+        [
+          "make",
+          "build",
+          "BUILD_DIR=build-acceptance-077da1f2ff15",
+          "CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON"
+        ]
+      ],
+      "duration_seconds": 21.69205262500327,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/release.log",
+      "name": "release",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "test",
+          "BUILD_DIR=build-acceptance-077da1f2ff15-portable"
+        ]
+      ],
+      "duration_seconds": 21.131332999968436,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/test.log",
+      "name": "test",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "sanitize",
+          "BUILD_DIR=build-acceptance-077da1f2ff15"
+        ]
+      ],
+      "duration_seconds": 34.26764883304713,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/sanitize.log",
+      "name": "sanitize",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "tsan",
+          "BUILD_DIR=build-acceptance-077da1f2ff15"
+        ]
+      ],
+      "duration_seconds": 15.63928408297943,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/tsan.log",
+      "name": "tsan",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "fuzz-smoke",
+          "BUILD_DIR=build-acceptance-077da1f2ff15"
+        ]
+      ],
+      "duration_seconds": 16.901442792033777,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/fuzz.log",
+      "name": "fuzz",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "demo",
+          "BUILD_DIR=build-acceptance-077da1f2ff15"
+        ]
+      ],
+      "duration_seconds": 0.3649190000141971,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/demo.log",
+      "name": "demo",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "tools/check_headers.py",
+          "--compiler",
+          "c++"
+        ]
+      ],
+      "duration_seconds": 11.98144266702002,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/headers.log",
+      "name": "headers",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "tools/check_headers.py",
+          "--format-only",
+          "--clang-format",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/format-env/bin/clang-format"
+        ]
+      ],
+      "duration_seconds": 0.35816933400928974,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/format.log",
+      "name": "format",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "build-acceptance-077da1f2ff15/lockstep_bench",
+          "--output",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/077da1f2ff15-20261005T205105/benchmark",
+          "--repetitions",
+          "10",
+          "--operations",
+          "1000000",
+          "--latency-operations",
+          "100000"
+        ]
+      ],
+      "duration_seconds": 0.8707075000274926,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/benchmark.log",
+      "name": "benchmark",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "build-acceptance-077da1f2ff15/lockstep_fault_stress",
+          "--events",
+          "100000000",
+          "--shards",
+          "4",
+          "--seed",
+          "12345",
+          "--output",
+          "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/077da1f2ff15-20261005T205105/stress"
+        ]
+      ],
+      "duration_seconds": 38.46489137498429,
+      "exit_status": 0,
+      "log": "results/evidence/077da1f2ff15-20261005T205105/logs/fault.log",
+      "name": "fault",
+      "skipped": false
+    }
+  ],
+  "error": "Source changed during acceptance"
+}

@@ -1,0 +1,27 @@
+[
+  {
+    "case": "missing_artifact",
+    "exit_status": 1,
+    "output": "FAIL: Missing artifact: results/evidence/93b758d052e0-20261005T205622/benchmark/latency-0.bin"
+  },
+  {
+    "case": "modified_artifact_byte",
+    "exit_status": 1,
+    "output": "FAIL: Modified artifact: results/evidence/93b758d052e0-20261005T205622/benchmark/latency-0.bin"
+  },
+  {
+    "case": "stale_source",
+    "exit_status": 1,
+    "output": "FAIL: Stale implementation source"
+  },
+  {
+    "case": "falsified_count_with_updated_hash",
+    "exit_status": 1,
+    "output": "FAIL: Falsified fault counts"
+  },
+  {
+    "case": "required_check_skipped_with_updated_hash",
+    "exit_status": 1,
+    "output": "FAIL: Required command failed/skipped: release"
+  }
+]

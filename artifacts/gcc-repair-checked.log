@@ -1,0 +1,31 @@
+=== Configuring Lockstep ===
+cmake -S . -B build-gcc-repair -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-15
+-- 
+-- Lockstep Configuration Summary
+-- ================================
+-- Build type: Release
+-- C++ Standard: 20
+-- Compiler: GNU 15.2.0
+-- System: Darwin arm64
+-- Native CPU flag: -mcpu=native
+-- Build tests: ON
+-- Build benchmarks: ON
+-- Build apps: ON
+-- Enable sanitizers: OFF
+-- Enable TSan: OFF
+-- Enable native: OFF
+-- 
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-gcc-repair
+=== Building Lockstep ===
+cmake --build build-gcc-repair --parallel
+[1/9] Linking CXX executable lockstep_fault_stress
+[2/9] Building CXX object CMakeFiles/fuzz_snapshot_decoder.dir/fuzz/fuzz_snapshot_decoder.cpp.o
+[3/9] Building CXX object CMakeFiles/fuzz_wal_decoder.dir/fuzz/fuzz_wal_decoder.cpp.o
+[4/9] Linking CXX executable fuzz_snapshot_decoder
+[5/9] Linking CXX executable fuzz_wal_decoder
+[6/9] Building CXX object CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o
+[7/9] Linking CXX executable lockstep_tests
+[8/9] Building CXX object CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o
+[9/9] Linking CXX executable lockstep_crash_matrix

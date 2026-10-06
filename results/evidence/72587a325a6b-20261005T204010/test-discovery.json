@@ -1,0 +1,575 @@
+{
+  "backtraceGraph" : 
+  {
+    "commands" : 
+    [
+      "add_test"
+    ],
+    "files" : 
+    [
+      "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/CMakeLists.txt"
+    ],
+    "nodes" : 
+    [
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 161,
+        "parent" : 0
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 162,
+        "parent" : 2
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 163,
+        "parent" : 4
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 164,
+        "parent" : 6
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 165,
+        "parent" : 8
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 166,
+        "parent" : 10
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 167,
+        "parent" : 12
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 168,
+        "parent" : 14
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 169,
+        "parent" : 16
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 170,
+        "parent" : 18
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 171,
+        "parent" : 20
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 172,
+        "parent" : 22
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 173,
+        "parent" : 24
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 174,
+        "parent" : 26
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 175,
+        "parent" : 28
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 176,
+        "parent" : 30
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 177,
+        "parent" : 32
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 178,
+        "parent" : 34
+      },
+      {
+        "file" : 0
+      },
+      {
+        "command" : 0,
+        "file" : 0,
+        "line" : 179,
+        "parent" : 36
+      }
+    ]
+  },
+  "kind" : "ctestInfo",
+  "tests" : 
+  [
+    {
+      "backtrace" : 1,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests"
+      ],
+      "name" : "LockstepTests",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 3,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "spsc"
+      ],
+      "name" : "spsc",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 5,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "network"
+      ],
+      "name" : "network",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 7,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "udp"
+      ],
+      "name" : "udp",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 9,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "endian"
+      ],
+      "name" : "endian",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 11,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "crc32c"
+      ],
+      "name" : "crc32c",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 13,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "checked_math"
+      ],
+      "name" : "checked_math",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 15,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "object_pool"
+      ],
+      "name" : "object_pool",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 17,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "robin_hood_map"
+      ],
+      "name" : "robin_hood_map",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 19,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "order_book"
+      ],
+      "name" : "order_book",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 21,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "order_book_detail"
+      ],
+      "name" : "order_book_detail",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 23,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "matching_engine"
+      ],
+      "name" : "matching_engine",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 25,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "risk_engine"
+      ],
+      "name" : "risk_engine",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 27,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "codec"
+      ],
+      "name" : "codec",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 29,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "wal"
+      ],
+      "name" : "wal",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 31,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "snapshot"
+      ],
+      "name" : "snapshot",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 33,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "differential"
+      ],
+      "name" : "differential",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 35,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "recovery"
+      ],
+      "name" : "recovery",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    },
+    {
+      "backtrace" : 37,
+      "command" : 
+      [
+        "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b/lockstep_tests",
+        "golden"
+      ],
+      "name" : "golden",
+      "properties" : 
+      [
+        {
+          "name" : "TIMEOUT",
+          "value" : 300.0
+        },
+        {
+          "name" : "WORKING_DIRECTORY",
+          "value" : "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-72587a325a6b"
+        }
+      ]
+    }
+  ],
+  "version" : 
+  {
+    "major" : 1,
+    "minor" : 0
+  }
+}

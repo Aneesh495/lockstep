@@ -1,0 +1,9 @@
+ M bench/lockstep_crash_matrix.cpp
+ M bench/lockstep_fault_stress.cpp
+ M include/lockstep/network/client_book.hpp
+ M src/engine/order_book.cpp
+ M src/engine/reference_book.cpp
+ M src/persistence/recovery.cpp
+ M tests/property/test_differential.cpp
+?? artifacts/resume-baseline/
+?? include/lockstep/engine/reference_model.hpp

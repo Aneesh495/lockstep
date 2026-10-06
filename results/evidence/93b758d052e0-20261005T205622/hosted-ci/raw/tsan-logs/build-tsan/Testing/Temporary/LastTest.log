@@ -1,0 +1,91 @@
+Start testing: Oct 06 00:56 UTC
+----------------------------------------------------------
+2/19 Testing: spsc
+2/19 Test: spsc
+Command: "/home/runner/work/lockstep/lockstep/build-tsan/lockstep_tests" "spsc"
+Directory: /home/runner/work/lockstep/lockstep/build-tsan
+"spsc" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running spsc tests...
+  [PASS] SPSC basic transfer
+  [PASS] SPSC full/empty
+  [PASS] SPSC wraparound
+  [PASS] SPSC concurrent transfer
+
+All selected tests passed!
+<end of output>
+Test time =   0.04 sec
+----------------------------------------------------------
+Test Passed.
+"spsc" end time: Oct 06 00:56 UTC
+"spsc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/19 Testing: network
+3/19 Test: network
+Command: "/home/runner/work/lockstep/lockstep/build-tsan/lockstep_tests" "network"
+Directory: /home/runner/work/lockstep/lockstep/build-tsan
+"network" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running network tests...
+Running network integration tests...
+  Testing TCP frame fragmentation...\n    [PASS] Frame fragmentation parsing\n  Testing TCP frame coalescing...
+    [PASS] Frame coalescing parsing
+  Testing malformed frames...
+    [PASS] Malformed frame rejection
+  Testing feed arbiter duplicate detection...
+    [PASS] Duplicate event handling
+  Testing feed arbiter gap detection...
+    [PASS] Gap detection
+  Testing feed arbiter redundant feed recovery...
+    [PASS] Redundant feed recovery
+  Testing feed arbiter snapshot recovery...
+    [PASS] Snapshot recovery
+  Testing feed arbiter session change detection...
+    [PASS] Session change detection
+  Testing TCP gateway creation...
+    [PASS] Real TCP fragmented/coalesced frames: 3 commands
+  Testing frame round-trip encoding...
+    [PASS] Frame round-trip encoding
+All network integration tests passed!
+
+All selected tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"network" end time: Oct 06 00:56 UTC
+"network" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/19 Testing: udp
+4/19 Test: udp
+Command: "/home/runner/work/lockstep/lockstep/build-tsan/lockstep_tests" "udp"
+Directory: /home/runner/work/lockstep/lockstep/build-tsan
+"udp" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running udp tests...
+  [PASS] Real UDP: 24 packets, 240 client events, A outage, B duplicate/reorder
+
+All selected tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"udp" end time: Oct 06 00:56 UTC
+"udp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 06 00:56 UTC

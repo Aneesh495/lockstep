@@ -1,0 +1,602 @@
+Start testing: Oct 06 00:56 UTC
+----------------------------------------------------------
+1/19 Testing: LockstepTests
+1/19 Test: LockstepTests
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"LockstepTests" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running endian tests...
+  [PASS] Endian round-trip
+  [PASS] Endian write/read
+  [PASS] ByteReader/ByteWriter
+Running crc32c tests...
+  [PASS] CRC32C check vectors
+  [PASS] CRC32C incremental update
+  [PASS] CRC32C empty input
+Running checked_math tests...
+  [PASS] Checked addition
+  [PASS] Checked subtraction
+  [PASS] Checked multiplication
+  [PASS] Notional computation
+Running object_pool tests...
+  [PASS] Object pool allocate/deallocate
+  [PASS] Object pool exhaustion
+  [PASS] Object pool free list
+  [PASS] Object pool verification
+Running robin_hood_map tests...
+  [PASS] Robin Hood map insert/find
+  [PASS] Robin Hood map erase
+  [PASS] Robin Hood map collision
+  [PASS] Robin Hood map capacity
+  [PASS] Robin Hood map integrity
+Running spsc tests...
+  [PASS] SPSC basic transfer
+  [PASS] SPSC full/empty
+  [PASS] SPSC wraparound
+  [PASS] SPSC concurrent transfer
+Running order_book tests...
+  [PASS] Order book new order
+  [PASS] Order book matching
+  [PASS] Order book cancel
+  [PASS] Order book replace
+  [PASS] Order book not crossed
+Running order_book_detail tests...
+  [PASS] New resting order
+  [PASS] IOC order
+  [PASS] FOK order
+  [PASS] Priority ordering
+Running matching_engine tests...
+Running matching engine tests...
+  [PASS] Matching engine new order
+  [PASS] Matching engine sequencing
+  [PASS] Matching engine differential
+  [PASS] Matching engine invariants
+  [PASS] Matching engine kill switch
+Running risk_engine tests...
+  [PASS] Risk engine quantity limit
+  [PASS] Risk engine position limit
+  [PASS] Risk engine kill switch
+  [PASS] Position risk includes existing open orders
+Running codec tests...
+  [PASS] Codec new order round-trip
+  [PASS] Codec frame header
+Running wal tests...
+  [PASS] WAL writer and reader lifecycle
+  [PASS] WAL empty file read
+Running snapshot tests...
+  [PASS] Snapshot empty engine
+  [PASS] Snapshot non-existent file handling
+Running differential tests...
+  [PASS] Seeded mixed workload
+  [PASS] 12000 independently compared mixed commands, complete FIFO/risk/trade state
+  [PASS] Capacity exhaustion
+  [PASS] Invalid IDs and inputs
+  [PASS] All order policies (GTC, IOC, FOK, STP)
+Running network tests...
+Running network integration tests...
+  Testing TCP frame fragmentation...\n    [PASS] Frame fragmentation parsing\n  Testing TCP frame coalescing...
+    [PASS] Frame coalescing parsing
+  Testing malformed frames...
+    [PASS] Malformed frame rejection
+  Testing feed arbiter duplicate detection...
+    [PASS] Duplicate event handling
+  Testing feed arbiter gap detection...
+    [PASS] Gap detection
+  Testing feed arbiter redundant feed recovery...
+    [PASS] Redundant feed recovery
+  Testing feed arbiter snapshot recovery...
+    [PASS] Snapshot recovery
+  Testing feed arbiter session change detection...
+    [PASS] Session change detection
+  Testing TCP gateway creation...
+    [PASS] Real TCP fragmented/coalesced frames: 3 commands
+  Testing frame round-trip encoding...
+    [PASS] Frame round-trip encoding
+All network integration tests passed!
+Running recovery tests...
+  [PASS] Two commands regression fixture
+  [PASS] Snapshot save and restore
+  [PASS] Snapshot plus subsequent WAL replay
+  [PASS] Replay twice deterministic
+  [PASS] Recovery followed by new trading
+  [PASS] Corrupt checksum rejected
+  [PASS] Invalid magic rejected
+  [PASS] WAL sequence anomalies rejected
+  [PASS] Torn final tail recoverable
+  [PASS] Corrupt snapshot rejected
+Running udp tests...
+  [PASS] Real UDP: 24 packets, 240 client events, A outage, B duplicate/reorder
+Running golden tests...
+  [PASS] CRC32C golden
+  [PASS] SHA256 golden
+
+All selected tests passed!
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"LockstepTests" end time: Oct 06 00:56 UTC
+"LockstepTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/19 Testing: spsc
+2/19 Test: spsc
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "spsc"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"spsc" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running spsc tests...
+  [PASS] SPSC basic transfer
+  [PASS] SPSC full/empty
+  [PASS] SPSC wraparound
+  [PASS] SPSC concurrent transfer
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"spsc" end time: Oct 06 00:56 UTC
+"spsc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/19 Testing: network
+3/19 Test: network
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "network"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"network" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running network tests...
+Running network integration tests...
+  Testing TCP frame fragmentation...\n    [PASS] Frame fragmentation parsing\n  Testing TCP frame coalescing...
+    [PASS] Frame coalescing parsing
+  Testing malformed frames...
+    [PASS] Malformed frame rejection
+  Testing feed arbiter duplicate detection...
+    [PASS] Duplicate event handling
+  Testing feed arbiter gap detection...
+    [PASS] Gap detection
+  Testing feed arbiter redundant feed recovery...
+    [PASS] Redundant feed recovery
+  Testing feed arbiter snapshot recovery...
+    [PASS] Snapshot recovery
+  Testing feed arbiter session change detection...
+    [PASS] Session change detection
+  Testing TCP gateway creation...
+    [PASS] Real TCP fragmented/coalesced frames: 3 commands
+  Testing frame round-trip encoding...
+    [PASS] Frame round-trip encoding
+All network integration tests passed!
+
+All selected tests passed!
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"network" end time: Oct 06 00:56 UTC
+"network" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/19 Testing: udp
+4/19 Test: udp
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "udp"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"udp" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running udp tests...
+  [PASS] Real UDP: 24 packets, 240 client events, A outage, B duplicate/reorder
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"udp" end time: Oct 06 00:56 UTC
+"udp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/19 Testing: endian
+5/19 Test: endian
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "endian"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"endian" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running endian tests...
+  [PASS] Endian round-trip
+  [PASS] Endian write/read
+  [PASS] ByteReader/ByteWriter
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"endian" end time: Oct 06 00:56 UTC
+"endian" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/19 Testing: crc32c
+6/19 Test: crc32c
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "crc32c"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"crc32c" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running crc32c tests...
+  [PASS] CRC32C check vectors
+  [PASS] CRC32C incremental update
+  [PASS] CRC32C empty input
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"crc32c" end time: Oct 06 00:56 UTC
+"crc32c" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/19 Testing: checked_math
+7/19 Test: checked_math
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "checked_math"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"checked_math" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running checked_math tests...
+  [PASS] Checked addition
+  [PASS] Checked subtraction
+  [PASS] Checked multiplication
+  [PASS] Notional computation
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"checked_math" end time: Oct 06 00:56 UTC
+"checked_math" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/19 Testing: object_pool
+8/19 Test: object_pool
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "object_pool"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"object_pool" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running object_pool tests...
+  [PASS] Object pool allocate/deallocate
+  [PASS] Object pool exhaustion
+  [PASS] Object pool free list
+  [PASS] Object pool verification
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"object_pool" end time: Oct 06 00:56 UTC
+"object_pool" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/19 Testing: robin_hood_map
+9/19 Test: robin_hood_map
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "robin_hood_map"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"robin_hood_map" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running robin_hood_map tests...
+  [PASS] Robin Hood map insert/find
+  [PASS] Robin Hood map erase
+  [PASS] Robin Hood map collision
+  [PASS] Robin Hood map capacity
+  [PASS] Robin Hood map integrity
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"robin_hood_map" end time: Oct 06 00:56 UTC
+"robin_hood_map" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/19 Testing: order_book
+10/19 Test: order_book
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "order_book"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"order_book" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running order_book tests...
+  [PASS] Order book new order
+  [PASS] Order book matching
+  [PASS] Order book cancel
+  [PASS] Order book replace
+  [PASS] Order book not crossed
+Running order_book_detail tests...
+  [PASS] New resting order
+  [PASS] IOC order
+  [PASS] FOK order
+  [PASS] Priority ordering
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"order_book" end time: Oct 06 00:56 UTC
+"order_book" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/19 Testing: order_book_detail
+11/19 Test: order_book_detail
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "order_book_detail"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"order_book_detail" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running order_book tests...
+  [PASS] Order book new order
+  [PASS] Order book matching
+  [PASS] Order book cancel
+  [PASS] Order book replace
+  [PASS] Order book not crossed
+Running order_book_detail tests...
+  [PASS] New resting order
+  [PASS] IOC order
+  [PASS] FOK order
+  [PASS] Priority ordering
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"order_book_detail" end time: Oct 06 00:56 UTC
+"order_book_detail" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/19 Testing: matching_engine
+12/19 Test: matching_engine
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "matching_engine"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"matching_engine" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running matching_engine tests...
+Running matching engine tests...
+  [PASS] Matching engine new order
+  [PASS] Matching engine sequencing
+  [PASS] Matching engine differential
+  [PASS] Matching engine invariants
+  [PASS] Matching engine kill switch
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"matching_engine" end time: Oct 06 00:56 UTC
+"matching_engine" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/19 Testing: risk_engine
+13/19 Test: risk_engine
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "risk_engine"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"risk_engine" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running risk_engine tests...
+  [PASS] Risk engine quantity limit
+  [PASS] Risk engine position limit
+  [PASS] Risk engine kill switch
+  [PASS] Position risk includes existing open orders
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"risk_engine" end time: Oct 06 00:56 UTC
+"risk_engine" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/19 Testing: codec
+14/19 Test: codec
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "codec"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"codec" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running codec tests...
+  [PASS] Codec new order round-trip
+  [PASS] Codec frame header
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"codec" end time: Oct 06 00:56 UTC
+"codec" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/19 Testing: wal
+15/19 Test: wal
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "wal"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"wal" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running wal tests...
+  [PASS] WAL writer and reader lifecycle
+  [PASS] WAL empty file read
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"wal" end time: Oct 06 00:56 UTC
+"wal" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/19 Testing: snapshot
+16/19 Test: snapshot
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "snapshot"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"snapshot" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running snapshot tests...
+  [PASS] Snapshot empty engine
+  [PASS] Snapshot non-existent file handling
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"snapshot" end time: Oct 06 00:56 UTC
+"snapshot" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/19 Testing: differential
+17/19 Test: differential
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "differential"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"differential" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running differential tests...
+  [PASS] Seeded mixed workload
+  [PASS] 12000 independently compared mixed commands, complete FIFO/risk/trade state
+  [PASS] Capacity exhaustion
+  [PASS] Invalid IDs and inputs
+  [PASS] All order policies (GTC, IOC, FOK, STP)
+
+All selected tests passed!
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"differential" end time: Oct 06 00:56 UTC
+"differential" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/19 Testing: recovery
+18/19 Test: recovery
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "recovery"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"recovery" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running recovery tests...
+  [PASS] Two commands regression fixture
+  [PASS] Snapshot save and restore
+  [PASS] Snapshot plus subsequent WAL replay
+  [PASS] Replay twice deterministic
+  [PASS] Recovery followed by new trading
+  [PASS] Corrupt checksum rejected
+  [PASS] Invalid magic rejected
+  [PASS] WAL sequence anomalies rejected
+  [PASS] Torn final tail recoverable
+  [PASS] Corrupt snapshot rejected
+
+All selected tests passed!
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"recovery" end time: Oct 06 00:56 UTC
+"recovery" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/19 Testing: golden
+19/19 Test: golden
+Command: "/Users/runner/work/lockstep/lockstep/build/lockstep_tests" "golden"
+Directory: /Users/runner/work/lockstep/lockstep/build
+"golden" start time: Oct 06 00:56 UTC
+Output:
+----------------------------------------------------------
+Lockstep Test Suite
+===================
+
+Running golden tests...
+  [PASS] CRC32C golden
+  [PASS] SHA256 golden
+
+All selected tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"golden" end time: Oct 06 00:56 UTC
+"golden" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 06 00:56 UTC

@@ -1,0 +1,10 @@
+{
+  "CLANG_FORMAT": "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/format-env/bin/clang-format",
+  "CXX": "c++",
+  "host": "AKs-MacBook.local",
+  "implementation_revision": "d6badbd14d56ee8d2765f784b46836613169b7a3",
+  "platform": "macOS-26.7-arm64-arm-64bit-Mach-O",
+  "python": "3.14.2 (v3.14.2:df793163d58, Dec  5 2025, 12:18:06) [Clang 16.0.0 (clang-1600.0.26.6)]",
+  "source_manifest_sha256": "807de0dfe428e0b95547709c6cb279462a8b43d9a0c1ebf5e28fb7fe1e31e73a",
+  "started": "20261005T161257"
+}

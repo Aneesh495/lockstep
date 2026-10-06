@@ -1,0 +1,10 @@
+Run 0: 3.31082e+07 commands/s; p99=167 ns; allocations=0
+Run 1: 6.14899e+07 commands/s; p99=84 ns; allocations=0
+Run 2: 5.69377e+07 commands/s; p99=83 ns; allocations=0
+Run 3: 5.26313e+07 commands/s; p99=83 ns; allocations=0
+Run 4: 5.4297e+07 commands/s; p99=83 ns; allocations=0
+Run 5: 6.22052e+07 commands/s; p99=42 ns; allocations=0
+Run 6: 6.12734e+07 commands/s; p99=42 ns; allocations=0
+Run 7: 4.85176e+07 commands/s; p99=125 ns; allocations=0
+Run 8: 5.23038e+07 commands/s; p99=125 ns; allocations=0
+Run 9: 6.02894e+07 commands/s; p99=83 ns; allocations=0

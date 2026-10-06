@@ -1,0 +1,135 @@
+=== Configuring Lockstep ===
+cmake -S . -B build-gcc-repair -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++-15
+-- 
+-- Lockstep Configuration Summary
+-- ================================
+-- Build type: Release
+-- C++ Standard: 20
+-- Compiler: GNU 15.2.0
+-- System: Darwin arm64
+-- Native CPU flag: -mcpu=native
+-- Build tests: ON
+-- Build benchmarks: ON
+-- Build apps: ON
+-- Enable sanitizers: OFF
+-- Enable TSan: OFF
+-- Enable native: OFF
+-- 
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-gcc-repair
+=== Building Lockstep ===
+cmake --build build-gcc-repair --parallel
+[1/36] Linking CXX static library liblockstep_core.a
+[2/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_checked_math.cpp.o
+[3/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_codec.cpp.o
+[4/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_object_pool.cpp.o
+[5/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_risk_engine.cpp.o
+[6/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book.cpp.o
+[7/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_spsc_ring.cpp.o
+[8/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_robin_hood_map.cpp.o
+[9/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book_detail.cpp.o
+[10/36] Building CXX object CMakeFiles/lockstep_client.dir/apps/lockstep_client.cpp.o
+[11/36] Building CXX object CMakeFiles/lockstep_bench.dir/bench/allocation_probe.cpp.o
+[12/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/golden/test_golden.cpp.o
+[13/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_matching_engine.cpp.o
+[14/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_wal.cpp.o
+[15/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_snapshot.cpp.o
+[16/36] Building CXX object CMakeFiles/fuzz_frame_decoder.dir/fuzz/fuzz_frame_decoder.cpp.o
+[17/36] Linking CXX executable lockstep_exchange
+[18/36] Linking CXX executable lockstep_client
+[19/36] Linking CXX executable lockstep_demo
+[20/36] Linking CXX executable lockstep_replay
+[21/36] Linking CXX executable fuzz_frame_decoder
+[22/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/integration/test_network.cpp.o
+[23/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/network/test_udp.cpp.o
+[24/36] Building CXX object CMakeFiles/lockstep_bench.dir/bench/lockstep_bench.cpp.o
+[25/36] Linking CXX executable lockstep_bench
+[26/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/recovery/test_recovery.cpp.o
+[27/36] Building CXX object CMakeFiles/fuzz_wal_decoder.dir/fuzz/fuzz_wal_decoder.cpp.o
+[28/36] Linking CXX executable fuzz_wal_decoder
+[29/36] Building CXX object CMakeFiles/fuzz_snapshot_decoder.dir/fuzz/fuzz_snapshot_decoder.cpp.o
+[30/36] Linking CXX executable fuzz_snapshot_decoder
+[31/36] Building CXX object CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o
+FAILED: [code=1] CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o 
+/opt/homebrew/bin/g++-15  -I/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -MD -MT CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o -MF CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o.d -o CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o -c /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/tests/property/test_differential.cpp
+In file included from /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/map:64,
+                 from /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/include/lockstep/engine/reference_book.hpp:6,
+                 from /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/include/lockstep/engine/matching_engine.hpp:9,
+                 from /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/tests/property/test_differential.cpp:7:
+In member function 'std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::const_iterator std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::begin() const [with _Key = long long int; _Val = std::pair<const long long int, std::deque<lockstep::Order> >; _KeyOfValue = std::_Select1st<std::pair<const long long int, std::deque<lockstep::Order> > >; _Compare = std::greater<long long int>; _Alloc = std::allocator<std::pair<const long long int, std::deque<lockstep::Order> > >]',
+    inlined from 'std::map<_Key, _Tp, _Compare, _Alloc>::const_iterator std::map<_Key, _Tp, _Compare, _Alloc>::begin() const [with _Key = long long int; _Tp = std::deque<lockstep::Order>; _Compare = std::greater<long long int>; _Alloc = std::allocator<std::pair<const long long int, std::deque<lockstep::Order> > >]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/stl_map.h:401:26,
+    inlined from 'void lockstep::ReferenceBook::forEachOrderInPriceTimeOrder(Func&&) const [with Func = campaign::expected(const std::vector<Spec>&, std::size_t, std::size_t)::<lambda(const lockstep::Order&)>]' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/include/lockstep/engine/reference_book.hpp:61:9,
+    inlined from 'std::string campaign::expected(const std::vector<Spec>&, std::size_t, std::size_t)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/tests/property/../../bench/campaign_support.hpp:198:49:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/stl_tree.h:1625:55: error: potential null pointer dereference [-Werror=null-dereference]
+ 1625 |       { return const_iterator(this->_M_impl._M_header._M_left); }
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/stl_tree.h:1625:55: error: potential null pointer dereference [-Werror=null-dereference]
+cc1plus: all warnings being treated as errors
+[32/36] Building CXX object CMakeFiles/lockstep_fault_stress.dir/bench/lockstep_fault_stress.cpp.o
+[33/36] Building CXX object CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o
+FAILED: [code=1] CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o 
+/opt/homebrew/bin/g++-15  -I/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -MD -MT CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o -MF CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o.d -o CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o -c /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp
+In file included from /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/ios:47,
+                 from /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/istream:42,
+                 from /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/sstream:42,
+                 from /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/chrono:51,
+                 from /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:6:
+In member function 'std::basic_streambuf<_CharT, _Traits>::char_type* std::basic_streambuf<_CharT, _Traits>::egptr() const [with _CharT = char; _Traits = std::char_traits<char>]',
+    inlined from 'std::basic_streambuf<_CharT, _Traits>::int_type std::basic_streambuf<_CharT, _Traits>::sbumpc() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:328:49,
+    inlined from 'std::istreambuf_iterator<_CharT, _Traits>& std::istreambuf_iterator<_CharT, _Traits>::operator++() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/streambuf_iterator.h:175:17,
+    inlined from 'constexpr void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::input_iterator_tag) [with _InIterator = std::istreambuf_iterator<char, std::char_traits<char> >; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.tcc:187:6,
+    inlined from 'constexpr std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::basic_string(_InputIterator, _InputIterator, const _Alloc&) [with _InputIterator = std::istreambuf_iterator<char, std::char_traits<char> >; <template-parameter-2-2> = void; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.h:857:16,
+    inlined from 'std::string {anonymous}::readFile(const std::filesystem::__cxx11::path&)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:26:51:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:497:30: error: potential null pointer dereference [-Werror=null-dereference]
+  497 |       egptr() const { return _M_in_end; }
+      |                              ^~~~~~~~~
+In member function 'std::basic_streambuf<_CharT, _Traits>::char_type* std::basic_streambuf<_CharT, _Traits>::gptr() const [with _CharT = char; _Traits = std::char_traits<char>]',
+    inlined from 'std::basic_streambuf<_CharT, _Traits>::int_type std::basic_streambuf<_CharT, _Traits>::sbumpc() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:328:33,
+    inlined from 'std::istreambuf_iterator<_CharT, _Traits>& std::istreambuf_iterator<_CharT, _Traits>::operator++() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/streambuf_iterator.h:175:17,
+    inlined from 'constexpr void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::input_iterator_tag) [with _InIterator = std::istreambuf_iterator<char, std::char_traits<char> >; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.tcc:187:6,
+    inlined from 'constexpr std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::basic_string(_InputIterator, _InputIterator, const _Alloc&) [with _InputIterator = std::istreambuf_iterator<char, std::char_traits<char> >; <template-parameter-2-2> = void; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.h:857:16,
+    inlined from 'std::string {anonymous}::readFile(const std::filesystem::__cxx11::path&)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:26:51:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:494:30: error: potential null pointer dereference [-Werror=null-dereference]
+  494 |       gptr()  const { return _M_in_cur;  }
+      |                              ^~~~~~~~~
+In member function 'std::basic_streambuf<_CharT, _Traits>::char_type* std::basic_streambuf<_CharT, _Traits>::gptr() const [with _CharT = char; _Traits = std::char_traits<char>]',
+    inlined from 'std::basic_streambuf<_CharT, _Traits>::int_type std::basic_streambuf<_CharT, _Traits>::sbumpc() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:328:33,
+    inlined from 'std::istreambuf_iterator<_CharT, _Traits>& std::istreambuf_iterator<_CharT, _Traits>::operator++() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/streambuf_iterator.h:175:17,
+    inlined from 'constexpr void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::input_iterator_tag) [with _InIterator = std::istreambuf_iterator<char, std::char_traits<char> >; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.tcc:215:6,
+    inlined from 'constexpr std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::basic_string(_InputIterator, _InputIterator, const _Alloc&) [with _InputIterator = std::istreambuf_iterator<char, std::char_traits<char> >; <template-parameter-2-2> = void; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.h:857:16,
+    inlined from 'std::string {anonymous}::readFile(const std::filesystem::__cxx11::path&)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:26:51:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:494:30: error: null pointer dereference [-Werror=null-dereference]
+  494 |       gptr()  const { return _M_in_cur;  }
+      |                              ^~~~~~~~~
+In member function 'std::basic_streambuf<_CharT, _Traits>::char_type* std::basic_streambuf<_CharT, _Traits>::egptr() const [with _CharT = char; _Traits = std::char_traits<char>]',
+    inlined from 'std::basic_streambuf<_CharT, _Traits>::int_type std::basic_streambuf<_CharT, _Traits>::sbumpc() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:328:49,
+    inlined from 'std::istreambuf_iterator<_CharT, _Traits>& std::istreambuf_iterator<_CharT, _Traits>::operator++() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/streambuf_iterator.h:175:17,
+    inlined from 'constexpr void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::input_iterator_tag) [with _InIterator = std::istreambuf_iterator<char, std::char_traits<char> >; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.tcc:215:6,
+    inlined from 'constexpr std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::basic_string(_InputIterator, _InputIterator, const _Alloc&) [with _InputIterator = std::istreambuf_iterator<char, std::char_traits<char> >; <template-parameter-2-2> = void; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.h:857:16,
+    inlined from 'std::string {anonymous}::readFile(const std::filesystem::__cxx11::path&)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:26:51:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:497:30: error: null pointer dereference [-Werror=null-dereference]
+  497 |       egptr() const { return _M_in_end; }
+      |                              ^~~~~~~~~
+In member function 'void std::basic_streambuf<_CharT, _Traits>::gbump(int) [with _CharT = char; _Traits = std::char_traits<char>]',
+    inlined from 'std::basic_streambuf<_CharT, _Traits>::int_type std::basic_streambuf<_CharT, _Traits>::sbumpc() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:331:17,
+    inlined from 'std::istreambuf_iterator<_CharT, _Traits>& std::istreambuf_iterator<_CharT, _Traits>::operator++() [with _CharT = char; _Traits = std::char_traits<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/streambuf_iterator.h:175:17,
+    inlined from 'constexpr void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::input_iterator_tag) [with _InIterator = std::istreambuf_iterator<char, std::char_traits<char> >; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.tcc:215:6,
+    inlined from 'constexpr std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::basic_string(_InputIterator, _InputIterator, const _Alloc&) [with _InputIterator = std::istreambuf_iterator<char, std::char_traits<char> >; <template-parameter-2-2> = void; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/basic_string.h:857:16,
+    inlined from 'std::string {anonymous}::readFile(const std::filesystem::__cxx11::path&)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:26:51:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/streambuf:507:34: error: null pointer dereference [-Werror=null-dereference]
+  507 |       gbump(int __n) { _M_in_cur += __n; }
+      |                        ~~~~~~~~~~^~~~~~
+In file included from /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/map:64,
+                 from /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/lockstep_crash_matrix.cpp:10:
+In member function 'std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::const_iterator std::_Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::begin() const [with _Key = long long int; _Val = std::pair<const long long int, std::deque<lockstep::Order> >; _KeyOfValue = std::_Select1st<std::pair<const long long int, std::deque<lockstep::Order> > >; _Compare = std::greater<long long int>; _Alloc = std::allocator<std::pair<const long long int, std::deque<lockstep::Order> > >]',
+    inlined from 'std::map<_Key, _Tp, _Compare, _Alloc>::const_iterator std::map<_Key, _Tp, _Compare, _Alloc>::begin() const [with _Key = long long int; _Tp = std::deque<lockstep::Order>; _Compare = std::greater<long long int>; _Alloc = std::allocator<std::pair<const long long int, std::deque<lockstep::Order> > >]' at /opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/stl_map.h:401:26,
+    inlined from 'void lockstep::ReferenceBook::forEachOrderInPriceTimeOrder(Func&&) const [with Func = campaign::expected(const std::vector<Spec>&, std::size_t, std::size_t)::<lambda(const lockstep::Order&)>]' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/include/lockstep/engine/reference_book.hpp:61:9,
+    inlined from 'std::string campaign::expected(const std::vector<Spec>&, std::size_t, std::size_t)' at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/bench/campaign_support.hpp:198:49:
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/stl_tree.h:1625:55: error: potential null pointer dereference [-Werror=null-dereference]
+ 1625 |       { return const_iterator(this->_M_impl._M_header._M_left); }
+      |                               ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15/bits/stl_tree.h:1625:55: error: potential null pointer dereference [-Werror=null-dereference]
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.
+make: *** [build] Error 1

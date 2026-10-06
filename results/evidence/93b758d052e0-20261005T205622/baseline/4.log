@@ -1,0 +1,153 @@
+Test project /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-baseline
+      Start  1: LockstepTests
+ 1/19 Test  #1: LockstepTests ....................Subprocess aborted***Exception:   0.23 sec
+Lockstep Test Suite
+===================
+
+Running endian tests...
+  [PASS] Endian round-trip
+  [PASS] Endian write/read
+  [PASS] ByteReader/ByteWriter
+Running crc32c tests...
+  [PASS] CRC32C check vectors
+  [PASS] CRC32C incremental update
+  [PASS] CRC32C empty input
+Running checked_math tests...
+  [PASS] Checked addition
+  [PASS] Checked subtraction
+  [PASS] Checked multiplication
+  [PASS] Notional computation
+Running object_pool tests...
+  [PASS] Object pool allocate/deallocate
+  [PASS] Object pool exhaustion
+  [PASS] Object pool free list
+  [PASS] Object pool verification
+Running robin_hood_map tests...
+  [PASS] Robin Hood map insert/find
+  [PASS] Robin Hood map erase
+  [PASS] Robin Hood map collision
+  [PASS] Robin Hood map capacity
+  [PASS] Robin Hood map integrity
+Running spsc tests...
+  [PASS] SPSC basic transfer
+  [PASS] SPSC full/empty
+  [PASS] SPSC wraparound
+  [PASS] SPSC concurrent transfer
+Running order_book tests...
+  [PASS] Order book new order
+  [PASS] Order book matching
+  [PASS] Order book cancel
+  [PASS] Order book replace
+  [PASS] Order book not crossed
+Running order_book_detail tests...
+  [PASS] New resting order
+  [PASS] IOC order
+  [PASS] FOK order
+  [PASS] Priority ordering
+Running matching_engine tests...
+Running matching engine tests...
+  [PASS] Matching engine new order
+  [PASS] Matching engine sequencing
+  [PASS] Matching engine differential
+  [PASS] Matching engine invariants
+  [PASS] Matching engine kill switch
+Running risk_engine tests...
+  [PASS] Risk engine quantity limit
+  [PASS] Risk engine position limit
+  [PASS] Risk engine kill switch
+Running codec tests...
+  [PASS] Codec new order round-trip
+  [PASS] Codec frame header
+Running wal tests...
+  [PASS] WAL writer and reader lifecycle
+  [PASS] WAL empty file read
+Running snapshot tests...
+  [PASS] Snapshot empty engine
+  [PASS] Snapshot non-existent file handling
+Running differential tests...
+  [PASS] Seeded mixed workload
+  [PASS] Capacity exhaustion
+  [PASS] Invalid IDs and inputs
+  [PASS] All order policies (GTC, IOC, FOK, STP)
+Running network tests...
+Running network integration tests...
+  Testing TCP frame fragmentation...\n    [PASS] Frame fragmentation parsing\n  Testing TCP frame coalescing...
+    [PASS] Frame coalescing parsing
+  Testing malformed frames...
+    [PASS] Malformed frame rejection
+  Testing feed arbiter duplicate detection...
+    [PASS] Duplicate event handling
+  Testing feed arbiter gap detection...
+    [PASS] Gap detection
+  Testing feed arbiter redundant feed recovery...
+    [PASS] Redundant feed recovery
+  Testing feed arbiter snapshot recovery...
+    [PASS] Snapshot recovery
+  Testing feed arbiter session change detection...
+    [PASS] Session change detection
+  Testing TCP gateway creation...
+    [PASS] TCP gateway creation and binding
+  Testing frame round-trip encoding...
+    [PASS] Frame round-trip encoding
+All network integration tests passed!
+Running recovery tests...
+Assertion failed: cs1->openBuyQuantity == 60 at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/tests/recovery/test_recovery.cpp:97
+
+      Start  2: spsc
+ 2/19 Test  #2: spsc .............................   Passed    0.00 sec
+      Start  3: network
+ 3/19 Test  #3: network ..........................   Passed    0.00 sec
+      Start  4: udp
+ 4/19 Test  #4: udp ..............................Subprocess aborted***Exception:   0.01 sec
+Lockstep Test Suite
+===================
+
+Running udp tests...
+Assertion failed: ::bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0 at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/tests/network/test_udp.cpp:42
+
+      Start  5: endian
+ 5/19 Test  #5: endian ...........................   Passed    0.00 sec
+      Start  6: crc32c
+ 6/19 Test  #6: crc32c ...........................   Passed    0.00 sec
+      Start  7: checked_math
+ 7/19 Test  #7: checked_math .....................   Passed    0.00 sec
+      Start  8: object_pool
+ 8/19 Test  #8: object_pool ......................   Passed    0.00 sec
+      Start  9: robin_hood_map
+ 9/19 Test  #9: robin_hood_map ...................   Passed    0.00 sec
+      Start 10: order_book
+10/19 Test #10: order_book .......................   Passed    0.00 sec
+      Start 11: order_book_detail
+11/19 Test #11: order_book_detail ................   Passed    0.00 sec
+      Start 12: matching_engine
+12/19 Test #12: matching_engine ..................   Passed    0.00 sec
+      Start 13: risk_engine
+13/19 Test #13: risk_engine ......................   Passed    0.00 sec
+      Start 14: codec
+14/19 Test #14: codec ............................   Passed    0.00 sec
+      Start 15: wal
+15/19 Test #15: wal ..............................   Passed    0.00 sec
+      Start 16: snapshot
+16/19 Test #16: snapshot .........................   Passed    0.00 sec
+      Start 17: differential
+17/19 Test #17: differential .....................   Passed    0.00 sec
+      Start 18: recovery
+18/19 Test #18: recovery .........................Subprocess aborted***Exception:   0.02 sec
+Lockstep Test Suite
+===================
+
+Running recovery tests...
+Assertion failed: cs1->openBuyQuantity == 60 at /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/tests/recovery/test_recovery.cpp:97
+
+      Start 19: golden
+19/19 Test #19: golden ...........................   Passed    0.00 sec
+
+84% tests passed, 3 tests failed out of 19
+
+Total Test time (real) =   0.33 sec
+
+The following tests FAILED:
+	  1 - LockstepTests (Subprocess aborted)
+	  4 - udp (Subprocess aborted)
+	 18 - recovery (Subprocess aborted)
+Errors while running CTest

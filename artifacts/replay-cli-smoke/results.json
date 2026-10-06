@@ -1,0 +1,32 @@
+[
+  {
+    "case": "valid",
+    "command": [
+      "build-gcc-repair/lockstep_replay",
+      "artifacts/replay-cli-smoke/valid.bin"
+    ],
+    "exit_status": 0,
+    "stdout": "Applied WAL commands: 20\nRecovered command sequence: 20\nValid WAL bytes: 1488\nResting orders: 1\nMatches: 3\nEngine digest: 5188513973283158198\nRisk digest: 13575977106188758333\nRecoverable incomplete final tail: no\n",
+    "stderr": ""
+  },
+  {
+    "case": "corrupt",
+    "command": [
+      "build-gcc-repair/lockstep_replay",
+      "artifacts/replay-cli-smoke/corrupt.bin"
+    ],
+    "exit_status": 1,
+    "stdout": "",
+    "stderr": "Replay failed: WAL record CRC mismatch: computed=737838507 stored=3389420514\n"
+  },
+  {
+    "case": "torn",
+    "command": [
+      "build-gcc-repair/lockstep_replay",
+      "artifacts/replay-cli-smoke/torn.bin"
+    ],
+    "exit_status": 0,
+    "stdout": "Applied WAL commands: 20\nRecovered command sequence: 20\nValid WAL bytes: 1488\nResting orders: 1\nMatches: 3\nEngine digest: 5188513973283158198\nRisk digest: 13575977106188758333\nRecoverable incomplete final tail: yes\n",
+    "stderr": ""
+  }
+]

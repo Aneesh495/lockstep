@@ -1,0 +1,6 @@
+python3 tools/run_acceptance.py
+Acceptance: release: ['make', 'build', 'BUILD_DIR=build-acceptance-43777b266bb1', 'CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON']
+Acceptance: test: ['make', 'test', 'BUILD_DIR=build-acceptance-43777b266bb1-portable']
+Acceptance: sanitize: ['make', 'sanitize', 'BUILD_DIR=build-acceptance-43777b266bb1']
+Source changed during acceptance
+make: *** [acceptance] Error 1

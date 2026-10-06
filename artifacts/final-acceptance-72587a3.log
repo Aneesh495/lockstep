@@ -1,0 +1,8 @@
+python3 tools/run_acceptance.py
+Acceptance: release: ['make', 'build', 'BUILD_DIR=build-acceptance-72587a325a6b', 'CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON']
+Acceptance: test: ['make', 'test', 'BUILD_DIR=build-acceptance-72587a325a6b-portable']
+Acceptance: sanitize: ['make', 'sanitize', 'BUILD_DIR=build-acceptance-72587a325a6b']
+Acceptance: tsan: ['make', 'tsan', 'BUILD_DIR=build-acceptance-72587a325a6b']
+Acceptance: fuzz: ['make', 'fuzz-smoke', 'BUILD_DIR=build-acceptance-72587a325a6b']
+Source changed during acceptance
+make: *** [acceptance] Error 1

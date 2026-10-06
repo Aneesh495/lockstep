@@ -1,0 +1,132 @@
+{"command": ["make", "sanitize", "BUILD_DIR=build-acceptance-a7daee4136e7"]}
+=== Running AddressSanitizer and UBSan ===
+cmake -S . -B build-acceptance-a7daee4136e7-asan -G "Ninja" \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DLOCKSTEP_ENABLE_SANITIZERS=ON \
+		-DLOCKSTEP_BUILD_BENCHMARKS=OFF 
+-- The CXX compiler identification is AppleClang 21.0.0.21000334
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test HAVE_MCPU_NATIVE
+-- Performing Test HAVE_MCPU_NATIVE - Success
+-- 
+-- Lockstep Configuration Summary
+-- ================================
+-- Build type: Debug
+-- C++ Standard: 20
+-- Compiler: AppleClang 21.0.0.21000334
+-- System: Darwin arm64
+-- Native CPU flag: -mcpu=native
+-- Build tests: ON
+-- Build benchmarks: OFF
+-- Build apps: ON
+-- Enable sanitizers: ON
+-- Enable TSan: OFF
+-- Enable native: OFF
+-- 
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-a7daee4136e7-asan
+cmake --build build-acceptance-a7daee4136e7-asan --parallel
+[1/55] Building CXX object CMakeFiles/lockstep_core.dir/src/common/virtual_clock.cpp.o
+[2/55] Building CXX object CMakeFiles/lockstep_core.dir/src/common/crc32c.cpp.o
+[3/55] Building CXX object CMakeFiles/lockstep_core.dir/src/common/stable_digest.cpp.o
+[4/55] Building CXX object CMakeFiles/lockstep_core.dir/src/protocol/codec.cpp.o
+[5/55] Building CXX object CMakeFiles/lockstep_core.dir/src/persistence/wal.cpp.o
+[6/55] Building CXX object CMakeFiles/lockstep_core.dir/src/engine/order_book.cpp.o
+[7/55] Building CXX object CMakeFiles/lockstep_core.dir/src/risk/risk_engine.cpp.o
+[8/55] Building CXX object CMakeFiles/lockstep_core.dir/src/network/snapshot_client.cpp.o
+[9/55] Building CXX object CMakeFiles/lockstep_core.dir/src/engine/matching_engine.cpp.o
+[10/55] Building CXX object CMakeFiles/lockstep_core.dir/src/metrics/allocation_counter.cpp.o
+[11/55] Building CXX object CMakeFiles/lockstep_core.dir/src/engine/reference_book.cpp.o
+[12/55] Building CXX object CMakeFiles/lockstep_core.dir/src/metrics/histogram.cpp.o
+[13/55] Building CXX object CMakeFiles/lockstep_core.dir/src/persistence/recovery.cpp.o
+[14/55] Building CXX object CMakeFiles/lockstep_core.dir/src/network/tcp_gateway.cpp.o
+[15/55] Building CXX object CMakeFiles/lockstep_core.dir/src/network/feed_arbiter.cpp.o
+[16/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/test_runners.cpp.o
+[17/55] Building CXX object CMakeFiles/lockstep_core.dir/src/persistence/snapshot.cpp.o
+[18/55] Building CXX object CMakeFiles/lockstep_core.dir/src/network/udp_publisher.cpp.o
+[19/55] Building CXX object CMakeFiles/lockstep_core.dir/src/fault/fault_proxy.cpp.o
+[20/55] Building CXX object CMakeFiles/lockstep_core.dir/src/metrics/system_info.cpp.o
+[21/55] Linking CXX static library liblockstep_core.a
+[22/55] Building CXX object CMakeFiles/lockstep_client.dir/apps/lockstep_client.cpp.o
+[23/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_endian.cpp.o
+[24/55] Building CXX object CMakeFiles/lockstep_replay.dir/apps/lockstep_replay.cpp.o
+[25/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_crc32c.cpp.o
+[26/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/test_main.cpp.o
+[27/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_checked_math.cpp.o
+[28/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_object_pool.cpp.o
+[29/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_robin_hood_map.cpp.o
+[30/55] Building CXX object CMakeFiles/lockstep_demo.dir/apps/lockstep_demo.cpp.o
+[31/55] Building CXX object CMakeFiles/lockstep_exchange.dir/apps/lockstep_exchange.cpp.o
+[32/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_spsc_ring.cpp.o
+[33/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book.cpp.o
+[34/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_risk_engine.cpp.o
+[35/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book_detail.cpp.o
+[36/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_codec.cpp.o
+[37/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_wal.cpp.o
+[38/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_matching_engine.cpp.o
+[39/55] Linking CXX executable lockstep_exchange
+[40/55] Linking CXX executable lockstep_client
+[41/55] Linking CXX executable lockstep_demo
+[42/55] Linking CXX executable lockstep_replay
+[43/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/golden/test_golden.cpp.o
+[44/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/unit/test_snapshot.cpp.o
+[45/55] Building CXX object CMakeFiles/fuzz_frame_decoder.dir/fuzz/fuzz_frame_decoder.cpp.o
+[46/55] Linking CXX executable fuzz_frame_decoder
+[47/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/integration/test_network.cpp.o
+[48/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/recovery/test_recovery.cpp.o
+[49/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/network/test_udp.cpp.o
+[50/55] Building CXX object CMakeFiles/fuzz_wal_decoder.dir/fuzz/fuzz_wal_decoder.cpp.o
+[51/55] Linking CXX executable fuzz_wal_decoder
+[52/55] Building CXX object CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o
+[53/55] Building CXX object CMakeFiles/fuzz_snapshot_decoder.dir/fuzz/fuzz_snapshot_decoder.cpp.o
+[54/55] Linking CXX executable fuzz_snapshot_decoder
+[55/55] Linking CXX executable lockstep_tests
+cd build-acceptance-a7daee4136e7-asan && ctest --output-on-failure --no-tests=error
+Test project /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-acceptance-a7daee4136e7-asan
+      Start  1: LockstepTests
+ 1/19 Test  #1: LockstepTests ....................   Passed    2.58 sec
+      Start  2: spsc
+ 2/19 Test  #2: spsc .............................   Passed    0.02 sec
+      Start  3: network
+ 3/19 Test  #3: network ..........................   Passed    0.03 sec
+      Start  4: udp
+ 4/19 Test  #4: udp ..............................   Passed    0.03 sec
+      Start  5: endian
+ 5/19 Test  #5: endian ...........................   Passed    0.02 sec
+      Start  6: crc32c
+ 6/19 Test  #6: crc32c ...........................   Passed    0.02 sec
+      Start  7: checked_math
+ 7/19 Test  #7: checked_math .....................   Passed    0.02 sec
+      Start  8: object_pool
+ 8/19 Test  #8: object_pool ......................   Passed    0.02 sec
+      Start  9: robin_hood_map
+ 9/19 Test  #9: robin_hood_map ...................   Passed    0.02 sec
+      Start 10: order_book
+10/19 Test #10: order_book .......................   Passed    0.02 sec
+      Start 11: order_book_detail
+11/19 Test #11: order_book_detail ................   Passed    0.02 sec
+      Start 12: matching_engine
+12/19 Test #12: matching_engine ..................   Passed    0.02 sec
+      Start 13: risk_engine
+13/19 Test #13: risk_engine ......................   Passed    0.02 sec
+      Start 14: codec
+14/19 Test #14: codec ............................   Passed    0.02 sec
+      Start 15: wal
+15/19 Test #15: wal ..............................   Passed    0.02 sec
+      Start 16: snapshot
+16/19 Test #16: snapshot .........................   Passed    0.02 sec
+      Start 17: differential
+17/19 Test #17: differential .....................   Passed    2.19 sec
+      Start 18: recovery
+18/19 Test #18: recovery .........................   Passed    0.07 sec
+      Start 19: golden
+19/19 Test #19: golden ...........................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Total Test time (real) =   5.19 sec

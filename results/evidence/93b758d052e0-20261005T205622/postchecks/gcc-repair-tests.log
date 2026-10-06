@@ -1,0 +1,43 @@
+Test project /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-gcc-repair
+      Start  1: LockstepTests
+ 1/19 Test  #1: LockstepTests ....................   Passed    0.59 sec
+      Start  2: spsc
+ 2/19 Test  #2: spsc .............................   Passed    0.02 sec
+      Start  3: network
+ 3/19 Test  #3: network ..........................   Passed    0.02 sec
+      Start  4: udp
+ 4/19 Test  #4: udp ..............................   Passed    0.04 sec
+      Start  5: endian
+ 5/19 Test  #5: endian ...........................   Passed    0.02 sec
+      Start  6: crc32c
+ 6/19 Test  #6: crc32c ...........................   Passed    0.02 sec
+      Start  7: checked_math
+ 7/19 Test  #7: checked_math .....................   Passed    0.02 sec
+      Start  8: object_pool
+ 8/19 Test  #8: object_pool ......................   Passed    0.02 sec
+      Start  9: robin_hood_map
+ 9/19 Test  #9: robin_hood_map ...................   Passed    0.02 sec
+      Start 10: order_book
+10/19 Test #10: order_book .......................   Passed    0.02 sec
+      Start 11: order_book_detail
+11/19 Test #11: order_book_detail ................   Passed    0.02 sec
+      Start 12: matching_engine
+12/19 Test #12: matching_engine ..................   Passed    0.02 sec
+      Start 13: risk_engine
+13/19 Test #13: risk_engine ......................   Passed    0.02 sec
+      Start 14: codec
+14/19 Test #14: codec ............................   Passed    0.02 sec
+      Start 15: wal
+15/19 Test #15: wal ..............................   Passed    0.02 sec
+      Start 16: snapshot
+16/19 Test #16: snapshot .........................   Passed    0.02 sec
+      Start 17: differential
+17/19 Test #17: differential .....................   Passed    0.11 sec
+      Start 18: recovery
+18/19 Test #18: recovery .........................   Passed    0.03 sec
+      Start 19: golden
+19/19 Test #19: golden ...........................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Total Test time (real) =   1.07 sec

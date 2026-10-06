@@ -1,0 +1,2 @@
+{"command": ["/Library/Frameworks/Python.framework/Versions/3.14/bin/python3", "tools/check_headers.py", "--format-only", "--clang-format", "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/format-env/bin/clang-format"]}
+Formatted inputs checked: 82

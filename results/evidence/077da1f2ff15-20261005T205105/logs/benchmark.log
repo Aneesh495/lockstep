@@ -1,0 +1,11 @@
+{"command": ["build-acceptance-077da1f2ff15/lockstep_bench", "--output", "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/077da1f2ff15-20261005T205105/benchmark", "--repetitions", "10", "--operations", "1000000", "--latency-operations", "100000"]}
+Run 0: 3.35924e+07 commands/s; p99=83 ns; allocations=0
+Run 1: 4.978e+07 commands/s; p99=83 ns; allocations=0
+Run 2: 5.3133e+07 commands/s; p99=125 ns; allocations=0
+Run 3: 4.77764e+07 commands/s; p99=83 ns; allocations=0
+Run 4: 5.29755e+07 commands/s; p99=84 ns; allocations=0
+Run 5: 4.43869e+07 commands/s; p99=83 ns; allocations=0
+Run 6: 4.68768e+07 commands/s; p99=83 ns; allocations=0
+Run 7: 5.2068e+07 commands/s; p99=84 ns; allocations=0
+Run 8: 4.55692e+07 commands/s; p99=83 ns; allocations=0
+Run 9: 4.45725e+07 commands/s; p99=84 ns; allocations=0

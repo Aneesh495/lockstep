@@ -1,0 +1,34 @@
+python3 tools/make_report.py --verify
+{
+  "implementation_revision": "93b758d052e095176b465520f3d3d57b16e72da9",
+  "performance": {
+    "median_commands_per_second": 43794807.72829771,
+    "median_p99_ns": 84.0,
+    "max_p99_ns": 208,
+    "hot_path_allocations": 0,
+    "repetitions": 10,
+    "eligible": true
+  },
+  "fault_campaign": {
+    "logical_events": 100000000,
+    "events_applied": 99833680,
+    "snapshot_covered_events": 166320,
+    "state_comparisons": 10001476,
+    "mismatches": 0,
+    "eligible": true
+  },
+  "crash_campaign": {
+    "expected_corruption_rejections": 1000,
+    "interrupted_processes": 10000,
+    "restarted_processes": 10000,
+    "state_comparisons": 9000,
+    "successful_recoveries": 9000,
+    "trials_run": 10000,
+    "unexpected_failures": 0,
+    "eligible": true
+  },
+  "performance_bullet_eligible": true,
+  "resilience_bullet_eligible": true,
+  "hosted_ci_passed": true,
+  "all_targets_met": true
+}

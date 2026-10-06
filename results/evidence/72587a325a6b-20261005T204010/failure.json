@@ -1,0 +1,76 @@
+{
+  "commands": [
+    {
+      "commands": [
+        [
+          "make",
+          "build",
+          "BUILD_DIR=build-acceptance-72587a325a6b",
+          "CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON"
+        ]
+      ],
+      "duration_seconds": 14.71682258398505,
+      "exit_status": 0,
+      "log": "results/evidence/72587a325a6b-20261005T204010/logs/release.log",
+      "name": "release",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "test",
+          "BUILD_DIR=build-acceptance-72587a325a6b-portable"
+        ]
+      ],
+      "duration_seconds": 11.330068667011801,
+      "exit_status": 0,
+      "log": "results/evidence/72587a325a6b-20261005T204010/logs/test.log",
+      "name": "test",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "sanitize",
+          "BUILD_DIR=build-acceptance-72587a325a6b"
+        ]
+      ],
+      "duration_seconds": 17.277243082993664,
+      "exit_status": 0,
+      "log": "results/evidence/72587a325a6b-20261005T204010/logs/sanitize.log",
+      "name": "sanitize",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "tsan",
+          "BUILD_DIR=build-acceptance-72587a325a6b"
+        ]
+      ],
+      "duration_seconds": 10.376205208012834,
+      "exit_status": 0,
+      "log": "results/evidence/72587a325a6b-20261005T204010/logs/tsan.log",
+      "name": "tsan",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "fuzz-smoke",
+          "BUILD_DIR=build-acceptance-72587a325a6b"
+        ]
+      ],
+      "duration_seconds": 12.348855042015202,
+      "exit_status": 0,
+      "log": "results/evidence/72587a325a6b-20261005T204010/logs/fuzz.log",
+      "name": "fuzz",
+      "skipped": false
+    }
+  ],
+  "error": "Source changed during acceptance"
+}

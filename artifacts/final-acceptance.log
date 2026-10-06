@@ -1,0 +1,10 @@
+python3 tools/run_acceptance.py
+Acceptance: release: ['cmake', '-S', '.', '-B', 'build-acceptance', '-DCMAKE_BUILD_TYPE=Release', '-DLOCKSTEP_ENABLE_NATIVE=ON']
+Acceptance: release: ['cmake', '--build', 'build-acceptance', '--parallel']
+Acceptance: test: ['make', 'test', 'BUILD_DIR=build-acceptance-portable']
+Acceptance: sanitize: ['make', 'sanitize', 'BUILD_DIR=build-acceptance']
+Acceptance: tsan: ['make', 'tsan', 'BUILD_DIR=build-acceptance']
+Acceptance: fuzz: ['make', 'fuzz-smoke', 'BUILD_DIR=build-acceptance']
+Acceptance: demo: ['make', 'demo', 'BUILD_DIR=build-acceptance']
+demo failed with exit 2; log: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/d6badbd14d56-20261005T161257/logs/demo.log
+make: *** [acceptance] Error 1

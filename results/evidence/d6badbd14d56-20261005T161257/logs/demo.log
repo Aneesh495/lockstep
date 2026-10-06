@@ -1,0 +1,7 @@
+{"command": ["make", "demo", "BUILD_DIR=build-acceptance"]}
+=== Configuring Lockstep ===
+cmake -S . -B build-acceptance -G "Ninja" -DCMAKE_BUILD_TYPE=Release 
+CMake Error: Error: generator : Ninja
+Does not match the generator used previously: Unix Makefiles
+Either remove the CMakeCache.txt file and CMakeFiles directory or choose a different binary directory.
+make[1]: *** [configure] Error 1

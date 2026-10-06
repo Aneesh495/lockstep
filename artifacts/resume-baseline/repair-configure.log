@@ -1,0 +1,18 @@
+-- 
+-- Lockstep Configuration Summary
+-- ================================
+-- Build type: Release
+-- C++ Standard: 20
+-- Compiler: AppleClang 21.0.0.21000334
+-- System: Darwin arm64
+-- Native CPU flag: -mcpu=native
+-- Build tests: ON
+-- Build benchmarks: ON
+-- Build apps: ON
+-- Enable sanitizers: OFF
+-- Enable TSan: OFF
+-- Enable native: OFF
+-- 
+-- Configuring done (0.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/build-baseline

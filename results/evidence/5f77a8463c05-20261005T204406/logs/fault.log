@@ -1,0 +1,2 @@
+{"command": ["build-acceptance-5f77a8463c05/lockstep_fault_stress", "--events", "100000000", "--shards", "4", "--seed", "12345", "--output", "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/5f77a8463c05-20261005T204406/stress"]}
+PASS: 100000000 logical events, 10001476 comparisons, 0 mismatches

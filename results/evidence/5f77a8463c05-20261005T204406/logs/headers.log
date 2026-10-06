@@ -1,0 +1,2 @@
+{"command": ["/Library/Frameworks/Python.framework/Versions/3.14/bin/python3", "tools/check_headers.py", "--compiler", "c++"]}
+Standalone headers compiled: 31

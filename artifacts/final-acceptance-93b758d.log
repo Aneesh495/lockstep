@@ -1,0 +1,45 @@
+python3 tools/run_acceptance.py
+Acceptance: release: ['make', 'build', 'BUILD_DIR=build-acceptance-93b758d052e0', 'CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON']
+Acceptance: test: ['make', 'test', 'BUILD_DIR=build-acceptance-93b758d052e0-portable']
+Acceptance: sanitize: ['make', 'sanitize', 'BUILD_DIR=build-acceptance-93b758d052e0']
+Acceptance: tsan: ['make', 'tsan', 'BUILD_DIR=build-acceptance-93b758d052e0']
+Acceptance: fuzz: ['make', 'fuzz-smoke', 'BUILD_DIR=build-acceptance-93b758d052e0']
+Acceptance: demo: ['make', 'demo', 'BUILD_DIR=build-acceptance-93b758d052e0']
+Acceptance: headers: ['/Library/Frameworks/Python.framework/Versions/3.14/bin/python3', 'tools/check_headers.py', '--compiler', 'c++']
+Acceptance: format: ['/Library/Frameworks/Python.framework/Versions/3.14/bin/python3', 'tools/check_headers.py', '--format-only', '--clang-format', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/format-env/bin/clang-format']
+Acceptance: benchmark: ['build-acceptance-93b758d052e0/lockstep_bench', '--output', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/93b758d052e0-20261005T205622/benchmark', '--repetitions', '10', '--operations', '1000000', '--latency-operations', '100000']
+Acceptance: fault: ['build-acceptance-93b758d052e0/lockstep_fault_stress', '--events', '100000000', '--shards', '4', '--seed', '12345', '--output', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/93b758d052e0-20261005T205622/stress']
+Acceptance: crash: ['build-acceptance-93b758d052e0/lockstep_crash_matrix', '--trials', '10000', '--seed', '12345', '--output', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/93b758d052e0-20261005T205622/stress']
+{
+  "implementation_revision": "93b758d052e095176b465520f3d3d57b16e72da9",
+  "performance": {
+    "median_commands_per_second": 43794807.72829771,
+    "median_p99_ns": 84.0,
+    "max_p99_ns": 208,
+    "hot_path_allocations": 0,
+    "repetitions": 10,
+    "eligible": true
+  },
+  "fault_campaign": {
+    "logical_events": 100000000,
+    "events_applied": 99833680,
+    "snapshot_covered_events": 166320,
+    "state_comparisons": 10001476,
+    "mismatches": 0,
+    "eligible": true
+  },
+  "crash_campaign": {
+    "expected_corruption_rejections": 1000,
+    "interrupted_processes": 10000,
+    "restarted_processes": 10000,
+    "state_comparisons": 9000,
+    "successful_recoveries": 9000,
+    "trials_run": 10000,
+    "unexpected_failures": 0,
+    "eligible": true
+  },
+  "performance_bullet_eligible": true,
+  "resilience_bullet_eligible": true,
+  "hosted_ci_passed": true,
+  "all_targets_met": true
+}

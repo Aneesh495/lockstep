@@ -1,0 +1,105 @@
+{
+  "commands": [
+    {
+      "commands": [
+        [
+          "make",
+          "build",
+          "BUILD_DIR=build-acceptance-a7daee4136e7",
+          "CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON"
+        ]
+      ],
+      "duration_seconds": 12.240861332975328,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/release.log",
+      "name": "release",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "test",
+          "BUILD_DIR=build-acceptance-a7daee4136e7-portable"
+        ]
+      ],
+      "duration_seconds": 11.490412541956175,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/test.log",
+      "name": "test",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "sanitize",
+          "BUILD_DIR=build-acceptance-a7daee4136e7"
+        ]
+      ],
+      "duration_seconds": 16.747472334012855,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/sanitize.log",
+      "name": "sanitize",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "tsan",
+          "BUILD_DIR=build-acceptance-a7daee4136e7"
+        ]
+      ],
+      "duration_seconds": 9.880671209015418,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/tsan.log",
+      "name": "tsan",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "fuzz-smoke",
+          "BUILD_DIR=build-acceptance-a7daee4136e7"
+        ]
+      ],
+      "duration_seconds": 13.458002917002887,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/fuzz.log",
+      "name": "fuzz",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "demo",
+          "BUILD_DIR=build-acceptance-a7daee4136e7"
+        ]
+      ],
+      "duration_seconds": 0.3034735830151476,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/demo.log",
+      "name": "demo",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+          "tools/check_headers.py",
+          "--compiler",
+          "c++"
+        ]
+      ],
+      "duration_seconds": 9.528170707984827,
+      "exit_status": 0,
+      "log": "results/evidence/a7daee4136e7-20261005T204142/logs/headers.log",
+      "name": "headers",
+      "skipped": false
+    }
+  ],
+  "error": "Source changed during acceptance"
+}

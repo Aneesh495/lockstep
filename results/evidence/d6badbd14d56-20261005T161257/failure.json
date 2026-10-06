@@ -1,0 +1,99 @@
+{
+  "commands": [
+    {
+      "commands": [
+        [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-acceptance",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DLOCKSTEP_ENABLE_NATIVE=ON"
+        ],
+        [
+          "cmake",
+          "--build",
+          "build-acceptance",
+          "--parallel"
+        ]
+      ],
+      "duration_seconds": 16.093787833000533,
+      "exit_status": 0,
+      "log": "results/evidence/d6badbd14d56-20261005T161257/logs/release.log",
+      "name": "release",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "test",
+          "BUILD_DIR=build-acceptance-portable"
+        ]
+      ],
+      "duration_seconds": 14.95181291695917,
+      "exit_status": 0,
+      "log": "results/evidence/d6badbd14d56-20261005T161257/logs/test.log",
+      "name": "test",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "sanitize",
+          "BUILD_DIR=build-acceptance"
+        ]
+      ],
+      "duration_seconds": 17.53387179103447,
+      "exit_status": 0,
+      "log": "results/evidence/d6badbd14d56-20261005T161257/logs/sanitize.log",
+      "name": "sanitize",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "tsan",
+          "BUILD_DIR=build-acceptance"
+        ]
+      ],
+      "duration_seconds": 11.247659582993947,
+      "exit_status": 0,
+      "log": "results/evidence/d6badbd14d56-20261005T161257/logs/tsan.log",
+      "name": "tsan",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "fuzz-smoke",
+          "BUILD_DIR=build-acceptance"
+        ]
+      ],
+      "duration_seconds": 22.29657387500629,
+      "exit_status": 0,
+      "log": "results/evidence/d6badbd14d56-20261005T161257/logs/fuzz.log",
+      "name": "fuzz",
+      "skipped": false
+    },
+    {
+      "commands": [
+        [
+          "make",
+          "demo",
+          "BUILD_DIR=build-acceptance"
+        ]
+      ],
+      "duration_seconds": 0.02822916698642075,
+      "exit_status": 2,
+      "log": "results/evidence/d6badbd14d56-20261005T161257/logs/demo.log",
+      "name": "demo",
+      "skipped": false
+    }
+  ],
+  "error": "demo failed with exit 2; log: /Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/d6badbd14d56-20261005T161257/logs/demo.log"
+}

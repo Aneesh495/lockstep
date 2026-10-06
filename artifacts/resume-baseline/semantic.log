@@ -1,0 +1,21 @@
+Lockstep Test Suite
+===================
+
+Running recovery tests...
+  [PASS] Two commands regression fixture
+  [PASS] Snapshot save and restore
+  [PASS] Snapshot plus subsequent WAL replay
+  [PASS] Replay twice deterministic
+  [PASS] Recovery followed by new trading
+  [PASS] Corrupt checksum rejected
+  [PASS] Invalid magic rejected
+  [PASS] WAL sequence anomalies rejected
+  [PASS] Torn final tail recoverable
+  [PASS] Corrupt snapshot rejected
+Running differential tests...
+  [PASS] Seeded mixed workload
+  [PASS] Capacity exhaustion
+  [PASS] Invalid IDs and inputs
+  [PASS] All order policies (GTC, IOC, FOK, STP)
+
+All selected tests passed!

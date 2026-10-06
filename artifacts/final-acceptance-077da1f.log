@@ -1,0 +1,13 @@
+python3 tools/run_acceptance.py
+Acceptance: release: ['make', 'build', 'BUILD_DIR=build-acceptance-077da1f2ff15', 'CMAKE_FLAGS=-DLOCKSTEP_ENABLE_NATIVE=ON']
+Acceptance: test: ['make', 'test', 'BUILD_DIR=build-acceptance-077da1f2ff15-portable']
+Acceptance: sanitize: ['make', 'sanitize', 'BUILD_DIR=build-acceptance-077da1f2ff15']
+Acceptance: tsan: ['make', 'tsan', 'BUILD_DIR=build-acceptance-077da1f2ff15']
+Acceptance: fuzz: ['make', 'fuzz-smoke', 'BUILD_DIR=build-acceptance-077da1f2ff15']
+Acceptance: demo: ['make', 'demo', 'BUILD_DIR=build-acceptance-077da1f2ff15']
+Acceptance: headers: ['/Library/Frameworks/Python.framework/Versions/3.14/bin/python3', 'tools/check_headers.py', '--compiler', 'c++']
+Acceptance: format: ['/Library/Frameworks/Python.framework/Versions/3.14/bin/python3', 'tools/check_headers.py', '--format-only', '--clang-format', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/format-env/bin/clang-format']
+Acceptance: benchmark: ['build-acceptance-077da1f2ff15/lockstep_bench', '--output', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/077da1f2ff15-20261005T205105/benchmark', '--repetitions', '10', '--operations', '1000000', '--latency-operations', '100000']
+Acceptance: fault: ['build-acceptance-077da1f2ff15/lockstep_fault_stress', '--events', '100000000', '--shards', '4', '--seed', '12345', '--output', '/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/077da1f2ff15-20261005T205105/stress']
+Source changed during acceptance
+make: *** [acceptance] Error 1

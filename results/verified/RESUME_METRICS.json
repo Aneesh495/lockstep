@@ -1,0 +1,33 @@
+{
+  "all_targets_met": true,
+  "crash_campaign": {
+    "eligible": true,
+    "expected_corruption_rejections": 1000,
+    "interrupted_processes": 10000,
+    "restarted_processes": 10000,
+    "state_comparisons": 9000,
+    "successful_recoveries": 9000,
+    "trials_run": 10000,
+    "unexpected_failures": 0
+  },
+  "fault_campaign": {
+    "eligible": true,
+    "events_applied": 99833680,
+    "logical_events": 100000000,
+    "mismatches": 0,
+    "snapshot_covered_events": 166320,
+    "state_comparisons": 10001476
+  },
+  "hosted_ci_passed": true,
+  "implementation_revision": "93b758d052e095176b465520f3d3d57b16e72da9",
+  "performance": {
+    "eligible": true,
+    "hot_path_allocations": 0,
+    "max_p99_ns": 208,
+    "median_commands_per_second": 43794807.72829771,
+    "median_p99_ns": 84.0,
+    "repetitions": 10
+  },
+  "performance_bullet_eligible": true,
+  "resilience_bullet_eligible": true
+}

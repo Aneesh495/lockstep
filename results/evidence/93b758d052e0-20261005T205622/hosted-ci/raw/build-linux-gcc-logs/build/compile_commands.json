@@ -1,0 +1,302 @@
+[
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/common/crc32c.cpp.o -c /home/runner/work/lockstep/lockstep/src/common/crc32c.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/common/crc32c.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/common/crc32c.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/common/stable_digest.cpp.o -c /home/runner/work/lockstep/lockstep/src/common/stable_digest.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/common/stable_digest.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/common/stable_digest.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/common/virtual_clock.cpp.o -c /home/runner/work/lockstep/lockstep/src/common/virtual_clock.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/common/virtual_clock.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/common/virtual_clock.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/protocol/codec.cpp.o -c /home/runner/work/lockstep/lockstep/src/protocol/codec.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/protocol/codec.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/protocol/codec.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/engine/order_book.cpp.o -c /home/runner/work/lockstep/lockstep/src/engine/order_book.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/engine/order_book.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/engine/order_book.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/engine/reference_book.cpp.o -c /home/runner/work/lockstep/lockstep/src/engine/reference_book.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/engine/reference_book.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/engine/reference_book.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/engine/matching_engine.cpp.o -c /home/runner/work/lockstep/lockstep/src/engine/matching_engine.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/engine/matching_engine.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/engine/matching_engine.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/risk/risk_engine.cpp.o -c /home/runner/work/lockstep/lockstep/src/risk/risk_engine.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/risk/risk_engine.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/risk/risk_engine.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/persistence/wal.cpp.o -c /home/runner/work/lockstep/lockstep/src/persistence/wal.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/persistence/wal.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/persistence/wal.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/persistence/snapshot.cpp.o -c /home/runner/work/lockstep/lockstep/src/persistence/snapshot.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/persistence/snapshot.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/persistence/snapshot.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/persistence/recovery.cpp.o -c /home/runner/work/lockstep/lockstep/src/persistence/recovery.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/persistence/recovery.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/persistence/recovery.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/network/tcp_gateway.cpp.o -c /home/runner/work/lockstep/lockstep/src/network/tcp_gateway.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/network/tcp_gateway.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/network/tcp_gateway.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/network/udp_publisher.cpp.o -c /home/runner/work/lockstep/lockstep/src/network/udp_publisher.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/network/udp_publisher.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/network/udp_publisher.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/network/feed_arbiter.cpp.o -c /home/runner/work/lockstep/lockstep/src/network/feed_arbiter.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/network/feed_arbiter.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/network/feed_arbiter.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/network/snapshot_client.cpp.o -c /home/runner/work/lockstep/lockstep/src/network/snapshot_client.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/network/snapshot_client.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/network/snapshot_client.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/fault/fault_proxy.cpp.o -c /home/runner/work/lockstep/lockstep/src/fault/fault_proxy.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/fault/fault_proxy.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/fault/fault_proxy.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/metrics/histogram.cpp.o -c /home/runner/work/lockstep/lockstep/src/metrics/histogram.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/metrics/histogram.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/metrics/histogram.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/metrics/allocation_counter.cpp.o -c /home/runner/work/lockstep/lockstep/src/metrics/allocation_counter.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/metrics/allocation_counter.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/metrics/allocation_counter.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -O3 -DNDEBUG -o CMakeFiles/lockstep_core.dir/src/metrics/system_info.cpp.o -c /home/runner/work/lockstep/lockstep/src/metrics/system_info.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/src/metrics/system_info.cpp",
+  "output": "CMakeFiles/lockstep_core.dir/src/metrics/system_info.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_exchange.dir/apps/lockstep_exchange.cpp.o -c /home/runner/work/lockstep/lockstep/apps/lockstep_exchange.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/apps/lockstep_exchange.cpp",
+  "output": "CMakeFiles/lockstep_exchange.dir/apps/lockstep_exchange.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_client.dir/apps/lockstep_client.cpp.o -c /home/runner/work/lockstep/lockstep/apps/lockstep_client.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/apps/lockstep_client.cpp",
+  "output": "CMakeFiles/lockstep_client.dir/apps/lockstep_client.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_demo.dir/apps/lockstep_demo.cpp.o -c /home/runner/work/lockstep/lockstep/apps/lockstep_demo.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/apps/lockstep_demo.cpp",
+  "output": "CMakeFiles/lockstep_demo.dir/apps/lockstep_demo.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_replay.dir/apps/lockstep_replay.cpp.o -c /home/runner/work/lockstep/lockstep/apps/lockstep_replay.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/apps/lockstep_replay.cpp",
+  "output": "CMakeFiles/lockstep_replay.dir/apps/lockstep_replay.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/test_main.cpp.o -c /home/runner/work/lockstep/lockstep/tests/test_main.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/test_main.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/test_main.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/test_runners.cpp.o -c /home/runner/work/lockstep/lockstep/tests/test_runners.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/test_runners.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/test_runners.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_endian.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_endian.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_endian.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_endian.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_crc32c.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_crc32c.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_crc32c.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_crc32c.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_checked_math.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_checked_math.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_checked_math.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_checked_math.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_object_pool.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_object_pool.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_object_pool.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_object_pool.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_robin_hood_map.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_robin_hood_map.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_robin_hood_map.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_robin_hood_map.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_spsc_ring.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_spsc_ring.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_spsc_ring.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_spsc_ring.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_order_book.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_order_book.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book_detail.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_order_book_detail.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_order_book_detail.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_order_book_detail.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_matching_engine.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_matching_engine.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_matching_engine.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_matching_engine.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_risk_engine.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_risk_engine.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_risk_engine.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_risk_engine.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_codec.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_codec.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_codec.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_codec.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_wal.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_wal.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_wal.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_wal.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/unit/test_snapshot.cpp.o -c /home/runner/work/lockstep/lockstep/tests/unit/test_snapshot.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/unit/test_snapshot.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/unit/test_snapshot.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o -c /home/runner/work/lockstep/lockstep/tests/property/test_differential.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/property/test_differential.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/property/test_differential.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/integration/test_network.cpp.o -c /home/runner/work/lockstep/lockstep/tests/integration/test_network.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/integration/test_network.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/integration/test_network.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/recovery/test_recovery.cpp.o -c /home/runner/work/lockstep/lockstep/tests/recovery/test_recovery.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/recovery/test_recovery.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/recovery/test_recovery.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/network/test_udp.cpp.o -c /home/runner/work/lockstep/lockstep/tests/network/test_udp.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/network/test_udp.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/network/test_udp.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -UNDEBUG -o CMakeFiles/lockstep_tests.dir/tests/golden/test_golden.cpp.o -c /home/runner/work/lockstep/lockstep/tests/golden/test_golden.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/tests/golden/test_golden.cpp",
+  "output": "CMakeFiles/lockstep_tests.dir/tests/golden/test_golden.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_bench.dir/bench/lockstep_bench.cpp.o -c /home/runner/work/lockstep/lockstep/bench/lockstep_bench.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/bench/lockstep_bench.cpp",
+  "output": "CMakeFiles/lockstep_bench.dir/bench/lockstep_bench.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_bench.dir/bench/allocation_probe.cpp.o -c /home/runner/work/lockstep/lockstep/bench/allocation_probe.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/bench/allocation_probe.cpp",
+  "output": "CMakeFiles/lockstep_bench.dir/bench/allocation_probe.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_fault_stress.dir/bench/lockstep_fault_stress.cpp.o -c /home/runner/work/lockstep/lockstep/bench/lockstep_fault_stress.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/bench/lockstep_fault_stress.cpp",
+  "output": "CMakeFiles/lockstep_fault_stress.dir/bench/lockstep_fault_stress.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o -c /home/runner/work/lockstep/lockstep/bench/lockstep_crash_matrix.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/bench/lockstep_crash_matrix.cpp",
+  "output": "CMakeFiles/lockstep_crash_matrix.dir/bench/lockstep_crash_matrix.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/fuzz_frame_decoder.dir/fuzz/fuzz_frame_decoder.cpp.o -c /home/runner/work/lockstep/lockstep/fuzz/fuzz_frame_decoder.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/fuzz/fuzz_frame_decoder.cpp",
+  "output": "CMakeFiles/fuzz_frame_decoder.dir/fuzz/fuzz_frame_decoder.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/fuzz_wal_decoder.dir/fuzz/fuzz_wal_decoder.cpp.o -c /home/runner/work/lockstep/lockstep/fuzz/fuzz_wal_decoder.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/fuzz/fuzz_wal_decoder.cpp",
+  "output": "CMakeFiles/fuzz_wal_decoder.dir/fuzz/fuzz_wal_decoder.cpp.o"
+},
+{
+  "directory": "/home/runner/work/lockstep/lockstep/build",
+  "command": "/usr/bin/g++ -I/home/runner/work/lockstep/lockstep/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wdouble-promotion -Wformat=2 -Wuninitialized -Wold-style-cast -Wnull-dereference -Woverloaded-virtual -Wnon-virtual-dtor -Wcast-align -Wunused -Wmissing-include-dirs -Wno-unused-parameter -o CMakeFiles/fuzz_snapshot_decoder.dir/fuzz/fuzz_snapshot_decoder.cpp.o -c /home/runner/work/lockstep/lockstep/fuzz/fuzz_snapshot_decoder.cpp",
+  "file": "/home/runner/work/lockstep/lockstep/fuzz/fuzz_snapshot_decoder.cpp",
+  "output": "CMakeFiles/fuzz_snapshot_decoder.dir/fuzz/fuzz_snapshot_decoder.cpp.o"
+}
+]

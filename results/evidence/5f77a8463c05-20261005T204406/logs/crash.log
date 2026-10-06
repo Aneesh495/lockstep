@@ -1,0 +1,12 @@
+{"command": ["build-acceptance-5f77a8463c05/lockstep_crash_matrix", "--trials", "10000", "--seed", "12345", "--output", "/Users/aneeshkrishna/Documents/Codex/2026-10-05/v/work/lockstep/results/evidence/5f77a8463c05-20261005T204406/stress"]}
+1000 real interrupted/restarted trials
+2000 real interrupted/restarted trials
+3000 real interrupted/restarted trials
+4000 real interrupted/restarted trials
+5000 real interrupted/restarted trials
+6000 real interrupted/restarted trials
+7000 real interrupted/restarted trials
+8000 real interrupted/restarted trials
+9000 real interrupted/restarted trials
+10000 real interrupted/restarted trials
+PASS: 10000 trials, 9000 recoveries, 1000 expected rejections, 0 unexpected failures
