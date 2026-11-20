@@ -11,6 +11,7 @@
 #include "lockstep/common/crc32c.hpp"
 #include "lockstep/protocol/codec.hpp"
 #include "lockstep/protocol/frame.hpp"
+#include "port_argument.hpp"
 
 using namespace lockstep;
 namespace {
@@ -86,11 +87,11 @@ int main(int argc, char** argv) {
     uint16_t port = 9999;
     if (argc == 2) {
         try {
-            const auto value = std::stoul(argv[1]);
-            if (value == 0 || value > 65535)
+            port = parseNetworkPort(argv[1]);
+            if (port == 0)
                 return 1;
-            port = static_cast<uint16_t>(value);
-        } catch (const std::exception&) {
+        } catch (const std::exception& e) {
+            std::cerr << e.what() << '\n';
             return 1;
         }
     } else if (argc != 1) {
