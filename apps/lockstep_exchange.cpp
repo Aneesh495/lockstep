@@ -8,6 +8,7 @@
 #include "lockstep/network/udp_publisher.hpp"
 #include "lockstep/persistence/recovery.hpp"
 #include "lockstep/protocol/codec.hpp"
+#include "port_argument.hpp"
 using namespace lockstep;
 namespace {
 volatile std::sig_atomic_t running = 1;
@@ -51,11 +52,11 @@ int main(int argc, char** argv) {
             if (arg == "--state-dir")
                 state = value;
             else if (arg == "--tcp-port")
-                tcp = static_cast<uint16_t>(std::stoul(value));
+                tcp = parseNetworkPort(value);
             else if (arg == "--udp-a")
-                a = static_cast<uint16_t>(std::stoul(value));
+                a = parseNetworkPort(value);
             else if (arg == "--udp-b")
-                b = static_cast<uint16_t>(std::stoul(value));
+                b = parseNetworkPort(value);
             else
                 throw std::invalid_argument("Unknown exchange option");
         }

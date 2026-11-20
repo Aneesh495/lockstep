@@ -16,13 +16,13 @@ and the fault story from the docs and harnesses alone.
 
 ```
                  +------------------+
-            +--->| UDP Feed A :5001 |
+            +--->| UDP Feed A :10001|
             |    +------------------+
  Clients    |    +--------+
- (TCP:8080)-+--->| Match  |---- WAL / snapshots
+ (TCP:9999)-+--->| Match  |---- WAL / snapshots
             |    | Engine |
             |    +--------+
-            +--->| UDP Feed B :5002 |
+            +--->| UDP Feed B :10002|
                  +------------------+
                       |
                       v
@@ -75,7 +75,7 @@ make demo
 ```
 
 ```bash
-./build/lockstep_exchange   # TCP 8080; UDP 5001 / 5002
+./build/lockstep_exchange   # TCP 9999, UDP 10001 and 10002
 ./build/lockstep_client
 ```
 

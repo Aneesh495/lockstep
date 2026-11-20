@@ -177,6 +177,12 @@ if(LOCKSTEP_BUILD_TESTS)
     add_test(NAME differential COMMAND lockstep_tests differential)
     add_test(NAME recovery COMMAND lockstep_tests recovery)
     add_test(NAME golden COMMAND lockstep_tests golden)
+    if(LOCKSTEP_BUILD_APPS)
+        add_test(NAME cli_ports COMMAND "${CMAKE_COMMAND}"
+            "-DEXCHANGE=$<TARGET_FILE:lockstep_exchange>"
+            "-DCLIENT=$<TARGET_FILE:lockstep_client>"
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/cli_ports.cmake")
+    endif()
     set_tests_properties(LockstepTests spsc network udp endian crc32c checked_math object_pool robin_hood_map order_book order_book_detail matching_engine risk_engine codec wal snapshot differential recovery golden PROPERTIES TIMEOUT 300)
 endif()
 
